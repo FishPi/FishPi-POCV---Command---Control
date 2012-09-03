@@ -27,10 +27,9 @@ class FishPiConfig:
         pass
 
     def configure_devices(self):
-        print "Configuring i2c devices..."
-       
         # TEMP only run i2c scan on Linux and adafruit distro
         if platform.system() == "Linux" and "adafruit" in platform.release():
+            print "Configuring i2c devices..."
             # scan for connected devices
             i2cAddresses = self.scan_i2c()
 
@@ -38,7 +37,8 @@ class FishPiConfig:
             for addr, in_use in i2cAddresses:
                 device_name, device_driver = self.lookup(addr)
                 self.devices.append([addr, device_name, device_driver, in_use])
-
+        else:
+            print "Not running on Adafruit Raspberry Pi distro. Not configuring devices."
 
     def lookup(self, addr):
         # lookup available device drivers by address
