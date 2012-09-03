@@ -14,6 +14,7 @@
 #
 
 import os
+import platform
 import subprocess
 
 #from Adafruit_I2C import Adafruit_I2C
@@ -28,13 +29,15 @@ class FishPiConfig:
     def configure_devices(self):
         print "Configuring i2c devices..."
        
-        # scan for connected devices
-        i2cAddresses = self.scan_i2c()
+        # TEMP only run i2c scan on Linux and adafruit distro
+        if platform.system() == "Linux" and "adafruit" in platform.release():
+            # scan for connected devices
+            i2cAddresses = self.scan_i2c()
 
-        # lookup available device drivers by address
-        for addr, in_use in i2cAddresses:
-            device_name, device_driver = self.lookup(addr)
-            self.devices.append([addr, device_name, device_driver, in_use])
+            # lookup available device drivers by address
+            for addr, in_use in i2cAddresses:
+                device_name, device_driver = self.lookup(addr)
+                self.devices.append([addr, device_name, device_driver, in_use])
 
 
     def lookup(self, addr):
