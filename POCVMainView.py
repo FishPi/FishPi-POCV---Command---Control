@@ -1,12 +1,19 @@
-#!/usr/bin/python
 
 from Tkinter import *
 from PIL import Image, ImageTk
 
+from POCVMainViewController import *
+
+root = 0
+controller = 0
+
 class Main:
 
-	def __init__(self,master):
-		self.frm_geo = MapFrame(master)
+	def __init__(self,master,view_controller):
+                root = master
+                controller = view_controller
+
+                self.frm_geo = MapFrame(master)
 	        self.frm_geo.pack(fill=X)
 	
 	      	self.frm_controls = Frame(master,bd=1,relief=GROOVE)
@@ -118,14 +125,4 @@ class CameraFrame(Frame,object):
 		self.cnvs_camera.create_image((0,0),image=photo,anchor=NW)
 		self.image=photo
         	self.cnvs_camera.pack(fill=BOTH)
-
-
-root = Tk()
-
-root.minsize(800,600)
-root.maxsize(800,600)
-
-app = Main(root)
-
-root.mainloop()
 
