@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from Tkinter import *
 from PIL import Image, ImageTk
 
