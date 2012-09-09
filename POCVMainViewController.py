@@ -15,11 +15,20 @@
 from time import localtime
 
 from FishPiConfig import FishPiConfig
+from CameraController import CameraController
+from DriveController import DriveController
+from NavigationUnit import NavigationUnit
+from PerceptionUnit import PerceptionUnit
 
 class POCVMainViewController:
 
     def __init__(self, configuration):
         self.config = configuration
+        
+        self.cameraController = CameraController()
+        self.driveController = DriveController()
+        self.navigationUnit = NavigationUnit()
+        self.perceptionUnit = PerceptionUnit()
 
     # Devices
 
@@ -43,4 +52,7 @@ class POCVMainViewController:
 
 
     # Route Planning and Navigation
+
+
+    # 
 
