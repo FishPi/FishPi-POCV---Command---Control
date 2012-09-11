@@ -2,8 +2,6 @@
 #
 # FishPi - An autonomous drop in the ocean
 #
-
-#
 # View Controller for POCV MainView
 #  - control logic split out from UI, providing:
 #    - access to device configuration and drivers
@@ -21,14 +19,16 @@ from NavigationUnit import NavigationUnit
 from PerceptionUnit import PerceptionUnit
 
 class POCVMainViewController:
-
+    """ Coordinator between UI and main control layers. """
+    
     def __init__(self, configuration):
         self.config = configuration
         
+        # setup coordinating
         self.cameraController = CameraController()
         self.driveController = DriveController()
-        self.navigationUnit = NavigationUnit()
         self.perceptionUnit = PerceptionUnit()
+        self.navigationUnit = NavigationUnit(self.driveController, self.perceptionUnit)
 
     # Devices
 
@@ -37,7 +37,8 @@ class POCVMainViewController:
             print device
 
     # Control Systems
-
+    # temporary direct access to DriveController to test hardware.
+    # ...
 
     # Sensors
 
@@ -53,6 +54,12 @@ class POCVMainViewController:
 
     # Route Planning and Navigation
 
+    def navigateTo(self):
+        """ Commands the NavigationUnit to commence navigation of a route. """
+        #self.navigationUnit.NavigateTo(route)
+        pass
 
-    # 
+    def halt(self):
+        """ Commands the NavigationUnit to Halt! """
+        self.navigationUnit.Halt()
 

@@ -2,8 +2,6 @@
 #
 # FishPi - An autonomous drop in the ocean
 #
-
-#
 # Drive Controller
 #  - provides interface for drive and steering control
 #
