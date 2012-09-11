@@ -1,5 +1,5 @@
-FishPi ProofOfConceptVehicle
-============================
+FishPi Proof-Of-Concept-Vehicle
+===============================
 
 This github repo contains the software for the FishPi POCV.
 
@@ -11,10 +11,10 @@ FishPi is an autonomous marine vessel being developed with the aim of crossing t
 Software
 --------
 
-The FishPi software is being developed in python 2.7 inline with the educational aims of the RaspberryPi.
+The FishPi software is being developed in python 2.7 inline with the educational aims of the Raspberry Pi.
 
 ### Usage
 
-Start the software by running './fishpi.py'
+Start the software by running `./fishpi.py`
 
 
