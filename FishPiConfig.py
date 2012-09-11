@@ -2,8 +2,6 @@
 #
 # FishPi - An autonomous drop in the ocean
 #
-
-#
 # Configuration for:
 #  - loading i2c devices and driver code
 #  - user directory for input / output files eg images and maps
@@ -13,6 +11,8 @@
 # Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
 #
 
+import logging
+
 import os
 import platform
 import subprocess
@@ -20,17 +20,49 @@ import subprocess
 #from Adafruit_I2C import Adafruit_I2C
 
 class FishPiConfig:
-
+    """ Responsible for configuration of FishPi. 
+        Reads offline configuration files centrally.
+        Scans and detects connected devices and provides driver classes.
+        Provides common file location paths (for consistency).
+    """
+    
     devices = []
+    root_folder = "~/pi/fishpi/"
 
     def __init__(self):
+        if os.path.exists(self.getConfigFile()):
+            # TODO read any static config from file
+            pass
+        # TODO any other init
+        # TODO setup logging (from Main)
         pass
-
+    
+    #
+    # file / folder section
+    #
+    
+    def getConfigFile(self):
+        return self.root_folder + ".fishpi_config"
+    
+    def getFolderForNavigation(self):
+        return self.root_folder + "navigation"
+    
+    def getFolderForImages(self):
+        return self.root_folder + "imgs"
+    
+    def getFolderForLogs(self):
+        return self.root_folder + "logs"
+    
+    #
+    # device configuration section
+    #
+    
     def configure_devices(self):
-        # TEMP only run i2c scan on Linux and adafruit distro
+        """ Configures i2c devices when running in appropriate environment. """
+        # TEMP only run i2c scan on Linux, logs errors
         if platform.system() == "Linux":
             try:
-                print "Configuring i2c devices..."
+                logging.info("Configuring i2c devices...")
                 # scan for connected devices
                 i2cAddresses = self.scan_i2c()
 
@@ -39,12 +71,14 @@ class FishPiConfig:
                     device_name, device_driver = self.lookup(addr)
                     self.devices.append([addr, device_name, device_driver, in_use])
             except Exception as ex:
-                print "Error scanning i2c devices: ", ex
+                logging.exception("Error scanning i2c devices!")
         else:
-            print "Not running on Adafruit Raspberry Pi distro. Not configuring devices."
+            logging.info("Not running on Linux distro. Not configuring i2c devices.")
+        
+        # TODO add non i2c device detection eg webcams on /dev/video*, provide driver classes
 
     def lookup(self, addr):
-        # lookup available device drivers by address
+        """ lookup available device drivers by hex address. """
         # note: i2c addresses can conflict
         # could scan registers etc to confirm count etc?
 
@@ -93,13 +127,17 @@ class FishPiConfig:
         # need to keep columns if care about UU devices
         addr = []
         lines = std_out_txt.rstrip().split("\n")
+        
+        if lines[0] in "command not found":
+            raise RuntimeError("i2cdetect not found")
+        
         for i in range(0,8):
             for j in range(0,16):
                 idx_i = i+1
                 idx_j = j*3+4
                 cell = lines[idx_i][idx_j:idx_j+2].strip()
                 if cell and cell != "--":
-                    print "    ...device at:", hex(16*i+j), cell
+                    logging.info("    ...device at:", hex(16*i+j), cell)
                     hexAddr = 16*i+j
                     if cell == "UU":
                         addr.append([hexAddr, True])

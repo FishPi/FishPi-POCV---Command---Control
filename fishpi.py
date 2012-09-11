@@ -3,8 +3,6 @@
 #
 # FishPi - An autonomous drop in the ocean
 #
-
-#
 # Entry point to the control software
 # - check cmd line args
 # - perform self check
@@ -20,6 +18,7 @@
 #   3: full auto
 
 import sys
+import logging
 
 from Tkinter import Tk
 from POCVMainView import *
@@ -33,38 +32,38 @@ class FishPiRunMode:
     Inactive, ManualWithUI, ManualHeadless, FullAuto = range(4)
 
 class FishPi:
-    # Entrypoint and setup class.
+    """ Entrypoint and setup class. """
     selected_mode = FishPiRunMode.ManualWithUI
     config = FishPiConfig()
 
     def __init__(self, args):
-        print "Initializing FishPi (v{0})...".format(FISH_PI_VERSION)
+        logging.info("Initializing FishPi (v{0})...".format(FISH_PI_VERSION))
         # TODO replace with standard cmd line parsing (eg argparse module)
         if args and len(args) >= 0:
             try:
                 self.selected_mode = int(args[0])
             except ValueError:
-                print "Usage 0:inactive, 1:manualWithUI, 2:manualHeadless, 3:fullAuto"
-                print "Defaulting to {0}.".format(self.selected_mode)
+                logging.warning("Usage 0:inactive, 1:manualWithUI, 2:manualHeadless, 3:fullAuto")
+                logging.warning("Defaulting to {0}.".format(self.selected_mode))
         
 
     def self_check(self):
         # TODO implement check for .lastState file
         # check contents for run mode and stable exit
-        print "Checking last running state..."
+        logging.info("Checking last running state...")
         
         # TODO check for sufficient power for normal operation
         # otherwise implement eg emergency beacon mode
-        print "Checking sufficient power..."
+        logging.info("Checking sufficient power...")
 
 
     def configure_devices(self):
-        # Configures eg i2c and other attached devices.
+        """ Configures eg i2c and other attached devices."""
         self.config.configure_devices()
 
     def run(self):
-        # Runs selected FishPi mode.
-        print "Starting FishPi in mode: {0}".format(self.selected_mode)
+        """ Runs selected FishPi mode."""
+        logging.info("Starting FishPi in mode: {0}".format(self.selected_mode))
         if self.selected_mode == FishPiRunMode.Inactive:
             sys.exit(0)
         elif self.selected_mode == FishPiRunMode.ManualWithUI:
@@ -74,10 +73,11 @@ class FishPi:
         elif self.selected_mode == FishPiRunMode.FullAuto:
             self.run_auto()
         else:
-            print "Invalid mode! Exiting."
+            logging.error("Invalid mode! Exiting.")
             sys.exit(1)
 
     def run_ui(self):
+        """ Runs in UI mode. """
         # configure
         self.configure_devices()
         
@@ -96,6 +96,7 @@ class FishPi:
 
 
     def run_headless(self):
+        """ Runs in headless (manual) mode. """
         # configure
         self.configure_devices()
 
@@ -109,10 +110,12 @@ class FishPi:
         pass
 
     def run_auto(self):
+        """ Runs in full auto mode. """
         self.configure_devices()
         pass
 
 def main():
+    logging.getLogger().setLevel(logging.DEBUG)
     fishPi = FishPi(sys.argv[1:])
     fishPi.self_check()
     fishPi.run()
