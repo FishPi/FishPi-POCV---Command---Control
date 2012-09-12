@@ -39,7 +39,10 @@ class MapFrame(Frame,object):
 		scale = .2
 		image_resized = image.resize((int(width*scale), int(height*scale)), Image.ANTIALIAS)
 		photo = ImageTk.PhotoImage(image_resized)
-		self.top =Label(self, image=photo, height=300)
+		self.top = Canvas(self,width=780, height=300)	
+	        self.top.create_image((40,-50),image=photo,anchor=NW)			
+	        self.top.create_oval((50,230,90,270),width=3,fill="white")			
+	        self.top.create_text((70,250),text="H",font=14)
 		self.image=photo
 	        self.top.pack(fill=X)
 
