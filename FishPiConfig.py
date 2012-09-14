@@ -27,7 +27,7 @@ class FishPiConfig(object):
     """
     
     _devices = []
-    _root_dir = "/home/pi/fishpi/"
+    _root_dir = os.path.join(os.getenv("HOME"), "fishpi")
 
     def __init__(self):
         if os.path.exists(self.config_file):
@@ -53,19 +53,19 @@ class FishPiConfig(object):
     
     @property
     def config_file(self):
-        return self._root_dir + ".fishpi_config"
+        return os.path.join(self._root_dir, ".fishpi_config")
     
     @property
     def navigation_data_path(self):
-        return self._root_dir + "navigation"
+        return os.path.join(self._root_dir, "navigation")
     
     @property
     def imgs_path(self):
-        return self._root_dir + "imgs"
+        return os.path.join(self._root_dir, "imgs")
     
     @property
     def logs_path(self):
-        return self._root_dir + "logs"
+        return os.path.join(self._root_dir, "logs")
 
     #
     # device configuration section

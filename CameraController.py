@@ -66,7 +66,7 @@ class SingleCamera(object):
         """ Captures image to given path """
         self._last_img = self._camera.get_image()
         file_stem = self.next_img_file(path)
-        pygame.image.save(self._last_img, path+'/'+file_stem+'.png')
+        pygame.image.save(self._last_img, os.path.join(path, file_stem+'.png'))
 
     @property
     def last_img(self):
@@ -107,8 +107,8 @@ class StereoCamera(object):
         self._last_img_left = self._camera_left.get_image()
         self._last_img_right = self._camera_right.get_image()
         file_stem = self.next_img_file(path)
-        pygame.image.save(self._last_img_left, path+'/'+file_stem + '_L.png')
-        pygame.image.save(self._last_img_right, path+'/'+file_stem + '_R.png')
+        pygame.image.save(self._last_img_left, os.path.join(path, file_stem + '_L.png'))
+        pygame.image.save(self._last_img_right, os.path.join(path, file_stem + '_R.png'))
 
     @property
     def last_img(self):
