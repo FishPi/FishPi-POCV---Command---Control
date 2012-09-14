@@ -17,5 +17,8 @@ The FishPi software is being developed in python 2.7 inline with the educational
 
 Start the software by running `./fishpi.py`
 
+License
+-------
 
+BSD 2-Clause License.
 
