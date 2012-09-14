@@ -30,7 +30,7 @@ class CameraController(object):
         if camlist and len(camlist) == 1:
             self._camera = SingleCamera(camlist[0], self.default_res, self.default_colorspace)
         elif camlist and len(camlist) >= 2:
-            self._camera = StereoCamera(camlist[0], camlist[1], self.default_res, self.colorspace)
+            self._camera = StereoCamera(camlist[0], camlist[1], self.default_res, self.default_colorspace)
     
     def capture_now(self):
         """ Captures an image now. """
