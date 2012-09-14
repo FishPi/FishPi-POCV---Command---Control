@@ -154,7 +154,7 @@ class FishPiConfig(object):
                 idx_j = j*3+4
                 cell = lines[idx_i][idx_j:idx_j+2].strip()
                 if cell and cell != "--":
-                    logging.info("    ...device at:", hex(16*i+j), cell)
+                    logging.info("    ...device at: %s %s", hex(16*i+j), cell)
                     hexAddr = 16*i+j
                     if cell == "UU":
                         addr.append([hexAddr, True])
