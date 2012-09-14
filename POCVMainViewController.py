@@ -25,16 +25,23 @@ class POCVMainViewController:
         self.config = configuration
         
         # setup coordinating
-        self.cameraController = CameraController()
-        self.driveController = DriveController()
-        self.perceptionUnit = PerceptionUnit()
-        self.navigationUnit = NavigationUnit(self.driveController, self.perceptionUnit)
+        self.camera_controller = CameraController(self.config)
+        self.drive_controller = DriveController()
+        self.perception_unit = PerceptionUnit()
+        self.navigation_unit = NavigationUnit(self.drive_controller, self.perception_unit)
 
     # Devices
 
     def list_devices(self):
         for device in self.config.devices:
             print device
+
+    def capture_img(self):
+        self.camera_controller.capture_now()
+
+    @property
+    def last_img(self):
+        self.camera_controller.last_img
 
     # Control Systems
     # temporary direct access to DriveController to test hardware.
@@ -54,12 +61,12 @@ class POCVMainViewController:
 
     # Route Planning and Navigation
 
-    def navigateTo(self):
+    def navigate_to(self):
         """ Commands the NavigationUnit to commence navigation of a route. """
-        #self.navigationUnit.NavigateTo(route)
+        #self.navigation_unit.NavigateTo(route)
         pass
 
     def halt(self):
         """ Commands the NavigationUnit to Halt! """
-        self.navigationUnit.Halt()
+        self.navigation_unit.Halt()
 
