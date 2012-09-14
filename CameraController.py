@@ -16,6 +16,7 @@ class CameraController(object):
     """ Provides access to camera devices. """
 
     default_res = (320,240)    
+    default_colorspace = "RGB"
 
     def __init__(self, configuration):
         self.configuration = configuration
@@ -27,9 +28,9 @@ class CameraController(object):
         pygame.camera.init()
         camlist = pygame.camera.list_cameras()
         if camlist and len(camlist) == 1:
-            self._camera = SingleCamera(camlist[0], self.default_res)
+            self._camera = SingleCamera(camlist[0], self.default_res, self.default_colorspace)
         elif camlist and len(camlist) >= 2:
-            self._camera = StereoCamera(camlist[0], camlist[1], self.default_res)
+            self._camera = StereoCamera(camlist[0], camlist[1], self.default_res, self.colorspace)
     
     def capture_now(self):
         """ Captures an image now. """
@@ -52,10 +53,10 @@ class CameraController(object):
 class SingleCamera(object):
     """ Provides access to a single camera """
     
-    def __init__(self, camera_addr, res):
+    def __init__(self, camera_addr, res, colorspace="RBG"):
         pygame.init()
         pygame.camera.init()
-        self._camera = pygame.camera.Camera(camera_addr, res)
+        self._camera = pygame.camera.Camera(camera_addr, res, colorspace)
         self._camera.start()
 
     def __del__(self):
@@ -89,12 +90,12 @@ class SingleCamera(object):
 class StereoCamera(object):
     """ Provides acces to pair of cameras. Convention is (left, right). """
 
-    def __init__(self, camera_addr_left, camera_addr_right, res):
+    def __init__(self, camera_addr_left, camera_addr_right, res, colorspace="RGB"):
         pygame.init()
         pygame.camera.init()
-        self._camera_left = pygame.camera.Camera(camera_addr_left, res)
+        self._camera_left = pygame.camera.Camera(camera_addr_left, res, colorspace)
         self._camera_left.start()
-        self._camera_right = pygame.camera.Camera(camera_addr_right, res)
+        self._camera_right = pygame.camera.Camera(camera_addr_right, res, colorspace)
         self._camera_right.start()
 
     def __del__(self):
