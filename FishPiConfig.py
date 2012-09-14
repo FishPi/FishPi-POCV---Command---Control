@@ -19,44 +19,63 @@ import subprocess
 
 #from Adafruit_I2C import Adafruit_I2C
 
-class FishPiConfig:
+class FishPiConfig(object):
     """ Responsible for configuration of FishPi. 
         Reads offline configuration files centrally.
         Scans and detects connected devices and provides driver classes.
         Provides common file location paths (for consistency).
     """
     
-    devices = []
-    root_folder = "~/pi/fishpi/"
+    _devices = []
+    _root_dir = os.path.join(os.getenv("HOME"), "fishpi")
 
     def __init__(self):
-        if os.path.exists(self.getConfigFile()):
+        if os.path.exists(self.config_file):
             # TODO read any static config from file
             pass
+        # create directories
+        if not os.path.exists(self._root_dir):
+            os.makedirs(self._root_dir)
+        if not os.path.exists(self.navigation_data_path):
+            os.makedirs(self.navigation_data_path)
+        if not os.path.exists(self.imgs_path):
+            os.makedirs(self.imgs_path)
+        if not os.path.exists(self.logs_path):
+            os.makedirs(self.logs_path)
+
         # TODO any other init
         # TODO setup logging (from Main)
         pass
     
     #
-    # file / folder section
+    # file / paths section
     #
     
-    def getConfigFile(self):
-        return self.root_folder + ".fishpi_config"
+    @property
+    def config_file(self):
+        return os.path.join(self._root_dir, ".fishpi_config")
     
-    def getFolderForNavigation(self):
-        return self.root_folder + "navigation"
+    @property
+    def navigation_data_path(self):
+        return os.path.join(self._root_dir, "navigation")
     
-    def getFolderForImages(self):
-        return self.root_folder + "imgs"
+    @property
+    def imgs_path(self):
+        return os.path.join(self._root_dir, "imgs")
     
-    def getFolderForLogs(self):
-        return self.root_folder + "logs"
-    
+    @property
+    def logs_path(self):
+        return os.path.join(self._root_dir, "logs")
+
     #
     # device configuration section
     #
-    
+ 
+    @property
+    def devices(self):
+        """ Attached devices. """
+        return self._devices
+
     def configure_devices(self):
         """ Configures i2c devices when running in appropriate environment. """
         # TEMP only run i2c scan on Linux, logs errors
@@ -64,12 +83,12 @@ class FishPiConfig:
             try:
                 logging.info("Configuring i2c devices...")
                 # scan for connected devices
-                i2cAddresses = self.scan_i2c()
+                i2c_addresses = self.scan_i2c()
 
                 # lookup available device drivers by address
-                for addr, in_use in i2cAddresses:
+                for addr, in_use in i2c_addresses:
                     device_name, device_driver = self.lookup(addr)
-                    self.devices.append([addr, device_name, device_driver, in_use])
+                    self._devices.append([addr, device_name, device_driver, in_use])
             except Exception as ex:
                 logging.exception("Error scanning i2c devices!")
         else:
@@ -106,8 +125,6 @@ class FishPiConfig:
             return "ITG3200", "ITG3200.py"
         else:
             return "unknown", ""
-
-
 
     def scan_i2c(self):
         """scans i2c port returning a list of detected addresses.
