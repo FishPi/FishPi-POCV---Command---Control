@@ -11,30 +11,43 @@
 #
 
 import logging
+import os
 from time import localtime
 
 from PIL import Image
 
 from FishPiConfig import FishPiConfig
-from DriveController import DriveController
 from NavigationUnit import NavigationUnit
 from PerceptionUnit import PerceptionUnit
 
 class POCVMainViewController:
     """ Coordinator between UI and main control layers. """
     
-    def __init__(self, configuration):
-        self.config = configuration
+    def __init__(self, config):
+        self.config = config
         
         # setup controllers and coordinating services
+        
+        # CameraController
         try:
             from CameraController import CameraController
             self.camera_controller = CameraController(self.config)
         except ImportError:
             logging.info("pygame package not found, camera support unavailable.")
             self.camera_controller = DummyCameraController()
+        
+        # DriveController
+        if os.getuid() == 0:
+            try:
+                from DriveController import DriveController
+                self.drive_controller = DriveController(self.config)
+            except ImportError:
+                logging.info("drive controller not loaded, drive support unavailable.")
+                self.drive_controller = DummyDriveController()
+        else:
+            logging.info("not running as root, drive support unavailable.")
+            self.drive_controller = DummyDriveController()
 
-        self.drive_controller = DriveController()
         self.perception_unit = PerceptionUnit()
         self.navigation_unit = NavigationUnit(self.drive_controller, self.perception_unit)
 
@@ -90,3 +103,15 @@ class DummyCameraController(object):
     def last_img(self):
         return self._last_img
 
+class DummyDriveController(object):
+    def __init__(self):
+         pass
+
+    def set_drive(self):
+        pass
+
+    def set_heading(self):
+        pass
+
+    def halt(self):
+        pass
