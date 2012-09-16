@@ -7,17 +7,11 @@
 #  - user directory for input / output files eg images and maps
 #
 
-#
-# Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
-#
-
 import logging
 
 import os
 import platform
 import subprocess
-
-#from Adafruit_I2C import Adafruit_I2C
 
 class FishPiConfig(object):
     """ Responsible for configuration of FishPi. 
