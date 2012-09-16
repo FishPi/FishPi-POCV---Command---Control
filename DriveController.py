@@ -40,8 +40,8 @@ class DriveController:
         self.prop_channel = prop_channel
         self.servo_channel = servo_channel
         # Initialise the PWM device
-        #self._pwm = PWM(i2c_addr, debug)
-        #self._pwm.setPWMFreq(ic_pwm_freq)
+        self._pwm = PWM(i2c_addr, debug)
+        self._pwm.setPWMFreq(self.ic_pwm_freq)
 
     def set_drive(self, throttle_level):
         """ Set drive throttle between -1.0 and 1.0 with 0.0 for zero drive. """
@@ -96,5 +96,5 @@ class DriveController:
         pulse /= pulseLength
         if (self.debug):
             print "%d pulse sent" % pulse
-        #self._pwm.setPWM(channel, 0, pulse)
+        self._pwm.setPWM(channel, 0, int(pulse))
 
