@@ -30,7 +30,7 @@ class Adafruit_I2C :
     try:
       self.bus.write_byte_data(self.address, reg, value)
       if (self.debug):
-        print("I2C: Wrote 0x%02X to register 0x%02X" % (value, reg))
+        print "I2C: Wrote 0x%02X to register 0x%02X" % (value, reg)
     except IOError, err:
       print "Error accessing 0x%02X: Check your I2C address" % self.address
       return -1
