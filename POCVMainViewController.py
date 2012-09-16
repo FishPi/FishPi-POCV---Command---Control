@@ -40,7 +40,8 @@ class POCVMainViewController:
         if os.getuid() == 0:
             try:
                 from DriveController import DriveController
-                self.drive_controller = DriveController(self.config)
+                # TODO pull out address from self.config.drive (and possibly pwm addresses)
+                self.drive_controller = DriveController()
             except ImportError:
                 logging.info("drive controller not loaded, drive support unavailable.")
                 self.drive_controller = DummyDriveController()
@@ -66,7 +67,15 @@ class POCVMainViewController:
 
     # Control Systems
     # temporary direct access to DriveController to test hardware.
-    # ...
+
+    def set_drive(self, throttle_level):
+        self.drive_controller.set_drvie(throttle_level)
+
+    def set_heading(self, heading):
+        self.drive_controller.set_heading(heading)
+
+    def halt(self):
+        self.drive_controller.halt()
 
     # Sensors
 
