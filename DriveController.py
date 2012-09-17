@@ -42,6 +42,9 @@ class DriveController:
         # Initialise the PWM device
         self._pwm = PWM(i2c_addr, debug)
         self._pwm.setPWMFreq(self.ic_pwm_freq)
+        # Set initial positions to centre
+        self.set_servo_pulse(self.prop_channel, 1.5)
+        self.set_servo_pulse(self.servo_channel, 1.5)
 
     def set_drive(self, throttle_level):
         """ Set drive throttle between -1.0 and 1.0 with 0.0 for zero drive. """
