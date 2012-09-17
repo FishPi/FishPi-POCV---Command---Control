@@ -3,7 +3,7 @@
 #
 # FishPi - An autonomous drop in the ocean
 #
-# Simple test of camera functionality
+# Simple test of PWM motor and servo drive
 #
 
 from time import sleep
