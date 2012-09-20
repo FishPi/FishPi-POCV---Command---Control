@@ -44,6 +44,7 @@ if __name__ == "__main__":
     except ValueError:
         print "caught -10"
 
+    # TODO setup proper angle tests
     print "steer to port for 10 sec"
     drive.set_heading(-100)
     sleep(10)
