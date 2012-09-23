@@ -13,9 +13,9 @@ if __name__ == "__main__":
     print "testing drive controller..."
     drive = DriveController(debug=True)
 
-    print "run full ahead for 10 sec..."
+    print "run full ahead for 5 sec..."
     drive.set_drive(1.0)
-    sleep(10)
+    sleep(5)
     
     print "run 50% ahead for 5 sec..."
     drive.set_drive(0.5)
@@ -29,10 +29,14 @@ if __name__ == "__main__":
     drive.set_drive(-0.5)
     sleep(5)
     
-    print "run full reverse for 10 sec"
+    print "run full reverse for 5 sec"
     drive.set_drive(-1.0)
-    sleep(10)
+    sleep(5)
     
+    print "and back to neutral..."
+    drive.set_drive(0.0)
+    sleep(5)
+
     print "check out of bounds errors"
     try:
         drive.set_drive(15.0)
@@ -44,12 +48,28 @@ if __name__ == "__main__":
     except ValueError:
         print "caught -10"
 
-    # TODO setup proper angle tests
-    print "steer to port for 10 sec"
-    drive.set_heading(-100)
-    sleep(10)
+    # test steering
+    print "steer hard to port for 5 sec"
+    drive.set_heading(-0.785398)
+    sleep(5)
 
-    print "steer to starboard for 10 sec"
-    drive.set_heading(100)
-    sleep(10)
+    print "steer to port for 5 sec"
+    drive.set_heading(-0.3927)
+    sleep(5)
+    
+    print "and back to neutral..."
+    drive.set_heading(0.0)
+    sleep(5)
+
+    print "steer to starboard for 5 sec"
+    drive.set_heading(0.3927)
+    sleep(5)
+
+    print "steer hard to starboard for 5 sec"
+    drive.set_heading(0.785398)
+    sleep(5)
+
+    print "and back to neutral..."
+    drive.set_heading(0.0)
+    sleep(5)
 

@@ -35,12 +35,12 @@ class DriveController:
     # 'standard' analog servo freq
     ic_pwm_freq = 60
 
-    def __init__(self, i2c_addr=0x40, prop_channel=0, servo_channel=1, debug=False):
+    def __init__(self, i2c_addr=0x40, i2c_bus=None, prop_channel=0, servo_channel=1, debug=False):
         self.debug = debug
         self.prop_channel = prop_channel
         self.servo_channel = servo_channel
         # Initialise the PWM device
-        self._pwm = PWM(i2c_addr, debug)
+        self._pwm = PWM(i2c_addr, i2c_bus=i2c_bus, debug=debug)
         self._pwm.setPWMFreq(self.ic_pwm_freq)
         # Set initial positions to centre
         self.set_servo_pulse(self.prop_channel, 1.5)
