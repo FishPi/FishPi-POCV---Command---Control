@@ -26,8 +26,11 @@ class PWM :
   __ALLLED_OFF_L       = 0xFC
   __ALLLED_OFF_H       = 0xFD
 
-  def __init__(self, address=0x40, debug=False):
-    self.i2c = Adafruit_I2C(address)
+  def __init__(self, address=0x40, i2c_bus=None, debug=False):
+    if i2c_bus is None:
+        self.i2c = Adafruit_I2C(address, debug=debug)
+    else:
+        self.i2c = Adafruit_I2C(address, bus=i2c_bus, debug=debug)
     self.address = address
     self.debug = debug
     if (self.debug):
