@@ -6,16 +6,43 @@
 # Simple test of GPS sensor
 #
 
+from time import sleep
 from GPSSensor import GPS_NavigatronSensor
 
 if __name__ == "__main__":
-    print "Testing GPS sensor..."
-    gpsSensor = GPS_NavigatronSensor()
+    print "Testing GPS sensor (running 5x with 5s pause)..."
+
+    print "Initialising..."
+    gpsSensor = GPS_NavigatronSensor(debug=True)
 
     # heading
-    (hstatus, fix2d, fix3d, numSat, gndSpd, altitude, time, location) = gpsSensor.read_sensor()
-    print "Status %s, fix2d? %d, fix3d? %d, numSat %d, gndSpd %d, altitude %d, time %d, location %d" % (hstatus, fix2d, fix3d, numSat, gndSpd, altitude, time, location)
+    print "Reading 1..."
+    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
+    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    sleep(5)
+    
+    print "Reading 2..."
+    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
+    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    sleep(5)
 
-    # raw values
-    (hstatus, fix2d, fix3d, numSat, gndSpd, altitude, time, location) = gpsSensor.read_sensor_raw()
-    print "Status %s, fix2d? %d, fix3d? %d, numSat %d, gndSpd %d, altitude %d, time %d, location %d" % (hstatus, fix2d, fix3d, numSat, gndSpd, altitude, time, location)
+    print "Reading 3..."
+    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
+    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    sleep(5)
+    
+    print "Reading 4..."
+    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
+    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    sleep(5)
+    
+    print "Reading 5..."
+    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
+    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    sleep(5)
+    
+    print "Done."
+
+    # raw values - not currently implemented any differently
+    # will move more fields over when correctly reading sensor
+    # gpsSensor.read_sensor_raw()
