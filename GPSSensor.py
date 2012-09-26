@@ -97,7 +97,7 @@ class GPS_NavigatronSensor:
         if self.debug:
             print "GPS: reading time..."
         time_buffer = self.i2c.readList(self.I2C_GPS_TIME, 4)
-        time = (time_buffer[0]<<24)|(time_buffer[1]<<16)|(time_buffer[2]<<8)|(time_buffer[3])/100.0
+        time = float((time_buffer[0]<<24)|(time_buffer[1]<<16)|(time_buffer[2]<<8)|(time_buffer[3]))/10000.0
         if self.debug:
             print "GPS: time = %f" % time
         # and return (just as tuple for now)
