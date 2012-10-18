@@ -13,8 +13,11 @@ from Adafruit_I2C import Adafruit_I2C
 class TemperatureSensor:
     """ Temperature Sensor using Tmp102 TI chip over I2C """
 
-    def __init__(self, address=0x48, debug=False):
-        self.i2c = Adafruit_I2C(address)
+    def __init__(self, address=0x48, i2c_bus=None, debug=False):
+        if i2c_bus is None:
+            self.i2c = Adafruit_I2C(address, debug=debug)
+        else:
+            self.i2c = Adafruit_I2C(address, bus=i2c_bus, debug=debug)
         self.address = address
         self.debug = debug
 
