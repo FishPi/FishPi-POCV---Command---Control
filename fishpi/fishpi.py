@@ -21,10 +21,10 @@ import sys
 import logging
 
 from Tkinter import Tk
-from POCVMainView import *
+from fishpi.ui.main_view import MainView
 
-from POCVMainViewController import *
-from localconfig import FishPiConfig
+from fishpi.core_kernel import FishPiKernel
+from fishpi.localconfig import FishPiConfig
 
 FISH_PI_VERSION = 0.1
 
@@ -82,7 +82,7 @@ class FishPi:
         self.configure_devices()
         
         # create controller
-        controller = POCVMainViewController(self.config)
+        controller = FishPiKernel(self.config)
 
         # run ui loop
         rootWindow = Tk()
@@ -90,7 +90,7 @@ class FishPi:
         rootWindow.minsize(800,600)
         rootWindow.maxsize(800,600)
 
-        app = Main(rootWindow, controller)
+        app = MainView(rootWindow, controller)
 
         rootWindow.mainloop()
 
@@ -101,7 +101,7 @@ class FishPi:
         self.configure_devices()
 
         # create controller
-        controller = POCVMainViewController(self.config)
+        controller = FishPiKernel(self.config)
 
         # testing
         controller.list_devices()
@@ -121,5 +121,5 @@ def main():
     fishPi.run()
 
 if __name__ == "__main__":
-    main()
-
+    status = main()
+    sys.exit(staus)

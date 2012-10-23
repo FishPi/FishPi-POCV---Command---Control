@@ -7,7 +7,7 @@ from POCVMainViewController import *
 root = 0
 controller = 0
 
-class Main:
+class MainView:
 
 	def __init__(self,master,view_controller):
                 root = master

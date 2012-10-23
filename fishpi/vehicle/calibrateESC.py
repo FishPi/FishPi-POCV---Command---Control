@@ -7,7 +7,7 @@
 #
 
 from time import sleep
-from DriveController import DriveController
+from fishpi.vehicle.drive_controller import DriveController
 
 if __name__ == "__main__":
     print "Calibrating ESC"

@@ -14,8 +14,8 @@
 # Standard meduim model servo for heading
 
 import time
-from Adafruit_I2C import Adafruit_I2C
-from Adafruit_PWM_Servo_Driver import PWM
+from external.Adafruit_I2C import Adafruit_I2C
+from external.Adafruit_PWM_Servo_Driver import PWM
 
 class DriveController:
     """ Provides drive and heading control abstraction from eg PWM servo or ESC devices. """
