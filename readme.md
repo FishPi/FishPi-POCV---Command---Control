@@ -19,7 +19,11 @@ Start the software by running `./fishpi/fishpi.py`
 
 ### Structure
 
-Top level package 'fishpi' with subpackages 'sensors', 'perception', 'control', 'vehicle', 'ui'.
+Top level package 'fishpi' with subpackages 'sensor', 'perception', 'control', 'vehicle', 'ui'.
+
+### Tests
+
+Test sub components and hardware with eg `./fishpi/sensor/test_GPS_I2C.py`.
 
 License
 -------

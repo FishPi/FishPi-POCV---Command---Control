@@ -24,7 +24,7 @@ from Tkinter import Tk
 from POCVMainView import *
 
 from POCVMainViewController import *
-from FishPiConfig import *
+from localconfig import FishPiConfig
 
 FISH_PI_VERSION = 0.1
 
