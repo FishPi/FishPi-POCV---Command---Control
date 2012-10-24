@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<gpx version="1.1"
+  creator="Marengo Route Creator - http://www.marengo-ltd.com/map/"
+  xmlns="http://www.topografix.com/GPX/1/1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 
+  http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <rte>
+    <name>New Route</name>
+    <rtept lat="52.429251716095685" lon="-1.9468921422958374">
+      <name>0</name>
+    </rtept>
+    <rtept lat="52.42920101706362" lon="-1.9467848539352417">
+      <name>1</name>
+    </rtept>
+    <rtept lat="52.42912415067796" lon="-1.9466131925582886">
+      <name>2</name>
+    </rtept>
+    <rtept lat="52.42915685979463" lon="-1.9463154673576355">
+      <name>3</name>
+    </rtept>
+    <rtept lat="52.42931713411541" lon="-1.946079432964325">
+      <name>4</name>
+    </rtept>
+    <rtept lat="52.42937110390859" lon="-1.9458326697349548">
+      <name>5</name>
+    </rtept>
+    <rtept lat="52.42939563561092" lon="-1.9455751776695251">
+      <name>6</name>
+    </rtept>
+    <rtept lat="52.42942670908094" lon="-1.94533109664917">
+      <name>7</name>
+    </rtept>
+    <rtept lat="52.42945287619657" lon="-1.9451245665550232">
+      <name>8</name>
+    </rtept>
+    <rtept lat="52.429559179944185" lon="-1.9449904561042786">
+      <name>9</name>
+    </rtept>
+    <rtept lat="52.429596795054984" lon="-1.9451701641082764">
+      <name>10</name>
+    </rtept>
+    <rtept lat="52.429613149440996" lon="-1.9454008340835571">
+      <name>11</name>
+    </rtept>
+    <rtept lat="52.429604972248754" lon="-1.9456610083580017">
+      <name>12</name>
+    </rtept>
+    <rtept lat="52.42958371154184" lon="-1.945905089378357">
+      <name>13</name>
+    </rtept>
+    <rtept lat="52.42958698242048" lon="-1.9461867213249207">
+      <name>14</name>
+    </rtept>
+    <rtept lat="52.42958044066291" lon="-1.9463932514190674">
+      <name>15</name>
+    </rtept>
+    <rtept lat="52.42956572170488" lon="-1.9465890526771545">
+      <name>16</name>
+    </rtept>
+    <rtept lat="52.42956408626478" lon="-1.9467607140541077">
+      <name>17</name>
+    </rtept>
+    <rtept lat="52.42949049139813" lon="-1.9468626379966736">
+      <name>18</name>
+    </rtept>
+    <rtept lat="52.42940054194974" lon="-1.9469377398490906">
+      <name>19</name>
+    </rtept>
+    <rtept lat="52.42934166584779" lon="-1.9469404220581055">
+      <name>20</name>
+    </rtept>
+  </rte>
+</gpx>

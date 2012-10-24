@@ -24,6 +24,8 @@ class FishPiConfig(object):
     _root_dir = os.path.join(os.getenv("HOME"), "fishpi")
 
     def __init__(self):
+        # TODO setup logging (from config)
+        logging.getLogger().setLevel(logging.DEBUG)
         if os.path.exists(self.config_file):
             # TODO read any static config from file
             pass
@@ -38,7 +40,6 @@ class FishPiConfig(object):
             os.makedirs(self.logs_path)
 
         # TODO any other init
-        # TODO setup logging (from Main)
         pass
     
     #

@@ -46,7 +46,7 @@ class DriveController:
         self.set_servo_pulse(self.prop_channel, 1.5)
         self.set_servo_pulse(self.servo_channel, 1.5)
 
-    def set_drive(self, throttle_level):
+    def set_throttle(self, throttle_level):
         """ Set drive throttle between -1.0 and 1.0 with 0.0 for zero drive. """
         # TODO check break vs reverse state by storing last set level
         if throttle_level > 1.0 or throttle_level < -1.0:
@@ -84,7 +84,7 @@ class DriveController:
         # TODO check if ESC feedback and can detect current state.
         # TODO check current motor direction and brake to zero.
         # for now, just set to zero output
-        self.set_drive(0.0)
+        self.set_throttle(0.0)
 
     def set_servo_pulse(self, channel, pulse):
         """ 0.001 is ~1ms pulse so standard servo would be in range 1ms <- 1.5ms -> 2/0ms """
