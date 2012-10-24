@@ -15,7 +15,15 @@ The FishPi software is being developed in python 2.7 inline with the educational
 
 ### Usage
 
-Start the software by running `./fishpi.py`
+Start the software by running `./fishpi/fishpi.py`
+
+### Structure
+
+Top level package 'fishpi' with subpackages 'sensor', 'perception', 'control', 'vehicle', 'ui'.
+
+### Tests
+
+Test sub components and hardware with eg `./fishpi/sensor/test_GPS_I2C.py`.
 
 License
 -------

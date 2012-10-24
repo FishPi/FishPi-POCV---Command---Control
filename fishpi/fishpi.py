@@ -20,11 +20,9 @@
 import sys
 import logging
 
-from Tkinter import Tk
-from POCVMainView import *
-
-from POCVMainViewController import *
-from FishPiConfig import *
+import ui.controller
+from core_kernel import FishPiKernel
+from localconfig import FishPiConfig
 
 FISH_PI_VERSION = 0.1
 
@@ -65,16 +63,17 @@ class FishPi:
         """ Runs selected FishPi mode."""
         logging.info("Starting FishPi in mode: {0}".format(self.selected_mode))
         if self.selected_mode == FishPiRunMode.Inactive:
-            sys.exit(0)
+            logging.info("Inactive mode set - exiting.")
+            return 0
         elif self.selected_mode == FishPiRunMode.ManualWithUI:
-            self.run_ui()
+            return self.run_ui()
         elif self.selected_mode == FishPiRunMode.ManualHeadless:
-            self.run_headless()
+            return self.run_headless()
         elif self.selected_mode == FishPiRunMode.FullAuto:
-            self.run_auto()
+            return self.run_auto()
         else:
             logging.error("Invalid mode! Exiting.")
-            sys.exit(1)
+            return 1
 
     def run_ui(self):
         """ Runs in UI mode. """
@@ -82,18 +81,15 @@ class FishPi:
         self.configure_devices()
         
         # create controller
-        controller = POCVMainViewController(self.config)
-
+        controller = FishPiKernel(self.config)
+        
         # run ui loop
-        rootWindow = Tk()
-
-        rootWindow.minsize(800,600)
-        rootWindow.maxsize(800,600)
-
-        app = Main(rootWindow, controller)
-
-        rootWindow.mainloop()
-
+        logging.info("Launching UI...")
+        ui.controller.run_main_view(controller)
+        logging.info("Program complete - exiting.")
+        
+        # done
+        return 0
 
     def run_headless(self):
         """ Runs in headless (manual) mode. """
@@ -101,25 +97,41 @@ class FishPi:
         self.configure_devices()
 
         # create controller
-        controller = POCVMainViewController(self.config)
+        controller = FishPiKernel(self.config)
 
         # testing
         controller.list_devices()
 
         # TODO wait for commands...
+        logging.info("Waiting for commands...")
         pass
+        logging.info("No command scripts implemented - exiting.")
+        
+        # done
+        return 0
 
     def run_auto(self):
         """ Runs in full auto mode. """
         self.configure_devices()
+        
+        # create controller
+        controller = FishPiKernel(self.config)
+        
+        # testing
+        controller.list_devices()
+
+        # run scripts
+        logging.info("Running autonomous scripts...")
         pass
+        logging.info("No autonomous scripts implemented - exiting.")
+        # done
+        return 0
 
 def main():
-    logging.getLogger().setLevel(logging.DEBUG)
     fishPi = FishPi(sys.argv[1:])
     fishPi.self_check()
-    fishPi.run()
+    return fishPi.run()
 
 if __name__ == "__main__":
-    main()
-
+    status = main()
+    sys.exit(status)
