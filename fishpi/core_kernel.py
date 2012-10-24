@@ -12,13 +12,14 @@
 
 import logging
 import os
+import platform
 from time import localtime
 
 from PIL import Image
 
 from localconfig import FishPiConfig
 from control.navigation import NavigationUnit
-#from fishpi.perception.PerceptionUnit import PerceptionUnit
+from perception.world import PerceptionUnit
 
 class FishPiKernel:
     """ Coordinator between different layers. """
@@ -29,24 +30,29 @@ class FishPiKernel:
         # setup controllers and coordinating services
         
         # CameraController
-        try:
-            from fishpi.sensor.camera import CameraController
-            self.camera_controller = CameraController(self.config)
-        except ImportError:
-            logging.info("pygame package not found, camera support unavailable.")
+        if platform.system() == "Linux":
+            try:
+                from sensor.camera import CameraController
+                self.camera_controller = CameraController(self.config)
+            except ImportError as ex:
+                logging.info(ex)
+                logging.info("Camera support unavailable.")
+                self.camera_controller = DummyCameraController()
+        else:
+            logging.info("Camera support unavailable.")
             self.camera_controller = DummyCameraController()
-        
+            
         # DriveController
         if os.getuid() == 0:
             try:
-                from fishpi.vehicle.DriveController import DriveController
+                from vehicle.DriveController import DriveController
                 # TODO pull out address from self.config.drive (and possibly pwm addresses)
                 self.drive_controller = DriveController()
             except ImportError:
-                logging.info("drive controller not loaded, drive support unavailable.")
+                logging.info("Drive controller not loaded, drive support unavailable.")
                 self.drive_controller = DummyDriveController()
         else:
-            logging.info("not running as root, drive support unavailable.")
+            logging.info("Not running as root, drive support unavailable.")
             self.drive_controller = DummyDriveController()
         
         self.perception_unit = PerceptionUnit()
@@ -55,8 +61,9 @@ class FishPiKernel:
     # Devices
     
     def list_devices(self):
+        logging.info("Listing devices...")
         for device in self.config.devices:
-            print device
+            logging.info(device)
     
     def capture_img(self):
         self.camera_controller.capture_now()
@@ -103,7 +110,7 @@ class FishPiKernel:
 class DummyCameraController(object):
     
     def __init__(self):
-        self._last_img = Image.open("camera.jpg")
+        self._last_img = Image.open("fishpi/resources/camera.jpg")
     
     def capture_now(self):
         pass

@@ -3,20 +3,32 @@
 # FishPi - An autonomous drop in the ocean
 #
 # View Controller for POCV MainView
-#  - control logic split out from UI, providing:
-#    - access to device configuration and drivers
-#    - basic control systems eg power and steering
-#    - sensory systems eg GPS and Compass
-#    - route planning and navigation
+#  - control logic split out from UI
 #
 
 import logging
-import os
-from time import localtime
 
+from Tkinter import Tk
 from PIL import Image
 
-from fishpi.core_kernel import FishPiKernel
+from ui.main_view import MainView
+
+def run_main_view(kernel):
+    """ Runs main UI view. """
+    
+    # create view controller
+    controller = MainViewController(kernel)
+    
+    # initialise and launch view
+    root = Tk()
+    root.minsize(800,600)
+    root.maxsize(800,600)
+    
+    app = MainView(root, controller)
+    
+    # run ui loop
+    root.mainloop()
+
 
 class MainViewController:
     """ Coordinator between UI and main control layers. """
@@ -54,6 +66,8 @@ class MainViewController:
     def read_compass(self):
         pass
     
+    def get_current_photo(self):
+        return Image.open("fishpi/resources/camera.jpg")
     
     # Route Planning and Navigation
     
@@ -66,3 +80,5 @@ class MainViewController:
         """ Commands the NavigationUnit to Halt! """
         self._kernel.navigation_unit.Halt()
 
+    def get_current_map(self):
+        return Image.open("fishpi/resources/bournville.tif")
