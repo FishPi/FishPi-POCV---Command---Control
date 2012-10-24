@@ -6,8 +6,8 @@
 # Simple test of camera functionality
 #
 
-from CameraController import SingleCamera
-from CameraController import StereoCamera
+from camera import SingleCamera
+from camera import StereoCamera
 
 if __name__ == "__main__":
     print "testing single camera..."

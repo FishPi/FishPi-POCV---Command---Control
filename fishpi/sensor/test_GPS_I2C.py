@@ -7,7 +7,7 @@
 #
 
 from time import sleep
-from GPSSensor import GPS_NavigatronSensor
+from GPS_I2C import GPS_NavigatronSensor
 
 if __name__ == "__main__":
     print "Testing GPS sensor (running 5x with 5s pause)..."

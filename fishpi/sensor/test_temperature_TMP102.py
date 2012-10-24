@@ -6,7 +6,7 @@
 # Simple test of temperature sensor
 #
 
-from TemperatureSensor import TemperatureSensor
+from temperature_TMP102 import TemperatureSensor
 
 def test_conversions():
     #test_values(0x7FF, 128.0)

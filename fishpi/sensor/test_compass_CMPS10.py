@@ -6,7 +6,7 @@
 # Simple test of compass sensor
 #
 
-from CompassSensor import Cmps10_Sensor
+from compass_CMPS10 import Cmps10_Sensor
 
 if __name__ == "__main__":
     print "Testing compass sensor..."

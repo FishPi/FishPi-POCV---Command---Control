@@ -7,7 +7,7 @@
 #
 
 from time import sleep
-from fishpi.vehicle.drive_controller import DriveController
+from drive_controller import DriveController
 
 if __name__ == "__main__":
     print "testing drive controller..."

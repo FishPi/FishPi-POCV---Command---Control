@@ -16,8 +16,8 @@ from time import localtime
 
 from PIL import Image
 
-from fishpi.localconfig import FishPiConfig
-from fishpi.control.navigation import NavigationUnit
+from localconfig import FishPiConfig
+from control.navigation import NavigationUnit
 #from fishpi.perception.PerceptionUnit import PerceptionUnit
 
 class FishPiKernel:
