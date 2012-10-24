@@ -7,6 +7,7 @@
 #
 
 import logging
+import math
 
 from Tkinter import Tk
 from PIL import Image
@@ -21,6 +22,7 @@ def run_main_view(kernel):
     
     # initialise and launch view
     root = Tk()
+    root.title("fishpi - Proof Of Concept Vehicle UI")
     root.minsize(800,600)
     root.maxsize(800,600)
     
@@ -43,17 +45,30 @@ class MainViewController:
     def last_img(self):
         self.camera_controller.last_img
     
-    # Control Systems
-    # temporary direct access to DriveController to test hardware.
+    # Control modes (Manual, AutoPilot)
+    def set_manual_mode(self):
+        """ Stops navigation unit and current auto-pilot drive. """
+        self._kernel.navigation_unit.halt()
+        self._kernel.drive_controller.halt()
     
-    def set_drive(self, throttle_level):
-        self._kernel.drive_controller.set_drive(throttle_level)
-    
-    def set_heading(self, heading):
-        self._kernel.drive_controller.set_heading(heading)
+    def set_auto_pilot_mode(self):
+        """ Stops current manual drive and starts navigation unit. """
+        self._kernel.drive_controller.halt()
+        self._kernel.navigation_unit.start()
     
     def halt(self):
-        self._kernel.drive_controller.halt()
+        """ Commands the NavigationUnit and Drive Control to Halt! """
+        self._kernel.halt()
+
+    # Drive control
+    # temporary direct access to DriveController to test hardware.
+    
+    def set_throttle(self, throttle_level):
+        self._kernel.set_throttle(float(throttle_level)/100.0)
+    
+    def set_heading(self, heading):
+        heading_in_rad = (float(heading)/180.0)*math.pi
+        self._kernel.set_heading(heading_in_rad)
     
     # Sensors
     
@@ -76,9 +91,5 @@ class MainViewController:
         #self.navigation_unit.NavigateTo(route)
         pass
     
-    def halt(self):
-        """ Commands the NavigationUnit to Halt! """
-        self._kernel.navigation_unit.Halt()
-
     def get_current_map(self):
         return Image.open("fishpi/resources/bournville.tif")

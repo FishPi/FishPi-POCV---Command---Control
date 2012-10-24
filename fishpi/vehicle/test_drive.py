@@ -14,37 +14,37 @@ if __name__ == "__main__":
     drive = DriveController(debug=True)
 
     print "run full ahead for 5 sec..."
-    drive.set_drive(1.0)
+    drive.set_throttle(1.0)
     sleep(5)
     
     print "run 50% ahead for 5 sec..."
-    drive.set_drive(0.5)
+    drive.set_throttle(0.5)
     sleep(5)
 
     print "run 0% for 5 sec..."
-    drive.set_drive(0.0)
+    drive.set_throttle(0.0)
     sleep(5)
 
     print "run 50% reverse for 5 sec"
-    drive.set_drive(-0.5)
+    drive.set_throttle(-0.5)
     sleep(5)
     
     print "run full reverse for 5 sec"
-    drive.set_drive(-1.0)
+    drive.set_throttle(-1.0)
     sleep(5)
     
     print "and back to neutral..."
-    drive.set_drive(0.0)
+    drive.set_throttle(0.0)
     sleep(5)
 
     print "check out of bounds errors"
     try:
-        drive.set_drive(15.0)
+        drive.set_throttle(15.0)
     except ValueError:
         print "caught 15"
     
     try:
-        drive.set_drive(-10.0)
+        drive.set_throttle(-10.0)
     except ValueError:
         print "caught -10"
 

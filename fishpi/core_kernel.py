@@ -75,15 +75,12 @@ class FishPiKernel:
     # Control Systems
     # temporary direct access to DriveController to test hardware.
     
-    def set_drive(self, throttle_level):
-        self.drive_controller.set_drvie(throttle_level)
+    def set_throttle(self, throttle_level):
+        self.drive_controller.set_throttle(throttle_level)
     
     def set_heading(self, heading):
         self.drive_controller.set_heading(heading)
-    
-    def halt(self):
-        self.drive_controller.halt()
-    
+        
     # Sensors
     
     def read_time(self):
@@ -104,8 +101,9 @@ class FishPiKernel:
         pass
     
     def halt(self):
-        """ Commands the NavigationUnit to Halt! """
-        self.navigation_unit.Halt()
+        """ Commands the NavigationUnit and Drive Control to Halt! """
+        self.navigation_unit.halt()
+        self.drive_controller.halt()
 
 class DummyCameraController(object):
     
@@ -123,11 +121,14 @@ class DummyDriveController(object):
     def __init__(self):
         pass
     
-    def set_drive(self):
+    def set_throttle(self, throttle_level):
+        logging.info("Throttle set to: %s" % throttle_level)
         pass
     
-    def set_heading(self):
+    def set_heading(self, heading):
+        logging.info("Heading set to: %s" % heading)
         pass
     
     def halt(self):
+        logging.info("Halt!")
         pass
