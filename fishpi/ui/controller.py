@@ -9,7 +9,8 @@
 import logging
 import math
 
-from Tkinter import Tk
+import Tkinter
+import tkFileDialog
 from PIL import Image
 
 from ui.main_view import MainView
@@ -17,15 +18,19 @@ from ui.main_view import MainView
 def run_main_view(kernel):
     """ Runs main UI view. """
     
-    # create view controller
-    controller = MainViewController(kernel)
-    
-    # initialise and launch view
-    root = Tk()
-    root.title("fishpi - Proof Of Concept Vehicle UI")
+    # initialise UI system
+    root = Tkinter.Tk()
+    root.title("fishpi - Proof Of Concept Vehicle control")
     root.minsize(800,600)
     root.maxsize(800,600)
     
+    # create view model
+    view_model = MainViewModel(root)
+    
+    # create view controller
+    controller = MainViewController(kernel, view_model)
+    
+    # create view
     app = MainView(root, controller)
     
     # run ui loop
@@ -35,8 +40,9 @@ def run_main_view(kernel):
 class MainViewController:
     """ Coordinator between UI and main control layers. """
     
-    def __init__(self, kernel):
+    def __init__(self, kernel, view_model):
         self._kernel = kernel
+        self.model = view_model
     
     def capture_img(self):
         pass
@@ -93,3 +99,39 @@ class MainViewController:
     
     def get_current_map(self):
         return Image.open("fishpi/resources/bournville.tif")
+
+    def load_gpx(self):
+        default_path = "fishpi/resources/sample_routes"
+        filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "GPX")])
+        print filename
+
+    def save_gpx(self):
+        pass
+
+class MainViewModel:
+    """ UI Model containing bindable variables. """
+
+    def __init__(self, root):
+        # GPS data
+        self.GPS_latitude = Tkinter.StringVar(master=root, value="##d ##.####' X")
+        self.GPS_longitude = Tkinter.StringVar(master=root, value="##d ##.####' X")
+        
+        self.GPS_heading = Tkinter.DoubleVar(master=root, value=0.0)
+        self.GPS_speed = Tkinter.DoubleVar(master=root, value=0.0)
+        self.GPS_altitude = Tkinter.DoubleVar(master=root, value=0.0)
+
+        self.GPS_fix = Tkinter.IntVar(master=root, value=0)
+        self.GPS_satellite_count = Tkinter.IntVar(master=root, value=0)
+
+        # compass data
+        self.compass_heading = Tkinter.DoubleVar(master=root, value=0.0)
+
+        # time data
+        self.time = Tkinter.StringVar(master=root, value="hh:mm:ss")
+        self.date = Tkinter.StringVar(master=root, value="dd:MM:yyyy")
+
+        # other data
+        self.temperature = Tkinter.DoubleVar(master=root, value=0.0)
+
+        # other settings
+        self.capture_img_enabled = Tkinter.IntVar(master=root, value=0)

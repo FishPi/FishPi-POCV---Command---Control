@@ -122,13 +122,13 @@ class DummyDriveController(object):
         pass
     
     def set_throttle(self, throttle_level):
-        logging.info("Throttle set to: %s" % throttle_level)
+        logging.debug("Throttle set to: %s" % throttle_level)
         pass
     
     def set_heading(self, heading):
-        logging.info("Heading set to: %s" % heading)
+        logging.debug("Heading set to: %s" % heading)
         pass
     
     def halt(self):
-        logging.info("Halt!")
+        logging.debug("Drive halting.")
         pass

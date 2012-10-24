@@ -5,6 +5,8 @@
 # Main View classes for POCV UI.
 #
 
+import tkFont
+
 from Tkinter import *
 from PIL import Image, ImageTk
 
@@ -104,29 +106,44 @@ class InfoFrame(Frame, object):
         super(InfoFrame, self).__init__(master, bd=1, relief=SUNKEN)
         self._view_controller = view_controller
 
-        self.lbl_latitude = Label(self, text = "Lat: \t", pady=6, bd=1, relief=GROOVE, anchor=W, justify=LEFT)
-        self.lbl_latitude.pack(fill=X, expand=True)
+        Label(self, text = "Location Info:", pady=6, anchor=W, justify=LEFT).grid(row=0, columnspan=2, sticky=W)
+        
+        # latitude
+        Label(self, text = "Latitude:", pady=6, anchor=W, justify=LEFT).grid(row=1, sticky=W)
+        Label(self, textvariable=view_controller.model.GPS_latitude).grid(row=1, column=1)
 
-        self.lbl_longitude = Label(self, text = "Long: \t", pady=6, bd=1, relief=GROOVE, anchor=W, justify=LEFT)
-        self.lbl_longitude.pack(fill=X, expand=True)
+        # longitude
+        Label(self, text = "Longitude:", pady=6, anchor=W, justify=LEFT).grid(row=2, sticky=W)
+        Label(self, textvariable=view_controller.model.GPS_longitude).grid(row=2, column=1)
 
-        self.lbl_signals = Label(self, text = "Satellite Signals", bd=1, relief=GROOVE, anchor=W, justify=LEFT)
-        self.lbl_signals.pack(fill=X, expand=True)
+        # compass heading info
+        Label(self, text = "Compass Heading:", pady=6, anchor=W, justify=LEFT).grid(row=3, sticky=W)
+        Label(self, textvariable=view_controller.model.compass_heading).grid(row=3, column=1)
+        
+        # GPS heading info
+        Label(self, text = "GPS Heading:", pady=6, anchor=W, justify=LEFT).grid(row=4, sticky=W)
+        Label(self, textvariable=view_controller.model.GPS_heading).grid(row=4, column=1)
+        Label(self, text = "GPS Speed (knots):", pady=6, anchor=W, justify=LEFT).grid(row=5, sticky=W)
+        Label(self, textvariable=view_controller.model.GPS_speed).grid(row=5, column=1)
+        Label(self, text = "GPS Altitude:", pady=6, anchor=W, justify=LEFT).grid(row=6, sticky=W)
+        Label(self, textvariable=view_controller.model.GPS_altitude).grid(row=6, column=1)
+        
+        # GPS status
+        Checkbutton(self, text="GPX fix?", font=tkFont.Font(weight="bold"), state=DISABLED, variable=view_controller.model.GPS_fix).grid(row=7, column=0, columnspan=2, sticky=E)
+        
+        Label(self, text = "# satellites:", pady=6, anchor=W, justify=LEFT).grid(row=8, sticky=W)
+        Label(self, textvariable=view_controller.model.GPS_satellite_count).grid(row=8, column=1)
 
-        self.lstbx_signals = Listbox(self, height=4)
-        self.lstbx_signals.pack(fill=X)
+        Label(self, text = "Other Info:", pady=6, anchor=W, justify=LEFT).grid(row=9, columnspan=2, sticky=W)
 
-        self.lbl_time = Label(self, text = "Time : HH:MM:SS", pady=6, bd=1, relief=GROOVE, anchor=W,justify=LEFT)
-        self.lbl_time.pack(fill=X, expand=True)
-
-        self.lbl_date = Label(self, text = "Date : DD:MM:YY", pady=6, bd=1, relief=GROOVE, anchor=W,justify=LEFT)
-        self.lbl_date.pack(fill=X, expand=True)
-
-        self.rdbtn_sat_lock = Radiobutton(self, text = "Satellite fix")
-        self.rdbtn_sat_lock.pack(fill=X, expand=True, side=RIGHT)
-
-        self.btn_config = Button(self, text = "Configuration")
-        self.btn_config.pack(fill=X, expand=True, side=RIGHT)
+        # date and time
+        Label(self, text = "Time:", pady=6, anchor=W, justify=LEFT).grid(row=10, sticky=W)
+        Label(self, textvariable=view_controller.model.time).grid(row=10, column=1)
+        Label(self, text = "Date:", pady=6, anchor=W, justify=LEFT).grid(row=11, sticky=W)
+        Label(self, textvariable=view_controller.model.date).grid(row=11, column=1)
+        
+        Label(self, text = "Temperature:", pady=6, anchor=W, justify=LEFT).grid(row=12, sticky=W)
+        Label(self, textvariable=view_controller.model.temperature).grid(row=12, column=1)
 
 class ControlsFrame(Frame, object):
     """ UI Frame displaying controls for heading and throttle. """
@@ -135,8 +152,7 @@ class ControlsFrame(Frame, object):
         super(ControlsFrame, self).__init__(master, bd=1, relief=SUNKEN)
         self._view_controller = view_controller
         
-        self.lbl_mode = Label(self, text = "Control Mode:", pady=6, bd=1, anchor=W, justify=LEFT)
-        self.lbl_mode.pack(fill=X, padx=2, expand=True)
+        Label(self, text = "Control Mode:", pady=6, bd=1, anchor=W, justify=LEFT).pack(fill=X, padx=2, expand=True)
         
         # top frame
         self.top_frame = Frame(self)
@@ -150,12 +166,11 @@ class ControlsFrame(Frame, object):
         self.btn_pause = Button(self.top_frame, text="Pause", command=self.on_pause)
         self.btn_pause.pack(side=LEFT)
         
-        self.btn_auto = Button(self.top_frame, text="Auto Pilot", command=self.on_set_auto_pilot_mode)
+        self.btn_auto = Button(self.top_frame, text="AutoPilot", command=self.on_set_auto_pilot_mode)
         self.btn_auto.pack(side=LEFT, padx=3)
         
         # centre frame
-        self.lbl_heading = Label(self, text = "Heading:", pady=6, bd=1, anchor=W, justify=LEFT)
-        self.lbl_heading.pack(fill=X, padx=2, expand=True)
+        Label(self, text = "Heading:", pady=6, bd=1, anchor=W, justify=LEFT).pack(fill=X, padx=2, expand=True)
         
         # rudder heading
         self.scl_rudder = Scale(self, orient=HORIZONTAL, from_=-45, to=45, command=self.on_rudder)
@@ -163,8 +178,7 @@ class ControlsFrame(Frame, object):
         self.scl_rudder.pack(fill=X, expand=True, padx=5)
         
         # throttle level
-        self.lbl_throttle = Label(self, text = "Throttle:", pady=6, bd=1, anchor=W, justify=LEFT)
-        self.lbl_throttle.pack(fill=X, padx=2, expand=True)
+        Label(self, text = "Throttle:", pady=6, bd=1, anchor=W, justify=LEFT).pack(fill=X, padx=2, expand=True)
         
         self.btn_zero_throttle = Button(self, text="Zero Throttle", command=self.on_zero_throttle)
         self.btn_zero_throttle.pack(side=RIGHT, padx=3)
@@ -196,16 +210,16 @@ class ControlsFrame(Frame, object):
         # only apply in manual mode
         self._view_controller.set_heading(value)
     
+    def on_throttle(self, value):
+        """ event handler for throttle change """
+        # only apply in manual mode
+        self._view_controller.set_throttle(value)
+    
     def on_zero_throttle(self):        
         """ event handler for throttle change """
         # only apply in manual mode
         self._view_controller.set_throttle(0)
         self.scl_speed_controller.set(0)
-
-    def on_throttle(self, value):        
-        """ event handler for throttle change """
-        # only apply in manual mode
-        self._view_controller.set_throttle(value)
 
 class RouteFrame(Frame, object):
     """ UI Frame with buttons for user interactions. """
@@ -214,16 +228,36 @@ class RouteFrame(Frame, object):
         super(RouteFrame, self).__init__(master, bd=1, relief=SUNKEN)
         self._view_controller = view_controller
         
-        self.bottom = Label(self, text = "Destination \t Lat\\Long \t Remove")
-        self.bottom.pack(fill=X)
+        Label(self, text = "Route Planning:", pady=6, anchor=W, justify=LEFT).grid(row=0, columnspan=4, sticky=W)
+        
+        # waypoints list
+        Label(self, text = "Waypoint", pady=6, anchor=W, justify=LEFT).grid(row=1, column=0, sticky=W)
+        Label(self, text = "Latitude", pady=6, anchor=W, justify=LEFT).grid(row=1, column=1, sticky=W)
+        Label(self, text = "Longitude", pady=6, anchor=W, justify=LEFT).grid(row=1, column=2, sticky=W)
+        Label(self, text = "Remove", pady=6, anchor=W, justify=LEFT).grid(row=1, column=3, sticky=W)
+        
+        self.lstbx_waypoints = Listbox(self, height=6)
+        self.lstbx_waypoints.grid(row=2, rowspan=6, columnspan=4, padx=3, sticky=NSEW)
 
-        self.lstbx_waypoints = Listbox(self,height=5)
-        self.lstbx_waypoints.pack(fill=X)
+        # load / save route
+        self.btn_load = Button(self, text="Load GPX", command=self.on_load_gpx)
+        self.btn_load.grid(row=9, column=0)
+        self.btn_save = Button(self, text="Save GPX", state=DISABLED, command=self.on_save_gpx)
+        self.btn_save.grid(row=9, column=1)
+        self.btn_route = Button(self, pady=4, text="Open Plannner", state=DISABLED, command=self.on_open_planner)
+        self.btn_route.grid(row=9, column=2, columnspan=2)
 
-        self.btn_save = Button(self, pady=4, text="Save GPX Track")
-        self.btn_save.pack()
-        self.btn_route = Button(self, pady=4, text="Open Route Planning")
-        self.btn_route.pack()
+        # misc
+        Checkbutton(self, text = "Capture Images", variable=view_controller.model.capture_img_enabled).grid(row=10, column=2, columnspan=2, sticky=E)
 
-        self.chkbtn_capture_img = Checkbutton(self, text = "Capture Images")
-        self.chkbtn_capture_img.pack(fill=X, expand=True)
+    def on_load_gpx(self):
+        """ event handler for loading gpx file """
+        self._view_controller.load_gpx()
+
+    def on_save_gpx(self):
+        """ event handler for save gpx file """
+        self._view_controller.save_gpx()
+
+    def on_open_planner(self):
+        """ event handler for planner window """
+        pass

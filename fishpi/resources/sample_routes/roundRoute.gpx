@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<gpx version="1.1"
+  creator="Marengo Route Creator - http://www.marengo-ltd.com/map/"
+  xmlns="http://www.topografix.com/GPX/1/1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 
+  http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <rte>
+    <name>New Route</name>
+    <rtept lat="52.4292239134079" lon="-1.9468089938163757">
+      <name>0</name>
+    </rtept>
+    <rtept lat="52.42940054194974" lon="-1.9469216465950012">
+      <name>1</name>
+    </rtept>
+    <rtept lat="52.42952320024293" lon="-1.946749985218048">
+      <name>2</name>
+    </rtept>
+    <rtept lat="52.429559179944185" lon="-1.94645494222641">
+      <name>3</name>
+    </rtept>
+    <rtept lat="52.429588617859714" lon="-1.9460901618003845">
+      <name>4</name>
+    </rtept>
+    <rtept lat="52.42958371154184" lon="-1.9457870721817017">
+      <name>5</name>
+    </rtept>
+    <rtept lat="52.42960333681013" lon="-1.9453740119934082">
+      <name>6</name>
+    </rtept>
+    <rtept lat="52.42959843049386" lon="-1.9450736045837402">
+      <name>7</name>
+    </rtept>
+    <rtept lat="52.42951502303399" lon="-1.945003867149353">
+      <name>8</name>
+    </rtept>
+    <rtept lat="52.42945451164079" lon="-1.9451138377189636">
+      <name>9</name>
+    </rtept>
+    <rtept lat="52.42941689640855" lon="-1.9453150033950806">
+      <name>10</name>
+    </rtept>
+    <rtept lat="52.429380916591164" lon="-1.9455671310424805">
+      <name>11</name>
+    </rtept>
+    <rtept lat="52.42933348860516" lon="-1.9458836317062378">
+      <name>12</name>
+    </rtept>
+    <rtept lat="52.429282789667155" lon="-1.9460874795913696">
+      <name>13</name>
+    </rtept>
+    <rtept lat="52.42919774615632" lon="-1.9462350010871887">
+      <name>14</name>
+    </rtept>
+    <rtept lat="52.429148682517734" lon="-1.9464066624641418">
+      <name>15</name>
+    </rtept>
+    <rtept lat="52.429153588884056" lon="-1.9466480612754822">
+      <name>16</name>
+    </rtept>
+  </rte>
+</gpx>
