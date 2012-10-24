@@ -105,6 +105,10 @@ class FishPiKernel:
         self.navigation_unit.halt()
         self.drive_controller.halt()
 
+    def load_gpx(self, filename):
+        gpx = self.perception_unit.load_gpx(filename)
+        return gpx
+
 class DummyCameraController(object):
     
     def __init__(self):

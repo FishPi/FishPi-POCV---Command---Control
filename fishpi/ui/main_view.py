@@ -109,40 +109,40 @@ class InfoFrame(Frame, object):
         Label(self, text = "Location Info:", pady=6, anchor=W, justify=LEFT).grid(row=0, columnspan=2, sticky=W)
         
         # latitude
-        Label(self, text = "Latitude:", pady=6, anchor=W, justify=LEFT).grid(row=1, sticky=W)
+        Label(self, text = "Latitude:", padx=3, anchor=W, justify=LEFT).grid(row=1, sticky=W)
         Label(self, textvariable=view_controller.model.GPS_latitude).grid(row=1, column=1)
 
         # longitude
-        Label(self, text = "Longitude:", pady=6, anchor=W, justify=LEFT).grid(row=2, sticky=W)
+        Label(self, text = "Longitude:", padx=3, anchor=W, justify=LEFT).grid(row=2, sticky=W)
         Label(self, textvariable=view_controller.model.GPS_longitude).grid(row=2, column=1)
 
         # compass heading info
-        Label(self, text = "Compass Heading:", pady=6, anchor=W, justify=LEFT).grid(row=3, sticky=W)
+        Label(self, text = "Compass Heading:", padx=3, anchor=W, justify=LEFT).grid(row=3, sticky=W)
         Label(self, textvariable=view_controller.model.compass_heading).grid(row=3, column=1)
         
         # GPS heading info
-        Label(self, text = "GPS Heading:", pady=6, anchor=W, justify=LEFT).grid(row=4, sticky=W)
+        Label(self, text = "GPS Heading:", padx=3, anchor=W, justify=LEFT).grid(row=4, sticky=W)
         Label(self, textvariable=view_controller.model.GPS_heading).grid(row=4, column=1)
-        Label(self, text = "GPS Speed (knots):", pady=6, anchor=W, justify=LEFT).grid(row=5, sticky=W)
+        Label(self, text = "GPS Speed (knots):", padx=3, anchor=W, justify=LEFT).grid(row=5, sticky=W)
         Label(self, textvariable=view_controller.model.GPS_speed).grid(row=5, column=1)
-        Label(self, text = "GPS Altitude:", pady=6, anchor=W, justify=LEFT).grid(row=6, sticky=W)
+        Label(self, text = "GPS Altitude:", padx=3, anchor=W, justify=LEFT).grid(row=6, sticky=W)
         Label(self, textvariable=view_controller.model.GPS_altitude).grid(row=6, column=1)
         
         # GPS status
         Checkbutton(self, text="GPX fix?", font=tkFont.Font(weight="bold"), state=DISABLED, variable=view_controller.model.GPS_fix).grid(row=7, column=0, columnspan=2, sticky=E)
         
-        Label(self, text = "# satellites:", pady=6, anchor=W, justify=LEFT).grid(row=8, sticky=W)
+        Label(self, text = "# satellites:", padx=3, anchor=W, justify=LEFT).grid(row=8, sticky=W)
         Label(self, textvariable=view_controller.model.GPS_satellite_count).grid(row=8, column=1)
 
         Label(self, text = "Other Info:", pady=6, anchor=W, justify=LEFT).grid(row=9, columnspan=2, sticky=W)
 
         # date and time
-        Label(self, text = "Time:", pady=6, anchor=W, justify=LEFT).grid(row=10, sticky=W)
+        Label(self, text = "Time:", padx=3, anchor=W, justify=LEFT).grid(row=10, sticky=W)
         Label(self, textvariable=view_controller.model.time).grid(row=10, column=1)
-        Label(self, text = "Date:", pady=6, anchor=W, justify=LEFT).grid(row=11, sticky=W)
+        Label(self, text = "Date:", padx=3, anchor=W, justify=LEFT).grid(row=11, sticky=W)
         Label(self, textvariable=view_controller.model.date).grid(row=11, column=1)
         
-        Label(self, text = "Temperature:", pady=6, anchor=W, justify=LEFT).grid(row=12, sticky=W)
+        Label(self, text = "Temperature:", padx=3, anchor=W, justify=LEFT).grid(row=12, sticky=W)
         Label(self, textvariable=view_controller.model.temperature).grid(row=12, column=1)
 
 class ControlsFrame(Frame, object):
@@ -231,28 +231,31 @@ class RouteFrame(Frame, object):
         Label(self, text = "Route Planning:", pady=6, anchor=W, justify=LEFT).grid(row=0, columnspan=4, sticky=W)
         
         # waypoints list
-        Label(self, text = "Waypoint", pady=6, anchor=W, justify=LEFT).grid(row=1, column=0, sticky=W)
-        Label(self, text = "Latitude", pady=6, anchor=W, justify=LEFT).grid(row=1, column=1, sticky=W)
-        Label(self, text = "Longitude", pady=6, anchor=W, justify=LEFT).grid(row=1, column=2, sticky=W)
-        Label(self, text = "Remove", pady=6, anchor=W, justify=LEFT).grid(row=1, column=3, sticky=W)
+        Label(self, text = "Waypoint", pady=3, anchor=W, justify=LEFT).grid(row=1, column=0, sticky=W)
+        Label(self, text = "Latitude", pady=3, anchor=W, justify=LEFT).grid(row=1, column=1, sticky=W)
+        Label(self, text = "Longitude", pady=3, anchor=W, justify=LEFT).grid(row=1, column=2, sticky=W)
+        Label(self, text = "Remove", pady=3, anchor=W, justify=LEFT).grid(row=1, column=3, sticky=W)
         
-        self.lstbx_waypoints = Listbox(self, height=6)
-        self.lstbx_waypoints.grid(row=2, rowspan=6, columnspan=4, padx=3, sticky=NSEW)
+        self.lstbx_waypoints = Listbox(self, height=10)
+        self.lstbx_waypoints.grid(row=2, rowspan=10, columnspan=4, padx=3, sticky=NSEW)
 
         # load / save route
         self.btn_load = Button(self, text="Load GPX", command=self.on_load_gpx)
-        self.btn_load.grid(row=9, column=0)
+        self.btn_load.grid(row=13, column=0)
         self.btn_save = Button(self, text="Save GPX", state=DISABLED, command=self.on_save_gpx)
-        self.btn_save.grid(row=9, column=1)
+        self.btn_save.grid(row=13, column=1)
         self.btn_route = Button(self, pady=4, text="Open Plannner", state=DISABLED, command=self.on_open_planner)
-        self.btn_route.grid(row=9, column=2, columnspan=2)
+        self.btn_route.grid(row=13, column=2, columnspan=2)
 
         # misc
-        Checkbutton(self, text = "Capture Images", variable=view_controller.model.capture_img_enabled).grid(row=10, column=2, columnspan=2, sticky=E)
+        Checkbutton(self, text = "Capture Images", variable=view_controller.model.capture_img_enabled).grid(row=15, column=2, columnspan=2, sticky=E)
 
     def on_load_gpx(self):
         """ event handler for loading gpx file """
         self._view_controller.load_gpx()
+        self.lstbx_waypoints.delete(0,END)
+        for item in self._view_controller.model.waypoints:
+            self.lstbx_waypoints.insert(END, item)
 
     def on_save_gpx(self):
         """ event handler for save gpx file """
