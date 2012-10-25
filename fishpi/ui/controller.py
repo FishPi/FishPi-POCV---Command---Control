@@ -8,6 +8,7 @@
 
 import logging
 import math
+import os
 
 import Tkinter
 import tkFileDialog
@@ -103,16 +104,17 @@ class MainViewController:
     def load_gpx(self):
         default_path = "fishpi/resources/sample_routes"
         filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "GPX")])
-        logging.info('loading %s' % filename)
-        gpx = self._kernel.load_gpx(filename)
-        # update list
-        self.model.clear_waypoints()
-        for route in gpx.routes:
-            for point in route.points:
-                wp_str = '({0}:{1},{2})'.format(point.name, point.latitude, point.longitude)
-                logging.info(wp_str)
-                wp_str2 = '{0}  {1}, {2}    X'.format(point.name, point.latitude, point.longitude)
-                self.model.waypoints.append(wp_str2)
+        if os.path.exists(filename):
+            logging.info('loading %s' % filename)
+            gpx = self._kernel.load_gpx(filename)
+            # update list
+            self.model.clear_waypoints()
+            for route in gpx.routes:
+                for point in route.points:
+                    wp_str = '({0}:{1},{2})'.format(point.name, point.latitude, point.longitude)
+                    logging.info(wp_str)
+                    wp_str2 = '{0}  {1}, {2}    X'.format(point.name, point.latitude, point.longitude)
+                    self.model.waypoints.append(wp_str2)
 
     def save_gpx(self):
         pass
