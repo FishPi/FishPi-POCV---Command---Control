@@ -28,9 +28,9 @@ class TemperatureSensor:
         # read 2 registers
         result = self.i2c.readList(0x00, 2)
         # convert to something useful... 
-        return self._convert_12b(result[0], result[1])
+        return self._convert_12b_split(result[0], result[1])
 
-    def _convert_12b(self, msb, lsb):
+    def _convert_12b_split(self, msb, lsb):
         value = (msb<<4) | (lsb>>4)
         return self._convert_12b(value)
 
