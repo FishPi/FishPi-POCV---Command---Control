@@ -11,7 +11,7 @@ import subprocess
 def board_ver():
 	proc = subprocess.Popen(['cat', '/proc/cpuinfo'], stdout=subprocess.PIPE, close_fds=True)
 	out, err = proc.communicate()
-	lines = filter(None, out.split("\n"))
+	lines = filter(None, out.split('\n'))
 	results = {}
 	for line in lines:
 		k, v = line.strip().split(':')
