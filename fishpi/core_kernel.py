@@ -37,10 +37,10 @@ class FishPiKernel:
             except ImportError as ex:
                 logging.info(ex)
                 logging.info("Camera support unavailable.")
-                self.camera_controller = DummyCameraController()
+                self.camera_controller = DummyCameraController(self.resources_folder())
         else:
             logging.info("Camera support unavailable.")
-            self.camera_controller = DummyCameraController()
+            self.camera_controller = DummyCameraController(self.resources_folder())
             
         # DriveController
         if os.getuid() == 0:
@@ -59,8 +59,13 @@ class FishPiKernel:
         self.navigation_unit = NavigationUnit(self.drive_controller, self.perception_unit)
 
     def update(self):
+        (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = self.gps_sensor.read_sensor()
+        
         pass
-
+    
+    def resources_folder(self):
+        return os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources')
+    
     # Devices
     
     def list_devices(self):
@@ -73,7 +78,7 @@ class FishPiKernel:
     
     @property
     def last_img(self):
-        self.camera_controller.last_img
+        return self.camera_controller.last_img
     
     # Control Systems
     # temporary direct access to DriveController to test hardware.
@@ -114,8 +119,9 @@ class FishPiKernel:
 
 class DummyCameraController(object):
     
-    def __init__(self):
-        self._last_img = Image.open("fishpi/resources/camera.jpg")
+    def __init__(self, resources_folder):
+        temp_image_path = os.path.join(resources_folder, 'camera.jpg')
+        self._last_img = Image.open(temp_image_path)
     
     def capture_now(self):
         pass

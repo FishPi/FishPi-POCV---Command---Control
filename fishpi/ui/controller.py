@@ -35,22 +35,25 @@ def run_main_view(kernel):
     controller = MainViewController(kernel, view_model)
     
     # create view
-    app = MainView(root, controller)
+    view = MainView(root, controller)
 
     # add callback to kernel for updates
-    root.after(callback_interval, update_callback, root, controller)
+    root.after(callback_interval, update_callback, root, controller, view)
 
     # run ui loop
     root.mainloop()
 
-def update_callback(root, controller):
+def update_callback(root, controller, view):
     """ Callback to perform updates etc. Needs to reregister callback at end. """
     # update kernel - note this will need revisiting for non-interactive modes...
+    logging.debug("In update...")
     controller._kernel.update()
     # tell controller to update model (from kernel)
     controller.update()
+    # annoyingly, images don't seem to bind so calling back to view to tell it to update image
+    view.update_callback()
     # reregister callback
-    root.after(callback_interval, update_callback, root, controller)
+    root.after(callback_interval, update_callback, root, controller, view)
 
 class MainViewController:
     """ Coordinator between UI and main control layers. """
@@ -61,15 +64,31 @@ class MainViewController:
     
     def update(self):
         """ Updates view model from kernel. """
+        """# GPS data
+        self.model.GPS_latitude.set()
+        self.model.GPS_longitude.set()
         
-        pass
-
-    def capture_img(self):
+        self.model.GPS_heading.set()
+        self.model.GPS_speed.set()
+        self.model.GPS_altitude.set()
+        
+        self.model.GPS_fix.set()
+        self.model.GPS_satellite_count.set()
+        
+        # compass data
+        self.model.compass_heading.set()
+        
+        # time data
+        self.model.time.set()
+        self.model.date.set()
+        
+        # other data
+        self.model.temperature.set()"""
         pass
     
     @property
     def last_img(self):
-        self.camera_controller.last_img
+        return self._kernel.last_img
     
     # Control modes (Manual, AutoPilot)
     def set_manual_mode(self):
@@ -96,20 +115,6 @@ class MainViewController:
         heading_in_rad = (float(heading)/180.0)*math.pi
         self._kernel.set_heading(heading_in_rad)
     
-    # Sensors
-    
-    def read_time(self):
-        return localtime()
-    
-    def read_GPS(self):
-        pass
-    
-    def read_compass(self):
-        pass
-    
-    def get_current_photo(self):
-        return Image.open("fishpi/resources/camera.jpg")
-    
     # Route Planning and Navigation
     
     def navigate_to(self):
@@ -118,10 +123,10 @@ class MainViewController:
         pass
     
     def get_current_map(self):
-        return Image.open("fishpi/resources/bournville.tif")
+        return Image.open(os.path.join(self._kernel.resources_folder(), 'bournville.tif'))
 
     def load_gpx(self):
-        default_path = "fishpi/resources/sample_routes"
+        default_path = os.path.join(self._kernel.resources_folder(), 'sample_routes')
         filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "GPX")])
         if os.path.exists(filename):
             logging.info('loading %s' % filename)
@@ -134,7 +139,7 @@ class MainViewController:
                     logging.info(wp_str)
                     wp_str2 = '{0}  {1}, {2}    X'.format(point.name, point.latitude, point.longitude)
                     self.model.waypoints.append(wp_str2)
-
+    
     def save_gpx(self):
         pass
 

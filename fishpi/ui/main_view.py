@@ -48,7 +48,10 @@ class MainView(Frame, object):
         # controls frame (in bottom sub-frame)
         self.controls_frame = ControlsFrame(self.bottom_frame, view_controller)
         self.controls_frame.pack(side=LEFT, fill=BOTH, padx=5, pady=5, expand=True)
-                
+    
+    def update_callback(self):
+        """ Callback for any view objects that need to requery (rather than observe a model. """
+        self.camera_frame.update_callback()
 
 class MapFrame(Frame, object):
     """ UI Frame displaying map. """
@@ -88,16 +91,23 @@ class CameraFrame(Frame, object):
     def __init__(self, master, view_controller):
         super(CameraFrame, self).__init__(master, bd=1, relief=SUNKEN)
         self._view_controller = view_controller
-        
+        # display image
+        self.cnvs_camera = Canvas(self, width=320, height=240)
+        self.update_image()
+        self.cnvs_camera.pack(fill=BOTH)
+    
+    def update_image(self):
         # get latest image
-        image = self._view_controller.get_current_photo()
+        image = self._view_controller.last_img
         photo = ImageTk.PhotoImage(image)
         
         # display it
-        self.cnvs_camera = Canvas(self, width=320, height=240)
         self.cnvs_camera.create_image((0,0), image=photo, anchor=NW)
+        #self.cnvs_camera.configure(image = photo)
         self.image = photo
-        self.cnvs_camera.pack(fill=BOTH)
+    
+    def update_callback(self):
+        self.update_image()
 
 class InfoFrame(Frame, object):
     """ UI Frame displaying information and status. """
