@@ -25,3 +25,6 @@ def i2c_bus():
 	else:
 		return smbus.SMBus(0)
 
+def serial_bus():
+	return "/dev/ttyAMA0"
+
