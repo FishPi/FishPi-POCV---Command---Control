@@ -49,13 +49,13 @@ class GPS_AdafruitSensor:
     MAXWAITSENTENCE = 5
 
     def __init__(self, serial_bus="/dev/ttyAMA0", baud=9600, debug=False):
-    self._GPS = serial.Serial(serial_bus, baud)
-    #self._GPS.write(self.PMTK_Q_RELEASE)
-    #self._version = self._GPS.readline(20)
-    self._GPS.write(self.PMTK_SET_NMEA_UPDATE_1HZ)
-    self._GPS.write(self.PMTK_SET_BAUD_9600)
-    self._GPS.write(self.PMTK_SET_NMEA_OUTPUT_RMCVTGGGA)
-    self._GPS.flush()
+        self._GPS = serial.Serial(serial_bus, baud)
+        #self._GPS.write(self.PMTK_Q_RELEASE)
+        #self._version = self._GPS.readline(20)
+        self._GPS.write(self.PMTK_SET_NMEA_UPDATE_1HZ)
+        self._GPS.write(self.PMTK_SET_BAUD_9600)
+        self._GPS.write(self.PMTK_SET_NMEA_OUTPUT_RMCVTGGGA)
+        self._GPS.flush()
 
     def read_sensor(self):
     """ Reads GPS and returns (fix, lat, lon, heading, speed, altitude, num_sat, time, date). """
