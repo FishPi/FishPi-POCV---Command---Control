@@ -59,6 +59,8 @@ class FishPiKernel:
         self.navigation_unit = NavigationUnit(self.drive_controller, self.perception_unit)
 
     def update(self):
+        (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = self.gps_sensor.read_sensor()
+        
         pass
     
     def resources_folder(self):
