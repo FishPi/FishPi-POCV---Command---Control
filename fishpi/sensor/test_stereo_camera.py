@@ -6,11 +6,11 @@
 # Simple test of camera functionality
 #
 
-from camera import SingleCamera
+from camera import StereoCamera
 
 if __name__ == "__main__":
-    print "testing single camera..."
-    cam = SingleCamera("/dev/video0", (320,240))
+    print "testing stereo camera..."
+    cam = StereoCamera("/dev/video0", "/dev/video1", (320,240))
     print "click.."
     cam.capture("/home/pi/fishpi/imgs")
     print "click.."
@@ -20,15 +20,13 @@ if __name__ == "__main__":
     cam = "done"
 
     print "and in YUV..."
-    cam = SingleCamera("/dev/video0", (320,240), "YUV")
+    cam = StereoCamera("/dev/video0", "/dev/video1", (320,240), "YUV")
     print "click.."
     cam.capture("/home/pi/fishpi/imgs")
     cam = "done"
-
+    
     print "and in HSV..."
-    cam = SingleCamera("/dev/video0", (320,240), "HSV")
+    cam = StereoCamera("/dev/video0", "/dev/video1", (320,240), "HSV")
     print "click.."
     cam.capture("/home/pi/fishpi/imgs")
-    print "click.."
     cam = "done"
-

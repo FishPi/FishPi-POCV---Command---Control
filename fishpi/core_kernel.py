@@ -57,7 +57,10 @@ class FishPiKernel:
         
         self.perception_unit = PerceptionUnit()
         self.navigation_unit = NavigationUnit(self.drive_controller, self.perception_unit)
-    
+
+    def update(self):
+        pass
+
     # Devices
     
     def list_devices(self):

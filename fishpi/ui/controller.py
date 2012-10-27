@@ -8,12 +8,16 @@
 
 import logging
 import math
+import os
 
 import Tkinter
 import tkFileDialog
 from PIL import Image
 
 from ui.main_view import MainView
+
+# callback interval in milli seconds
+callback_interval = 1000
 
 def run_main_view(kernel):
     """ Runs main UI view. """
@@ -32,10 +36,21 @@ def run_main_view(kernel):
     
     # create view
     app = MainView(root, controller)
-    
+
+    # add callback to kernel for updates
+    root.after(callback_interval, update_callback, root, controller)
+
     # run ui loop
     root.mainloop()
 
+def update_callback(root, controller):
+    """ Callback to perform updates etc. Needs to reregister callback at end. """
+    # update kernel - note this will need revisiting for non-interactive modes...
+    controller._kernel.update()
+    # tell controller to update model (from kernel)
+    controller.update()
+    # reregister callback
+    root.after(callback_interval, update_callback, root, controller)
 
 class MainViewController:
     """ Coordinator between UI and main control layers. """
@@ -44,6 +59,11 @@ class MainViewController:
         self._kernel = kernel
         self.model = view_model
     
+    def update(self):
+        """ Updates view model from kernel. """
+        
+        pass
+
     def capture_img(self):
         pass
     
@@ -103,16 +123,17 @@ class MainViewController:
     def load_gpx(self):
         default_path = "fishpi/resources/sample_routes"
         filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "GPX")])
-        logging.info('loading %s' % filename)
-        gpx = self._kernel.load_gpx(filename)
-        # update list
-        self.model.clear_waypoints()
-        for route in gpx.routes:
-            for point in route.points:
-                wp_str = '({0}:{1},{2})'.format(point.name, point.latitude, point.longitude)
-                logging.info(wp_str)
-                wp_str2 = '{0}  {1}, {2}    X'.format(point.name, point.latitude, point.longitude)
-                self.model.waypoints.append(wp_str2)
+        if os.path.exists(filename):
+            logging.info('loading %s' % filename)
+            gpx = self._kernel.load_gpx(filename)
+            # update list
+            self.model.clear_waypoints()
+            for route in gpx.routes:
+                for point in route.points:
+                    wp_str = '({0}:{1},{2})'.format(point.name, point.latitude, point.longitude)
+                    logging.info(wp_str)
+                    wp_str2 = '{0}  {1}, {2}    X'.format(point.name, point.latitude, point.longitude)
+                    self.model.waypoints.append(wp_str2)
 
     def save_gpx(self):
         pass
