@@ -49,51 +49,51 @@ class GPS_AdafruitSensor:
     MAXWAITSENTENCE = 5
 
     def __init__(self, serial_bus="/dev/ttyAMA0", baud=9600, debug=False):
-	self._GPS = serial.Serial(serial_bus, baud)
-	#self._GPS.write(self.PMTK_Q_RELEASE)
-	#self._version = self._GPS.readline(20)
-	self._GPS.write(self.PMTK_SET_NMEA_UPDATE_1HZ)
-	self._GPS.write(self.PMTK_SET_BAUD_9600)
-	self._GPS.write(self.PMTK_SET_NMEA_OUTPUT_RMCVTGGGA)
-	self._GPS.flush()
+    self._GPS = serial.Serial(serial_bus, baud)
+    #self._GPS.write(self.PMTK_Q_RELEASE)
+    #self._version = self._GPS.readline(20)
+    self._GPS.write(self.PMTK_SET_NMEA_UPDATE_1HZ)
+    self._GPS.write(self.PMTK_SET_BAUD_9600)
+    self._GPS.write(self.PMTK_SET_NMEA_OUTPUT_RMCVTGGGA)
+    self._GPS.flush()
 
     def read_sensor(self):
-	""" Reads GPS and returns (fix, lat, lon, heading, speed, altitude, num_sat, time, date). """
-	if not(self._GPS.inWaiting()):
-	    return self.zero_response()
+    """ Reads GPS and returns (fix, lat, lon, heading, speed, altitude, num_sat, time, date). """
+    if not(self._GPS.inWaiting()):
+        return self.zero_response()
 
-	# read gps gga (fix data) packet
-	hasRead, gps_gga = self.wait_for_sentence('$GPGGA')
-	if not(has_read):
-	    return self.zero_response()
-	if not(gps_gga.gps_qual > 0):
-	    return self.zero_response()
+    # read gps gga (fix data) packet
+    hasRead_gga, gps_gga = self.wait_for_sentence('$GPGGA')
+    if not(has_read_gga):
+        return self.zero_response()
+    if not(gps_gga.gps_qual > 0):
+        return self.zero_response()
 	
-	fix = gps_gga.gps_qual
-	lat = gps_gga.latitude * (1.0 if gps_gga.lat_direction == 'N' else -1.0)
-	lon = gps_gga.longitude * (1.0 if gps_gga.lon_direction == 'E' else -1.0)
-	altitude = gps_gga.antenna_altitude
-	num_sat = gps_gga.num_sats
-	time = gps_gga.timestamp
-        
-	# read gps rmc (recommended minimum) packet
-	has_read, gps_rmc = wait_for_sentence('$GPRMC')
-	if not(has_read):
-	    return self.zero_response()    
-	if not(gps_rmc.data_validity == 'A'):
-	    return self.zero_response()
+    fix = gps_gga.gps_qual
+    lat = gps_gga.latitude * (1.0 if gps_gga.lat_direction == 'N' else -1.0)
+    lon = gps_gga.longitude * (1.0 if gps_gga.lon_direction == 'E' else -1.0)
+    altitude = gps_gga.antenna_altitude
+    num_sat = gps_gga.num_sats
+    time = gps_gga.timestamp
+    
+    # read gps rmc (recommended minimum) packet
+    has_read_rmc, gps_rmc = wait_for_sentence('$GPRMC')
+    if not(has_read_rmc):
+        return self.zero_response()
+    if not(gps_rmc.data_validity == 'A'):
+        return self.zero_response()
 
-	lat = gps_rmc.lat * (1.0 if gps_rmc.lat_dir == 'N' else -1.0)
-	lon = gps_rmc.lon * (1.0 if gps_rmc.lon_dir == 'E' else -1.0)
-	altitude = gps_rmc.antenna_altitude
-	num_sat = gps_rmc.num_sats
-	time = gps_rmc.timestamp
-	date = gps_rmc.datestamp
-	heading = gps_rmc.true_course
-	speed = gps_rmc.spd_over_grnd
+    lat = gps_rmc.lat * (1.0 if gps_rmc.lat_dir == 'N' else -1.0)
+    lon = gps_rmc.lon * (1.0 if gps_rmc.lon_dir == 'E' else -1.0)
+    altitude = gps_rmc.antenna_altitude
+    num_sat = gps_rmc.num_sats
+    time = gps_rmc.timestamp
+    date = gps_rmc.datestamp
+    heading = gps_rmc.true_course
+    speed = gps_rmc.spd_over_grnd
 
-	# and done
-	return fix, lat, lon, heading, speed, altitude, num_sat, time, date
+    # and done
+    return fix, lat, lon, heading, speed, altitude, num_sat, time, date
 
     def read_sensor_raw(self):
         """ Read raw sensor values. """
@@ -104,9 +104,9 @@ class GPS_AdafruitSensor:
 
     def wait_for_sentence(self, wait4me):
         i = 0;
-	while (i < self.MAXWAITSENTENCE):
-	    if self._GPS.inWaiting():
-	        line = self._GPS.readline()
+    while (i < self.MAXWAITSENTENCE):
+        if self._GPS.inWaiting():
+            line = self._GPS.readline()
                 if line.startswith(wait4me):
                     if line.startswith('$GPGGA'):
                         p = pynmea.nmea.GPRMC()
@@ -116,7 +116,7 @@ class GPS_AdafruitSensor:
                         p = pynmea.nmea.GPGGA()
                         p.parse(line)
                         return True, p
-		i += 1
+        i += 1
 
         return False, None
 
