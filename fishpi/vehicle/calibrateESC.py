@@ -6,12 +6,14 @@
 # Calibrate ESC through PWM controller
 #
 
+import raspberrypi
+
 from time import sleep
 from drive_controller import DriveController
 
 if __name__ == "__main__":
     print "Calibrating ESC"
-    drive = DriveController(debug=True)
+    drive = DriveController(debug=True, i2c_bus=raspberrypi.i2c_bus())
 
     raw_input("Power on ESC and enter calibration mode... Then press <ENTER>...")
 

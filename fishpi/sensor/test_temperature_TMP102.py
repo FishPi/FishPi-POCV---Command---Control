@@ -6,6 +6,8 @@
 # Simple test of temperature sensor
 #
 
+import raspberrypi
+
 from temperature_TMP102 import TemperatureSensor
 
 def test_conversions():
@@ -30,11 +32,11 @@ def test_values(value_in, value_expected):
         print "FAIL:  got %f, expected %f for %s" % (value_out, value_expected, bin(value_in))
 
 if __name__ == "__main__":
-    print "Testing value conversions..."
-    test_conversions()
+    #print "Testing value conversions..."
+    #test_conversions()
 
     print "Testing temperature sensor..."
-    tmpSensor = TemperatureSensor()
+    tmpSensor = TemperatureSensor(debug=True, i2c_bus=raspberrypi.i2c_bus())
     value = tmpSensor.read_sensor()
     print "Current temperature: %f" % value
 

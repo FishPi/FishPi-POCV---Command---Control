@@ -7,10 +7,10 @@
 #  - Register definitions at http://www.flytron.com/pdf/Navigatron_Master.pde
 #
 #  - Standard sense gives:
-#    - status, fix2d, fix3d, numSat, gndSpd, altitude, time, location
+#    - fix, lat, lon, heading, speed, altitude, numSat, time, date
 #
 #  - Detailed raw sense gives:
-#    - status, fix2d, fix3d, numSat, gndSpd, altitude, time, location
+#    - fix, lat, lon, heading, speed, altitude, numSat, time, date
 #
 
 #

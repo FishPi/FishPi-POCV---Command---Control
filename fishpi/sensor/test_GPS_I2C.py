@@ -6,6 +6,8 @@
 # Simple test of GPS sensor
 #
 
+import raspberrypi
+
 from time import sleep
 from GPS_I2C import GPS_NavigatronSensor
 
@@ -13,7 +15,7 @@ if __name__ == "__main__":
     print "Testing GPS sensor (running 5x with 5s pause)..."
 
     print "Initialising..."
-    gpsSensor = GPS_NavigatronSensor(debug=True)
+    gpsSensor = GPS_NavigatronSensor(debug=True, i2c_bus=raspberrypi.i2c_bus())
 
     # heading
     print "Reading 1..."
