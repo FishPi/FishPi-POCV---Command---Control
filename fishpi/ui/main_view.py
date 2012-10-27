@@ -90,7 +90,7 @@ class CameraFrame(Frame, object):
         self._view_controller = view_controller
         
         # get latest image
-        image = self._view_controller.get_current_photo()
+        image = self._view_controller.last_img
         photo = ImageTk.PhotoImage(image)
         
         # display it

@@ -69,7 +69,7 @@ class MainViewController:
     
     @property
     def last_img(self):
-        self.camera_controller.last_img
+        return self._kernel.last_img
     
     # Control modes (Manual, AutoPilot)
     def set_manual_mode(self):
@@ -96,20 +96,6 @@ class MainViewController:
         heading_in_rad = (float(heading)/180.0)*math.pi
         self._kernel.set_heading(heading_in_rad)
     
-    # Sensors
-    
-    def read_time(self):
-        return localtime()
-    
-    def read_GPS(self):
-        pass
-    
-    def read_compass(self):
-        pass
-    
-    def get_current_photo(self):
-        return Image.open("fishpi/resources/camera.jpg")
-    
     # Route Planning and Navigation
     
     def navigate_to(self):
@@ -118,10 +104,10 @@ class MainViewController:
         pass
     
     def get_current_map(self):
-        return Image.open("fishpi/resources/bournville.tif")
+        return Image.open(os.path.join(self._kernel.resources_folder(), 'bournville.tif'))
 
     def load_gpx(self):
-        default_path = "fishpi/resources/sample_routes"
+        default_path = os.path.join(self._kernel.resources_folder(), 'sample_routes')
         filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "GPX")])
         if os.path.exists(filename):
             logging.info('loading %s' % filename)
@@ -134,7 +120,7 @@ class MainViewController:
                     logging.info(wp_str)
                     wp_str2 = '{0}  {1}, {2}    X'.format(point.name, point.latitude, point.longitude)
                     self.model.waypoints.append(wp_str2)
-
+    
     def save_gpx(self):
         pass
 
