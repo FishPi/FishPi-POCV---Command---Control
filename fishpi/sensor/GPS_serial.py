@@ -50,7 +50,10 @@ class GPS_AdafruitSensor:
 	self._version = self._GPS.readline(20)
 
     def read_sensor(self):
-	line = self._GPS.readline()
+	
+        line1 = self.scan_for_input()
+        line2 = self.scan_for_input()
+
 	status = 'x'
 	lat = 'x'
 	lon = 'x'
@@ -66,17 +69,14 @@ class GPS_AdafruitSensor:
         """ Read raw sensor values. """
         return self.read_sensor()
 
-    def parse(self, nmea):
-        """ Parses NMEA message. """
-	
-	chars = list(nmea)
-	# do checksum check
-	if chars[len(chars)-4] == '*':
-	    pass
-
-    	if '$GPGGA':
-		pass
-
-	if '$GPRMC':
-		pass
-
+    def scan_for_input(self):
+        line = self._GPS.readline()
+        if line.startswith('$GPRMC'):
+            p = pynmea.nmea.GPRMC()
+            p.parse(line)
+            return 'GPRMC', p
+        if line.startswith('$GPGGA'):
+            p = pynmea.nmea.GPGGA()
+            p.parse(line)
+            return 'GPGGA', p
+        return None, None
