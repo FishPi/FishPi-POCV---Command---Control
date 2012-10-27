@@ -15,32 +15,32 @@ if __name__ == "__main__":
     print "Testing GPS sensor (running 5x with 5s pause)..."
 
     print "Initialising..."
-    gpsSensor = GPS_AdafruitSensor(debug=True, serial_bus=raspberrypi.serial_bus())
-
+    gps_sensor = GPS_AdafruitSensor(debug=True, serial_bus=raspberrypi.serial_bus())
+    print raspberrypi.serial_bus()
     # heading
     print "Reading 1..."
-    fix, lat, lon, heading, speed, altitude, num_sat, time, date = gpsSensor.read_sensor()
-    print (fix, lat, lon, heading, speed, altitude, num_sat, time, date)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Reading 2..."
-    (fix, lat, lon, heading, speed, altitude, num_sat, time, date) = gpsSensor.read_sensor()
-    print (fix, lat, lon, heading, speed, altitude, num_sat, time, date)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
 
     print "Reading 3..."
-    (fix, lat, lon, heading, speed, altitude, num_sat, time, date) = gpsSensor.read_sensor()
-    print (fix, lat, lon, heading, speed, altitude, num_sat, time, date)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Reading 4..."
-    (fix, lat, lon, heading, speed, altitude, num_sat, time, date) = gpsSensor.read_sensor()
-    print (fix, lat, lon, heading, speed, altitude, num_sat, time, date)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Reading 5..."
-    (fix, lat, lon, heading, speed, altitude, num_sat, time, date) = gpsSensor.read_sensor()
-    print (fix, lat, lon, heading, speed, altitude, num_sat, time, date)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Done."

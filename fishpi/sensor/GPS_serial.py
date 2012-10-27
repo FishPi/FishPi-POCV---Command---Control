@@ -11,10 +11,10 @@
 #  - nmea sentence details at http://aprs.gids.nl/nmea/
 #
 #  - Standard sense gives:
-#    - fix, lat, lon, heading, speed, altitude, num_sat, time, date
+#    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 #
 #  - Detailed raw sense gives:
-#    - fix, lat, lon, heading, speed, altitude, num_sat, time, date
+#    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 
 import serial
 import pynmea.nmea
@@ -58,49 +58,47 @@ class GPS_AdafruitSensor:
         self._GPS.flush()
 
     def read_sensor(self):
-        """ Reads GPS and returns (fix, lat, lon, heading, speed, altitude, num_sat, time, date). """
+        """ Reads GPS and returns (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp). """
         if not(self._GPS.inWaiting()):
             return self.zero_response()
 
         # read gps gga (fix data) packet
-        hasRead_gga, gps_gga = self.wait_for_sentence('$GPGGA')
+        has_read_gga, gps_gga = self.wait_for_sentence('$GPGGA')
         if not(has_read_gga):
             return self.zero_response()
         if not(gps_gga.gps_qual > 0):
             return self.zero_response()
 	
         fix = gps_gga.gps_qual
-        lat = gps_gga.latitude * (1.0 if gps_gga.lat_direction == 'N' else -1.0)
-        lon = gps_gga.longitude * (1.0 if gps_gga.lon_direction == 'E' else -1.0)
+        lat = float(gps_gga.latitude) * (1.0 if gps_gga.lat_direction == 'N' else -1.0)
+        lon = float(gps_gga.longitude) * (1.0 if gps_gga.lon_direction == 'E' else -1.0)
         altitude = gps_gga.antenna_altitude
         num_sat = gps_gga.num_sats
-        time = gps_gga.timestamp
+        timestamp = gps_gga.timestamp
         
         # read gps rmc (recommended minimum) packet
-        has_read_rmc, gps_rmc = wait_for_sentence('$GPRMC')
+        has_read_rmc, gps_rmc = self.wait_for_sentence('$GPRMC')
         if not(has_read_rmc):
             return self.zero_response()
         if not(gps_rmc.data_validity == 'A'):
             return self.zero_response()
 
-        lat = gps_rmc.lat * (1.0 if gps_rmc.lat_dir == 'N' else -1.0)
-        lon = gps_rmc.lon * (1.0 if gps_rmc.lon_dir == 'E' else -1.0)
-        altitude = gps_rmc.antenna_altitude
-        num_sat = gps_rmc.num_sats
-        time = gps_rmc.timestamp
-        date = gps_rmc.datestamp
+        lat = float(gps_rmc.lat) * (1.0 if gps_rmc.lat_dir == 'N' else -1.0)
+        lon = float(gps_rmc.lon) * (1.0 if gps_rmc.lon_dir == 'E' else -1.0)
+        timestamp = gps_rmc.timestamp
+        datestamp = gps_rmc.datestamp
         heading = gps_rmc.true_course
         speed = gps_rmc.spd_over_grnd
 
         # and done
-        return fix, lat, lon, heading, speed, altitude, num_sat, time, date
+        return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 
     def read_sensor_raw(self):
         """ Read raw sensor values. """
         return self.read_sensor()
 
     def zero_response(self):
-        return 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0
+        return 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0
 
     def wait_for_sentence(self, wait4me):
         i = 0;
@@ -108,15 +106,15 @@ class GPS_AdafruitSensor:
             i += 1
             if self._GPS.inWaiting():
                 line = self._GPS.readline()
-                    if line.startswith(wait4me):
-                        if line.startswith('$GPGGA'):
-                            p = pynmea.nmea.GPRMC()
-                            p.parse(line)
-                            return True, p
-                        if line.startswith('$GPGGA'):
-                            p = pynmea.nmea.GPGGA()
-                            p.parse(line)
-                            return True, p
+                if line.startswith(wait4me):
+                    if line.startswith('$GPGGA'):
+                        p = pynmea.nmea.GPGGA()
+                        p.parse(line)
+                        return True, p
+		    if line.startswith('$GPRMC'):
+                        p = pynmea.nmea.GPRMC()
+                        p.parse(line)
+                        return True, p
 
         return False, None
 
