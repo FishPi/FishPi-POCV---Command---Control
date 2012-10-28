@@ -16,6 +16,7 @@
 #  - Detailed raw sense gives:
 #    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 
+from datetime import datetime
 import serial
 import pynmea.nmea
 
@@ -74,7 +75,7 @@ class GPS_AdafruitSensor:
         lon = float(gps_gga.longitude) * (1.0 if gps_gga.lon_direction == 'E' else -1.0)
         altitude = gps_gga.antenna_altitude
         num_sat = gps_gga.num_sats
-        timestamp = gps_gga.timestamp
+        timestamp = datetime.strptime(gps_gga.timestamp.rstrip('.000'), "%H%M%S").time()
         
         # read gps rmc (recommended minimum) packet
         has_read_rmc, gps_rmc = self.wait_for_sentence('$GPRMC')
@@ -85,8 +86,8 @@ class GPS_AdafruitSensor:
 
         lat = float(gps_rmc.lat) * (1.0 if gps_rmc.lat_dir == 'N' else -1.0)
         lon = float(gps_rmc.lon) * (1.0 if gps_rmc.lon_dir == 'E' else -1.0)
-        timestamp = gps_rmc.timestamp
-        datestamp = gps_rmc.datestamp
+        timestamp = datetime.strptime(gps_rmc.timestamp.rstrip('.000'), "%H%M%S").time()
+        datestamp = datetime.strptime(gps_rmc.datestamp, "%d%m%y").date()
         heading = gps_rmc.true_course
         speed = gps_rmc.spd_over_grnd
 
@@ -98,7 +99,8 @@ class GPS_AdafruitSensor:
         return self.read_sensor()
 
     def zero_response(self):
-        return 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0
+        dt = datetime.today()
+        return 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, dt.time(), dt.date()
 
     def wait_for_sentence(self, wait4me):
         i = 0;
