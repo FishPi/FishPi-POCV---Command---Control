@@ -8,6 +8,8 @@
 #
 
 import os
+
+from PIL import Image
 import pygame
 import pygame.camera
 from pygame.locals import *
@@ -31,6 +33,7 @@ class CameraController(object):
             self._camera = SingleCamera(camlist[0], self.default_res, self.default_colorspace)
         elif camlist and len(camlist) >= 2:
             self._camera = StereoCamera(camlist[0], camlist[1], self.default_res, self.default_colorspace)
+        self.capture_now()
     
     def capture_now(self):
         """ Captures an image now. """
@@ -39,7 +42,16 @@ class CameraController(object):
     @property
     def last_img(self):
         """ Last image captured. """
-        return self._camera.last_img
+        pil_img = self.pygame_to_pil(self._camera.last_img)
+        return pil_img
+    
+    def pygame_to_pil(self, pygame_image):
+        img_str = pygame.image.tostring(pygame_image, 'RGB')
+        return Image.fromstring('RGB', pygame_image.get_size(), img_str)
+
+    def pil_to_pygame(self, pil_image):
+        imgstr = pil_image.tostring()
+        return pygame.image.fromstring(imgstr, pil_image.size, 'RGB')
 
     def set_capture_mode(self, mode): 
         pass
