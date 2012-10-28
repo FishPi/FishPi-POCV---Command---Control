@@ -38,7 +38,8 @@ def run_main_view(kernel):
     view = MainView(root, controller)
 
     # add callback to kernel for updates
-    root.after(callback_interval, update_callback, root, controller, view)
+    # longer delay on first callback to give UI time for initialisation
+    root.after(5000, update_callback, root, controller, view)
 
     # run ui loop
     root.mainloop()
@@ -47,6 +48,7 @@ def update_callback(root, controller, view):
     """ Callback to perform updates etc. Needs to reregister callback at end. """
     # update kernel - note this will need revisiting for non-interactive modes...
     logging.debug("In update...")
+    controller._kernel.camera_controller.enabled = controller.model.capture_img_enabled.get()
     controller._kernel.update()
     # tell controller to update model (from kernel)
     controller.update()
@@ -79,8 +81,8 @@ class MainViewController:
         self.model.compass_heading.set(self._kernel.data.compass_heading)
         
         # time data
-        self.model.time.set(self._kernel.data.timestamp)
-        self.model.date.set(self._kernel.data.datestamp)
+        self.model.time.set(self._kernel.data.timestamp.isoformat())
+        self.model.date.set(self._kernel.data.datestamp.isoformat())
         
         # other data
         self.model.temperature.set(self._kernel.data.temperature)

@@ -13,7 +13,7 @@
 import logging
 import os
 import platform
-from time import localtime
+from datetime import datetime
 
 from PIL import Image
 
@@ -98,7 +98,9 @@ class FishPiKernel:
     # Sensors
     
     def read_time(self):
-        return localtime()
+        dt = datetime.today()
+        self.data.timestamp = dt.time()
+        self.data.datestamp = dt.date()
     
     def read_GPS(self):
         if self._gps_sensor:
