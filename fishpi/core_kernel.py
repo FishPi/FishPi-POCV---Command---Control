@@ -22,6 +22,11 @@ from model_data import POCVModelData
 from control.navigation import NavigationUnit
 from perception.world import PerceptionUnit
 
+#temp
+import raspberrypi
+from sensor.GPS_serial import GPS_AdafruitSensor
+from sensor.compass_CMPS10 import Cmps10_Sensor
+
 class FishPiKernel:
     """ Coordinator between different layers. """
     
@@ -30,7 +35,11 @@ class FishPiKernel:
         self._gps_sensor = None
         self._compass_sensor = None
         self._temperature_sensor = None
-        
+
+        # temp test
+        self._gps_sensor = GPS_AdafruitSensor()
+        self._compass_sensor = Cmps10_Sensor(i2c_bus=raspberrypi.i2c_bus())
+
         # setup controllers and coordinating services
         
         # CameraController
