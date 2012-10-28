@@ -18,6 +18,7 @@ from time import localtime
 from PIL import Image
 
 from localconfig import FishPiConfig
+from model_data import POCVModelData
 from control.navigation import NavigationUnit
 from perception.world import PerceptionUnit
 
@@ -26,6 +27,9 @@ class FishPiKernel:
     
     def __init__(self, config):
         self.config = config
+        self._gps_sensor = None
+        self._compass_sensor = None
+        self._temperature_sensor = None
         
         # setup controllers and coordinating services
         
@@ -57,11 +61,13 @@ class FishPiKernel:
         
         self.perception_unit = PerceptionUnit()
         self.navigation_unit = NavigationUnit(self.drive_controller, self.perception_unit)
+        self.data = POCVModelData()
 
     def update(self):
-        #(fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = self.gps_sensor.read_sensor()
-        self.camera_controller.capture_now()
-        pass
+        self.read_time()
+        self.read_GPS()
+        self.read_compass()
+        self.capture_img()
     
     def resources_folder(self):
         return os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources')
@@ -95,11 +101,27 @@ class FishPiKernel:
         return localtime()
     
     def read_GPS(self):
-        pass
+        if self._gps_sensor:
+            (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = self._gps_sensor.read_sensor()
+            self.data.fix = fix
+            self.data.lat = lat
+            self.data.lon = lon
+            self.data.gps_heading = heading
+            self.data.speed = speed
+            self.data.altitude = altitude
+            self.data.num_sat = num_sat
+            self.data.timestamp = timestamp
+            self.data.datestamp = datestamp
     
     def read_compass(self):
-        pass
-    
+        if self._compass_sensor:
+            heading = self._compass_sensor.read_sensor()
+            self.data.compass_heading = heading
+
+    def read_temperature(self):
+        if self._temperature_sensor:
+            temperature = self._temperature_sensor.read_sensor()
+            self.data.temperature = temperature
     
     # Route Planning and Navigation
     

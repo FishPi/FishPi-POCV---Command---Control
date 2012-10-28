@@ -64,27 +64,26 @@ class MainViewController:
     
     def update(self):
         """ Updates view model from kernel. """
-        """# GPS data
-        self.model.GPS_latitude.set()
-        self.model.GPS_longitude.set()
+        # GPS data
+        self.model.GPS_latitude.set(self._kernel.data.lat)
+        self.model.GPS_longitude.set(self._kernel.data.lon)
         
-        self.model.GPS_heading.set()
-        self.model.GPS_speed.set()
-        self.model.GPS_altitude.set()
+        self.model.GPS_heading.set(self._kernel.data.gps_heading)
+        self.model.GPS_speed.set(self._kernel.data.speed)
+        self.model.GPS_altitude.set(self._kernel.data.altitude)
         
-        self.model.GPS_fix.set()
-        self.model.GPS_satellite_count.set()
+        self.model.GPS_fix.set(self._kernel.data.fix)
+        self.model.GPS_satellite_count.set(self._kernel.data.num_sat)
         
         # compass data
-        self.model.compass_heading.set()
+        self.model.compass_heading.set(self._kernel.data.compass_heading)
         
         # time data
-        self.model.time.set()
-        self.model.date.set()
+        self.model.time.set(self._kernel.data.timestamp)
+        self.model.date.set(self._kernel.data.datestamp)
         
         # other data
-        self.model.temperature.set()"""
-        pass
+        self.model.temperature.set(self._kernel.data.temperature)
     
     @property
     def last_img(self):
