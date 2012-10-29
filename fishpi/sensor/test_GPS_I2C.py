@@ -19,28 +19,28 @@ if __name__ == "__main__":
 
     # heading
     print "Reading 1..."
-    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
-    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Reading 2..."
-    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
-    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
-
+    
     print "Reading 3..."
-    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
-    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Reading 4..."
-    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
-    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Reading 5..."
-    (status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time) = gpsSensor.read_sensor()
-    print "(status, lat,lon) = (%s, %f, %f)" % (hex(status), lat, lon)
+    (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
+    print fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     sleep(5)
     
     print "Done."

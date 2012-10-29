@@ -7,10 +7,10 @@
 #  - Register definitions at http://www.flytron.com/pdf/Navigatron_Master.pde
 #
 #  - Standard sense gives:
-#    - fix, lat, lon, heading, speed, altitude, numSat, time, date
+#    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 #
 #  - Detailed raw sense gives:
-#    - fix, lat, lon, heading, speed, altitude, numSat, time, date
+#    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 #
 
 #
@@ -71,6 +71,10 @@ class GPS_NavigatronSensor:
         status = self.i2c.readU8(self.I2C_GPS_STATUS)
         if self.debug:
             print "GPS: status %s" % hex(status)
+        
+        fix = 1
+        num_sat = 1
+    
         # read data
         if self.debug:
             print "GPS: reading location..."
@@ -79,6 +83,7 @@ class GPS_NavigatronSensor:
         lon = float((loc_buffer[4]<<24)|(loc_buffer[5]<<16)|(loc_buffer[6]<<8)|(loc_buffer[7]))
         if self.debug:
             print "GPS: (lat,lon) = (%f, %f)" % (lat,lon)
+    
         # read remaining data
         if self.debug:
             print "GPS: reading nav heading..."
@@ -88,11 +93,12 @@ class GPS_NavigatronSensor:
             print "GPS: bearing to (N/S, E/W) = (%f, %f)" % (nav_lat, nav_lon)
         if self.debug:
             print "GPS: reading ground speed and altitude..."
-        gnd_spd = self.i2c.readU16(self.I2C_GPS_GROUND_SPEED)/100.0
+        speed = self.i2c.readU16(self.I2C_GPS_GROUND_SPEED)/100.0
         altitude = self.i2c.readU16(self.I2C_GPS_ALTITUDE)
-        gnd_course = self.i2c.readU16(self.I2C_GPS_GROUND_COURSE)
+        heading = self.i2c.readU16(self.I2C_GPS_GROUND_COURSE)
         if self.debug:
-            print "GPS: (ground speed, altitde, ground course) = (%f, %f, %f)" % (gnd_spd, altitude, gnd_course)
+            print "GPS: (ground speed, altitude, ground course) = (%f, %f, %f)" % (speed, altitude, heading)
+
         # read time
         if self.debug:
             print "GPS: reading time..."
@@ -100,8 +106,11 @@ class GPS_NavigatronSensor:
         time = float((time_buffer[0]<<24)|(time_buffer[1]<<16)|(time_buffer[2]<<8)|(time_buffer[3]))/10000.0
         if self.debug:
             print "GPS: time = %f" % time
-        # and return (just as tuple for now)
-        return status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time
+        timestamp = x
+        datestamp = x
+                
+        # and return
+        return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 
     def read_sensor_raw(self):
         """ Read raw sensor values. """
