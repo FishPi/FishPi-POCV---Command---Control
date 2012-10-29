@@ -50,6 +50,7 @@ class GPS_AdafruitSensor:
     MAXWAITSENTENCE = 5
 
     def __init__(self, serial_bus="/dev/ttyAMA0", baud=9600, debug=False):
+        self.debug = debug
         self._GPS = serial.Serial(serial_bus, baud)
         #self._GPS.write(self.PMTK_Q_RELEASE)
         #self._version = self._GPS.readline(20)
@@ -110,10 +111,12 @@ class GPS_AdafruitSensor:
                 line = self._GPS.readline()
                 if line.startswith(wait4me):
                     if line.startswith('$GPGGA'):
+                        logging.debug("Received GPGGA: %s", line)
                         p = pynmea.nmea.GPGGA()
                         p.parse(line)
                         return True, p
-		    if line.startswith('$GPRMC'):
+                    if line.startswith('$GPRMC'):
+                        logging.debug("Received GPRMC: %s", line)
                         p = pynmea.nmea.GPRMC()
                         p.parse(line)
                         return True, p

@@ -25,7 +25,7 @@ class CameraController(object):
     def __init__(self, configuration):
         self.configuration = configuration
         self._tick_count = self.TICK_DELAY
-        self.enabled = True
+        self.enabled = False
         # set capture path
         self.imgs_path = configuration.imgs_path
         # get and initialise devices
