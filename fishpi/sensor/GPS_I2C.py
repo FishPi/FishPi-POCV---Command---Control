@@ -16,6 +16,8 @@
 #
 # Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
 
+from datetime import datetime
+
 from Adafruit_I2C import Adafruit_I2C
 
 class GPS_NavigatronSensor:
@@ -106,8 +108,11 @@ class GPS_NavigatronSensor:
         time = float((time_buffer[0]<<24)|(time_buffer[1]<<16)|(time_buffer[2]<<8)|(time_buffer[3]))/10000.0
         if self.debug:
             print "GPS: time = %f" % time
-        timestamp = x
-        datestamp = x
+        dt = datetime.today()
+        timestamp = dt.time()
+        datestamp = dt.date()
+        #timestamp = x
+        #datestamp = x
                 
         # and return
         return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
