@@ -128,7 +128,7 @@ class MainViewController:
 
     def load_gpx(self):
         default_path = os.path.join(self._kernel.config.resources_folder(), 'sample_routes')
-        filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "*.GPX")])
+        filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "*.GPX; *.gpx")])
         if os.path.exists(filename):
             logging.info('loading %s' % filename)
             gpx = self._kernel.load_gpx(filename)
