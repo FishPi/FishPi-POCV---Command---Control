@@ -172,15 +172,15 @@ class FishPiConfig(object):
         elif addr == 0x60:
             try:
                 from sensor.compass_CMPS10 import Cmps10_Sensor
-                self._compass_sensor = Cmps10_Sensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
+                self.compass_sensor = Cmps10_Sensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
                 logging.warning("Error setting up COMPASS over i2c - %s" % ex)
-            return "COMPASS", self._compass_sensor
+            return "COMPASS", self.compass_sensor
         
         elif addr == 0x40: #or addr == 0x70:
             # DriveController (not sure what 0x70 address is for...)
             try:
-                from vehicle.DriveController import DriveController
+                from vehicle.drive_controller import DriveController
                 # TODO pwm addresses from config?
                 self.drive_controller = DriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:

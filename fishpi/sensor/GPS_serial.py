@@ -17,6 +17,7 @@
 #    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 
 from datetime import datetime
+import logging
 import serial
 import pynmea.nmea
 
@@ -70,7 +71,9 @@ class GPS_AdafruitSensor:
             return self.zero_response()
         if not(gps_gga.gps_qual > 0):
             return self.zero_response()
-	
+        if not(gps_gga.latitude) or not(gps_gga.longitude):
+            return self.zero_response()
+
         fix = gps_gga.gps_qual
         lat = float(gps_gga.latitude) * (1.0 if gps_gga.lat_direction == 'N' else -1.0)
         lon = float(gps_gga.longitude) * (1.0 if gps_gga.lon_direction == 'E' else -1.0)

@@ -48,11 +48,14 @@ class FishPiKernel:
 
     def update(self):
         """ Update loop for sensors. """
-        self.read_time()
-        self.read_GPS()
-        self.read_compass()
-        self.capture_img()
-        
+        try:
+            self.read_time()
+            self.read_compass()
+            self.read_GPS()
+            self.capture_img()
+        except Exception as ex:
+            logging.info('Error in update loop - %s' % ex)
+
     # Devices
     
     def list_devices(self):
