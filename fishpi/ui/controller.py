@@ -38,7 +38,8 @@ def run_main_view(kernel):
     view = MainView(root, controller)
 
     # add callback to kernel for updates
-    root.after(callback_interval, update_callback, root, controller, view)
+    # longer delay on first callback to give UI time for initialisation
+    root.after(5000, update_callback, root, controller, view)
 
     # run ui loop
     root.mainloop()
@@ -47,6 +48,7 @@ def update_callback(root, controller, view):
     """ Callback to perform updates etc. Needs to reregister callback at end. """
     # update kernel - note this will need revisiting for non-interactive modes...
     logging.debug("In update...")
+    controller._kernel.set_capture_img_enabled(controller.model.capture_img_enabled.get())
     controller._kernel.update()
     # tell controller to update model (from kernel)
     controller.update()
@@ -64,27 +66,26 @@ class MainViewController:
     
     def update(self):
         """ Updates view model from kernel. """
-        """# GPS data
-        self.model.GPS_latitude.set()
-        self.model.GPS_longitude.set()
+        # GPS data
+        self.model.GPS_latitude.set(self._kernel.data.lat)
+        self.model.GPS_longitude.set(self._kernel.data.lon)
         
-        self.model.GPS_heading.set()
-        self.model.GPS_speed.set()
-        self.model.GPS_altitude.set()
+        self.model.GPS_heading.set(self._kernel.data.gps_heading)
+        self.model.GPS_speed.set(self._kernel.data.speed)
+        self.model.GPS_altitude.set(self._kernel.data.altitude)
         
-        self.model.GPS_fix.set()
-        self.model.GPS_satellite_count.set()
+        self.model.GPS_fix.set(self._kernel.data.fix)
+        self.model.GPS_satellite_count.set(self._kernel.data.num_sat)
         
         # compass data
-        self.model.compass_heading.set()
+        self.model.compass_heading.set(self._kernel.data.compass_heading)
         
         # time data
-        self.model.time.set()
-        self.model.date.set()
+        self.model.time.set(self._kernel.data.timestamp.isoformat())
+        self.model.date.set(self._kernel.data.datestamp.isoformat())
         
         # other data
-        self.model.temperature.set()"""
-        pass
+        self.model.temperature.set(self._kernel.data.temperature)
     
     @property
     def last_img(self):
@@ -94,11 +95,11 @@ class MainViewController:
     def set_manual_mode(self):
         """ Stops navigation unit and current auto-pilot drive. """
         self._kernel.navigation_unit.halt()
-        self._kernel.drive_controller.halt()
+        self._kernel.halt()
     
     def set_auto_pilot_mode(self):
         """ Stops current manual drive and starts navigation unit. """
-        self._kernel.drive_controller.halt()
+        self._kernel.halt()
         self._kernel.navigation_unit.start()
     
     def halt(self):
@@ -123,11 +124,11 @@ class MainViewController:
         pass
     
     def get_current_map(self):
-        return Image.open(os.path.join(self._kernel.resources_folder(), 'bournville.tif'))
+        return Image.open(os.path.join(self._kernel.config.resources_folder(), 'bournville.tif'))
 
     def load_gpx(self):
-        default_path = os.path.join(self._kernel.resources_folder(), 'sample_routes')
-        filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "GPX")])
+        default_path = os.path.join(self._kernel.config.resources_folder(), 'sample_routes')
+        filename = tkFileDialog.askopenfilename(initialdir=default_path, title="Select GPX file to load", filetypes=[("GPX", "*.GPX; *.gpx")])
         if os.path.exists(filename):
             logging.info('loading %s' % filename)
             gpx = self._kernel.load_gpx(filename)

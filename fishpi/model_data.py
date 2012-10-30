@@ -10,67 +10,19 @@ class POCVModelData:
     """ Internal model containing FishPi POCV state. """
 
     def __init__(self):
-        pass
+        self.fix = 0
+        self.lat = 0.0
+        self.lon = 0.0
+        self.gps_heading = 0.0
+        self.speed = 0.0
+        self.altitude = 0.0
+        self.num_sat = 0
+        self.timestamp = ''
+        self.datestamp = ''
 
-    def getHeading(self):
-        pass
+        self.compass_heading = 0.0
 
-    def getSpeed(self):
-        pass
+        self.temperature = 0.0
 
-    def getDriveSetting(self):
-        pass
 
-    def getSteeringSetting(self):
-        pass
-
-    def getLatLong(self):
-        pass
-
-    def getDateTime(self):
-        pass
-
-    def getRouteData(self):
-        pass
-
-class RouteData:
-    """ Internal model containing Route Data. """
-
-    def __init__(self):
-        pass
-
-class SensorData:
-    """ Internal model containing Sensor Data. """
-
-    def __init__(self):
-        pass
-
-    def getGPSData(self):
-        pass
-
-    def getCompassData(self):
-        pass
-
-    def getTemperatureData(self):
-        pass
-
-    def getGyroData(self):
-        pass
-
-    def getAccelerometerData(self):
-        pass
-
-class CameraData:
-    """ Internal model containing Camera Data. """
-
-    def __init__(self):
-        pass
-
-    def getCaptureMode(self):
-        pass
-
-    def getIsEnabled(self):
-        pass
-
-    def getLastImageLocation(self):
-        pass
+        

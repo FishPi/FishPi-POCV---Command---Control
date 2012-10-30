@@ -13,11 +13,10 @@
 import logging
 import os
 import platform
-from time import localtime
-
-from PIL import Image
+from datetime import datetime
 
 from localconfig import FishPiConfig
+from model_data import POCVModelData
 from control.navigation import NavigationUnit
 from perception.world import PerceptionUnit
 
@@ -27,45 +26,36 @@ class FishPiKernel:
     def __init__(self, config):
         self.config = config
         
-        # setup controllers and coordinating services
+        # pull over all hw devices (or proxies) from config
         
-        # CameraController
-        if platform.system() == "Linux":
-            try:
-                from sensor.camera import CameraController
-                self.camera_controller = CameraController(self.config)
-            except ImportError as ex:
-                logging.info(ex)
-                logging.info("Camera support unavailable.")
-                self.camera_controller = DummyCameraController(self.resources_folder())
-        else:
-            logging.info("Camera support unavailable.")
-            self.camera_controller = DummyCameraController(self.resources_folder())
-            
-        # DriveController
-        if os.getuid() == 0:
-            try:
-                from vehicle.DriveController import DriveController
-                # TODO pull out address from self.config.drive (and possibly pwm addresses)
-                self.drive_controller = DriveController()
-            except ImportError:
-                logging.info("Drive controller not loaded, drive support unavailable.")
-                self.drive_controller = DummyDriveController()
-        else:
-            logging.info("Not running as root, drive support unavailable.")
-            self.drive_controller = DummyDriveController()
+        # sensors
+        self._gps_sensor = config.gps_sensor
+        self._compass_sensor = config.compass_sensor
+        self._temperature_sensor = config.temperature_sensor
         
+        # vehicle
+        self._drive_controller = config.drive_controller
+        
+        # camera
+        self._camera_controller = config.camera_controller
+
+        # supporting classes
         self.perception_unit = PerceptionUnit()
-        self.navigation_unit = NavigationUnit(self.drive_controller, self.perception_unit)
+        self.navigation_unit = NavigationUnit(self._drive_controller, self.perception_unit)
+        
+        # data class
+        self.data = POCVModelData()
 
     def update(self):
-        (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = self.gps_sensor.read_sensor()
-        
-        pass
-    
-    def resources_folder(self):
-        return os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources')
-    
+        """ Update loop for sensors. """
+        try:
+            self.read_time()
+            self.read_compass()
+            self.read_GPS()
+            self.capture_img()
+        except Exception as ex:
+            logging.info('Error in update loop - %s' % ex)
+
     # Devices
     
     def list_devices(self):
@@ -74,32 +64,56 @@ class FishPiKernel:
             logging.info(device)
     
     def capture_img(self):
-        self.camera_controller.capture_now()
+        self._camera_controller.capture_now()
+    
+    def get_capture_img_enabled(self):
+        return self._camera_controller.enabled
+    
+    def set_capture_img_enabled(self, capture_img_enabled):
+        self._camera_controller.enabled = capture_img_enabled
     
     @property
     def last_img(self):
-        return self.camera_controller.last_img
-    
-    # Control Systems
-    # temporary direct access to DriveController to test hardware.
-    
-    def set_throttle(self, throttle_level):
-        self.drive_controller.set_throttle(throttle_level)
-    
-    def set_heading(self, heading):
-        self.drive_controller.set_heading(heading)
+        return self._camera_controller.last_img
         
     # Sensors
     
     def read_time(self):
-        return localtime()
+        dt = datetime.today()
+        self.data.timestamp = dt.time()
+        self.data.datestamp = dt.date()
     
     def read_GPS(self):
-        pass
+        if self._gps_sensor:
+            (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = self._gps_sensor.read_sensor()
+            self.data.fix = fix
+            self.data.lat = lat
+            self.data.lon = lon
+            self.data.gps_heading = heading
+            self.data.speed = speed
+            self.data.altitude = altitude
+            self.data.num_sat = num_sat
+            self.data.timestamp = timestamp
+            self.data.datestamp = datestamp
     
     def read_compass(self):
-        pass
+        if self._compass_sensor:
+            heading = self._compass_sensor.read_sensor()
+            self.data.compass_heading = heading
+
+    def read_temperature(self):
+        if self._temperature_sensor:
+            temperature = self._temperature_sensor.read_sensor()
+            self.data.temperature = temperature
     
+    # Control Systems
+    # temporary direct access to DriveController to test hardware.
+
+    def set_throttle(self, throttle_level):
+        self._drive_controller.set_throttle(throttle_level)
+
+    def set_heading(self, heading):
+        self._drive_controller.set_heading(heading)
     
     # Route Planning and Navigation
     
@@ -111,37 +125,8 @@ class FishPiKernel:
     def halt(self):
         """ Commands the NavigationUnit and Drive Control to Halt! """
         self.navigation_unit.halt()
-        self.drive_controller.halt()
+        self._drive_controller.halt()
 
     def load_gpx(self, filename):
         gpx = self.perception_unit.load_gpx(filename)
         return gpx
-
-class DummyCameraController(object):
-    
-    def __init__(self, resources_folder):
-        temp_image_path = os.path.join(resources_folder, 'camera.jpg')
-        self._last_img = Image.open(temp_image_path)
-    
-    def capture_now(self):
-        pass
-    
-    @property
-    def last_img(self):
-        return self._last_img
-
-class DummyDriveController(object):
-    def __init__(self):
-        pass
-    
-    def set_throttle(self, throttle_level):
-        logging.debug("Throttle set to: %s" % throttle_level)
-        pass
-    
-    def set_heading(self, heading):
-        logging.debug("Heading set to: %s" % heading)
-        pass
-    
-    def halt(self):
-        logging.debug("Drive halting.")
-        pass

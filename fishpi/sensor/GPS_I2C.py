@@ -7,14 +7,16 @@
 #  - Register definitions at http://www.flytron.com/pdf/Navigatron_Master.pde
 #
 #  - Standard sense gives:
-#    - fix, lat, lon, heading, speed, altitude, numSat, time, date
+#    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 #
 #  - Detailed raw sense gives:
-#    - fix, lat, lon, heading, speed, altitude, numSat, time, date
+#    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 #
 
 #
 # Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
+
+from datetime import datetime
 
 from Adafruit_I2C import Adafruit_I2C
 
@@ -71,14 +73,21 @@ class GPS_NavigatronSensor:
         status = self.i2c.readU8(self.I2C_GPS_STATUS)
         if self.debug:
             print "GPS: status %s" % hex(status)
+        
+        fix = 1
+        num_sat = 1
+    
         # read data
         if self.debug:
             print "GPS: reading location..."
         loc_buffer = self.i2c.readList(self.I2C_GPS_LOCATION, 8)
-        lat = float((loc_buffer[0]<<24)|(loc_buffer[1]<<16)|(loc_buffer[2]<<8)|(loc_buffer[3]))
-        lon = float((loc_buffer[4]<<24)|(loc_buffer[5]<<16)|(loc_buffer[6]<<8)|(loc_buffer[7]))
+        ulat = float((loc_buffer[3]<<24)|(loc_buffer[2]<<16)|(loc_buffer[1]<<8)|(loc_buffer[0]))
+        ulon = float((loc_buffer[7]<<24)|(loc_buffer[6]<<16)|(loc_buffer[5]<<8)|(loc_buffer[4]))
+        lat = self.convert_u_l(ulat)/10000000.0
+        lon = self.convert_u_l(ulon)/10000000.0
         if self.debug:
             print "GPS: (lat,lon) = (%f, %f)" % (lat,lon)
+    
         # read remaining data
         if self.debug:
             print "GPS: reading nav heading..."
@@ -88,20 +97,33 @@ class GPS_NavigatronSensor:
             print "GPS: bearing to (N/S, E/W) = (%f, %f)" % (nav_lat, nav_lon)
         if self.debug:
             print "GPS: reading ground speed and altitude..."
-        gnd_spd = self.i2c.readU16(self.I2C_GPS_GROUND_SPEED)/100.0
+        speed = self.i2c.readU16(self.I2C_GPS_GROUND_SPEED)/100.0
         altitude = self.i2c.readU16(self.I2C_GPS_ALTITUDE)
-        gnd_course = self.i2c.readU16(self.I2C_GPS_GROUND_COURSE)
+        heading = self.i2c.readU16(self.I2C_GPS_GROUND_COURSE)
         if self.debug:
-            print "GPS: (ground speed, altitde, ground course) = (%f, %f, %f)" % (gnd_spd, altitude, gnd_course)
+            print "GPS: (ground speed, altitude, ground course) = (%f, %f, %f)" % (speed, altitude, heading)
+
         # read time
         if self.debug:
             print "GPS: reading time..."
         time_buffer = self.i2c.readList(self.I2C_GPS_TIME, 4)
-        time = float((time_buffer[0]<<24)|(time_buffer[1]<<16)|(time_buffer[2]<<8)|(time_buffer[3]))/10000.0
+        time = float((time_buffer[3]<<24)|(time_buffer[2]<<16)|(time_buffer[1]<<8)|(time_buffer[0]))/10000.0
         if self.debug:
             print "GPS: time = %f" % time
-        # and return (just as tuple for now)
-        return status, lat, lon, nav_lat, nav_lon, gnd_spd, altitude, gnd_course, time
+        dt = datetime.today()
+        timestamp = dt.time()
+        datestamp = dt.date()
+        #timestamp = datetime.strptime(int(time), "%H%M%S").time()
+        #datestamp = x
+                
+        # and return
+        return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
+    
+    def convert_u_l(self, value_in):
+        if value_in >> 31:
+            return float(int('0b'+''.join('1' if c == '0' else '0' for c in bin(value_in-1).lstrip('-0b')),2)) * -1.0
+        else:
+            return float(value_in)
 
     def read_sensor_raw(self):
         """ Read raw sensor values. """

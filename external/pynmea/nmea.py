@@ -1,5 +1,5 @@
 import re
-from pynmea.utils import checksum_calc
+from utils import checksum_calc
 
 class NMEASentence(object):
     """ Base sentence class. This is used to pull apart a sentence.
