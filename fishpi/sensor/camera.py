@@ -8,6 +8,8 @@
 #
 
 import os
+import logging
+from PIL import Image
 import pygame
 import pygame.camera
 from pygame.locals import *
@@ -15,11 +17,15 @@ from pygame.locals import *
 class CameraController(object):
     """ Provides access to camera devices. """
 
+    TICK_DELAY = 5
+
     default_res = (320,240)    
     default_colorspace = "RGB"
 
     def __init__(self, configuration):
         self.configuration = configuration
+        self._tick_count = self.TICK_DELAY
+        self.enabled = False
         # set capture path
         self.imgs_path = configuration.imgs_path
         # get and initialise devices
@@ -31,23 +37,36 @@ class CameraController(object):
             self._camera = SingleCamera(camlist[0], self.default_res, self.default_colorspace)
         elif camlist and len(camlist) >= 2:
             self._camera = StereoCamera(camlist[0], camlist[1], self.default_res, self.default_colorspace)
+        self.capture_now(override_enabled=True)
     
-    def capture_now(self):
+    def capture_now(self, override_enabled=False):
         """ Captures an image now. """
-        self._camera.capture(self.imgs_path)
+        if not(override_enabled) and not(self.enabled):
+            return
+
+        if self._tick_count >= self.TICK_DELAY:
+            logging.debug('Updating image...')
+            self._camera.capture(self.imgs_path)
+            # might be more performat to just reload from filesystem into 'correct' library
+            self._pil_img = self.pygame_to_pil(self._camera.last_img)
+            self._tick_count = 0
+        else:
+            self._tick_count += 1
 
     @property
     def last_img(self):
         """ Last image captured. """
-        return self._camera.last_img
+        return self._pil_img
+    
+    def pygame_to_pil(self, pygame_image):
+        img_str = pygame.image.tostring(pygame_image, self.default_colorspace)
+        return Image.fromstring(self.default_colorspace, pygame_image.get_size(), img_str)
+
+    def pil_to_pygame(self, pil_image):
+        imgstr = pil_image.tostring()
+        return pygame.image.fromstring(imgstr, pil_image.size, self.default_colorspace)
 
     def set_capture_mode(self, mode): 
-        pass
-
-    def enable_capture(self):
-        pass
-
-    def disable_capture(self):
         pass
 
 class SingleCamera(object):

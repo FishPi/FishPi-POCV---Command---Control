@@ -16,6 +16,8 @@
 #  - Detailed raw sense gives:
 #    - fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 
+from datetime import datetime
+import logging
 import serial
 import pynmea.nmea
 
@@ -49,6 +51,7 @@ class GPS_AdafruitSensor:
     MAXWAITSENTENCE = 5
 
     def __init__(self, serial_bus="/dev/ttyAMA0", baud=9600, debug=False):
+        self.debug = debug
         self._GPS = serial.Serial(serial_bus, baud)
         #self._GPS.write(self.PMTK_Q_RELEASE)
         #self._version = self._GPS.readline(20)
@@ -68,13 +71,15 @@ class GPS_AdafruitSensor:
             return self.zero_response()
         if not(gps_gga.gps_qual > 0):
             return self.zero_response()
-	
+        if not(gps_gga.latitude) or not(gps_gga.longitude):
+            return self.zero_response()
+
         fix = gps_gga.gps_qual
         lat = float(gps_gga.latitude) * (1.0 if gps_gga.lat_direction == 'N' else -1.0)
         lon = float(gps_gga.longitude) * (1.0 if gps_gga.lon_direction == 'E' else -1.0)
         altitude = gps_gga.antenna_altitude
         num_sat = gps_gga.num_sats
-        timestamp = gps_gga.timestamp
+        timestamp = datetime.strptime(gps_gga.timestamp.rstrip('.000'), "%H%M%S").time()
         
         # read gps rmc (recommended minimum) packet
         has_read_rmc, gps_rmc = self.wait_for_sentence('$GPRMC')
@@ -85,8 +90,8 @@ class GPS_AdafruitSensor:
 
         lat = float(gps_rmc.lat) * (1.0 if gps_rmc.lat_dir == 'N' else -1.0)
         lon = float(gps_rmc.lon) * (1.0 if gps_rmc.lon_dir == 'E' else -1.0)
-        timestamp = gps_rmc.timestamp
-        datestamp = gps_rmc.datestamp
+        timestamp = datetime.strptime(gps_rmc.timestamp.rstrip('.000'), "%H%M%S").time()
+        datestamp = datetime.strptime(gps_rmc.datestamp, "%d%m%y").date()
         heading = gps_rmc.true_course
         speed = gps_rmc.spd_over_grnd
 
@@ -98,7 +103,8 @@ class GPS_AdafruitSensor:
         return self.read_sensor()
 
     def zero_response(self):
-        return 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0
+        dt = datetime.today()
+        return 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, dt.time(), dt.date()
 
     def wait_for_sentence(self, wait4me):
         i = 0;
@@ -108,10 +114,12 @@ class GPS_AdafruitSensor:
                 line = self._GPS.readline()
                 if line.startswith(wait4me):
                     if line.startswith('$GPGGA'):
+                        logging.debug("Received GPGGA: %s", line)
                         p = pynmea.nmea.GPGGA()
                         p.parse(line)
                         return True, p
-		    if line.startswith('$GPRMC'):
+                    if line.startswith('$GPRMC'):
+                        logging.debug("Received GPRMC: %s", line)
                         p = pynmea.nmea.GPRMC()
                         p.parse(line)
                         return True, p

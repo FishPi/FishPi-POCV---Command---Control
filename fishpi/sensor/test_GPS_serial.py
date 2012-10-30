@@ -17,6 +17,7 @@ if __name__ == "__main__":
     print "Initialising..."
     gps_sensor = GPS_AdafruitSensor(debug=True, serial_bus=raspberrypi.serial_bus())
     print raspberrypi.serial_bus()
+    
     # heading
     print "Reading 1..."
     (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = gps_sensor.read_sensor()
