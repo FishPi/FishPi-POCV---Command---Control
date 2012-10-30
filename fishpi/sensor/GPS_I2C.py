@@ -81,8 +81,10 @@ class GPS_NavigatronSensor:
         if self.debug:
             print "GPS: reading location..."
         loc_buffer = self.i2c.readList(self.I2C_GPS_LOCATION, 8)
-        lat = float((loc_buffer[0]<<24)|(loc_buffer[1]<<16)|(loc_buffer[2]<<8)|(loc_buffer[3]))
-        lon = float((loc_buffer[4]<<24)|(loc_buffer[5]<<16)|(loc_buffer[6]<<8)|(loc_buffer[7]))
+        ulat = float((loc_buffer[3]<<24)|(loc_buffer[2]<<16)|(loc_buffer[1]<<8)|(loc_buffer[0]))
+        ulon = float((loc_buffer[7]<<24)|(loc_buffer[6]<<16)|(loc_buffer[5]<<8)|(loc_buffer[4]))
+        lat = self.convert_u_l(ulat)/10000000.0
+        lon = self.convert_u_l(ulon)/10000000.0
         if self.debug:
             print "GPS: (lat,lon) = (%f, %f)" % (lat,lon)
     
@@ -105,17 +107,23 @@ class GPS_NavigatronSensor:
         if self.debug:
             print "GPS: reading time..."
         time_buffer = self.i2c.readList(self.I2C_GPS_TIME, 4)
-        time = float((time_buffer[0]<<24)|(time_buffer[1]<<16)|(time_buffer[2]<<8)|(time_buffer[3]))/10000.0
+        time = float((time_buffer[3]<<24)|(time_buffer[2]<<16)|(time_buffer[1]<<8)|(time_buffer[0]))/10000.0
         if self.debug:
             print "GPS: time = %f" % time
         dt = datetime.today()
         timestamp = dt.time()
         datestamp = dt.date()
-        #timestamp = x
+        #timestamp = datetime.strptime(int(time), "%H%M%S").time()
         #datestamp = x
                 
         # and return
         return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
+    
+    def convert_u_l(self, value_in):
+        if value_in >> 31:
+            return float(int('0b'+''.join('1' if c == '0' else '0' for c in bin(value_in-1).lstrip('-0b')),2)) * -1.0
+        else:
+            return float(value_in)
 
     def read_sensor_raw(self):
         """ Read raw sensor values. """
