@@ -116,7 +116,7 @@ class FishPiConfig(object):
                 self._devices.append([addr, device_name, device_driver, in_use])
                             
         except Exception as ex:
-            logging.exception("Error scanning i2c devices - " + ex)
+            logging.exception("Error scanning i2c devices - %s" % ex)
 
         # if no GPS (eg i2c) set up, then import a serial one. Should check for device present first.
         if not(self.gps_sensor):
@@ -124,14 +124,14 @@ class FishPiConfig(object):
                 from sensor.GPS_serial import GPS_AdafruitSensor
                 self.gps_sensor = GPS_AdafruitSensor(serial_bus=raspberrypi.serial_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up GPS over serial - " + ex)
+                logging.warning("Error setting up GPS over serial - %s" % ex)
 
         # CameraController (over USB)
         try:
             from sensor.camera import CameraController
-            self.camera_controller = CameraController(self.config)
+            self.camera_controller = CameraController(self)
         except Exception as ex:
-            logging.info("Camera support unavailable - " + ex)
+            logging.info("Camera support unavailable - %s" % ex)
             self.camera_controller = DummyCameraController(self.resources_folder())
 
         # any remaining dummy devices
@@ -158,7 +158,7 @@ class FishPiConfig(object):
                 from sensor.GPS_I2C import GPS_NavigatronSensor
                 self.gps_sensor = GPS_NavigatronSensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up GPS over i2c - " + ex)
+                logging.warning("Error setting up GPS over i2c - %s" % ex)
             return "GPS", self.gps_sensor
         
         elif addr == 0x48:
@@ -166,7 +166,7 @@ class FishPiConfig(object):
                 from sensor.temperature_TMP102 import TemperatureSensor
                 self.temperature_sensor = TemperatureSensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up TEMPERATURE over i2c - " + ex)
+                logging.warning("Error setting up TEMPERATURE over i2c - %s" % ex)
             return "TEMPERATURE", self.temperature_sensor
                     
         elif addr == 0x60:
@@ -174,7 +174,7 @@ class FishPiConfig(object):
                 from sensor.compass_CMPS10 import Cmps10_Sensor
                 self._compass_sensor = Cmps10_Sensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up COMPASS over i2c - " + ex)
+                logging.warning("Error setting up COMPASS over i2c - %s" % ex)
             return "COMPASS", self._compass_sensor
         
         elif addr == 0x40: #or addr == 0x70:
@@ -184,7 +184,7 @@ class FishPiConfig(object):
                 # TODO pwm addresses from config?
                 self.drive_controller = DriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.info("Error setting up DRIVECONTROLLER over i2c - " + ex)
+                logging.info("Error setting up DRIVECONTROLLER over i2c - %s" % ex)
                 self.drive_controller = DummyDriveController()
             return "DRIVECONTROLLER", self.drive_controller
                 

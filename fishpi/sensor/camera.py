@@ -37,11 +37,11 @@ class CameraController(object):
             self._camera = SingleCamera(camlist[0], self.default_res, self.default_colorspace)
         elif camlist and len(camlist) >= 2:
             self._camera = StereoCamera(camlist[0], camlist[1], self.default_res, self.default_colorspace)
-        self.capture_now()
+        self.capture_now(override_enabled=True)
     
-    def capture_now(self):
+    def capture_now(self, override_enabled=False):
         """ Captures an image now. """
-        if not(self.enabled):
+        if not(override_enabled) and not(self.enabled):
             return
 
         if self._tick_count >= self.TICK_DELAY:
