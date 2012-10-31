@@ -53,6 +53,7 @@ class FishPiKernel:
             self.read_compass()
             self.read_GPS()
             self.capture_img()
+            self.read_temperature()
         except Exception as ex:
             logging.info('Error in update loop - %s' % ex)
 
