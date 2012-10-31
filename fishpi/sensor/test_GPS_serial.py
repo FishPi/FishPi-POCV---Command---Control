@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print "Testing GPS sensor (running 5x with 5s pause)..."
 
     print "Initialising..."
-    gps_sensor = GPS_AdafruitSensor(debug=True, serial_bus=raspberrypi.serial_bus())
+    gps_sensor = GPS_AdafruitSensor(debug=True, serial_bus='/dev/ttyUSB0')
     print raspberrypi.serial_bus()
     
     # heading

@@ -110,7 +110,7 @@ class MainViewController:
     # temporary direct access to DriveController to test hardware.
     
     def set_throttle(self, throttle_level):
-        throttle_act = float(throttle_level)/100.0)
+        throttle_act = float(throttle_level)/100.0
         # adjustment for slider so min +/- .3 so if in .1 to .3 range, jump to .3
         if throttle_act > 0.1 and throttle_act < 0.3:
             throttle_act = 0.3
