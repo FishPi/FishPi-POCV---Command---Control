@@ -81,10 +81,7 @@ class GPS_NavigatronSensor:
         if self.debug:
             print "GPS: reading location..."
         loc_buffer = self.i2c.readList(self.I2C_GPS_LOCATION, 8)
-        ulat = float((loc_buffer[3]<<24)|(loc_buffer[2]<<16)|(loc_buffer[1]<<8)|(loc_buffer[0]))
-        ulon = float((loc_buffer[7]<<24)|(loc_buffer[6]<<16)|(loc_buffer[5]<<8)|(loc_buffer[4]))
-        lat = self.convert_u_l(ulat)/10000000.0
-        lon = self.convert_u_l(ulon)/10000000.0
+        (lat, lon) = self.convert_buffer(loc_buffer)
         if self.debug:
             print "GPS: (lat,lon) = (%f, %f)" % (lat,lon)
     
@@ -119,6 +116,13 @@ class GPS_NavigatronSensor:
         # and return
         return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     
+    def convert_buffer(self, loc_buffer):
+        ulat = int((loc_buffer[3]<<24)|(loc_buffer[2]<<16)|(loc_buffer[1]<<8)|(loc_buffer[0]))
+        ulon = int((loc_buffer[7]<<24)|(loc_buffer[6]<<16)|(loc_buffer[5]<<8)|(loc_buffer[4]))
+        lat = self.convert_u_l(ulat)/10000000.0
+        lon = self.convert_u_l(ulon)/10000000.0
+        return lat, lon
+
     def convert_u_l(self, value_in):
         if value_in >> 31:
             return float(int('0b'+''.join('1' if c == '0' else '0' for c in bin(value_in-1).lstrip('-0b')),2)) * -1.0
