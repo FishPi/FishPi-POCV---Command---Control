@@ -110,10 +110,18 @@ class MainViewController:
     # temporary direct access to DriveController to test hardware.
     
     def set_throttle(self, throttle_level):
-        self._kernel.set_throttle(float(throttle_level)/100.0)
+        throttle_act = float(throttle_level)/100.0)
+        # adjustment for slider so min +/- .3 so if in .1 to .3 range, jump to .3
+        if throttle_act > 0.1 and throttle_act < 0.3:
+            throttle_act = 0.3
+        elif throttle_act < -0.1 and throttle_act > -0.3:
+            throttle_act = -0.3
+        self._kernel.set_throttle(throttle_act)
     
     def set_heading(self, heading):
         heading_in_rad = (float(heading)/180.0)*math.pi
+        # adjustment for slider in opposite direction - TODO - move to drive controller
+        heading_in_rad = heading_in_rad * -1.0
         self._kernel.set_heading(heading_in_rad)
     
     # Route Planning and Navigation
