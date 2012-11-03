@@ -187,6 +187,9 @@ class ControlsFrame(Frame, object):
         self.scl_rudder.set(0)
         self.scl_rudder.pack(fill=X, expand=True, padx=5)
         
+        self.btn_zero_heading = Button(self, text="Centre Rudder", command=self.on_zero_heading)
+        self.btn_zero_heading.pack(padx=3)
+
         # throttle level
         Label(self, text = "Throttle:", pady=6, bd=1, anchor=W, justify=LEFT).pack(fill=X, padx=2, expand=True)
         
@@ -230,6 +233,12 @@ class ControlsFrame(Frame, object):
         # only apply in manual mode
         self._view_controller.set_throttle(0)
         self.scl_speed_controller.set(0)
+
+    def on_zero_heading(self):        
+        """ event handler for heading change """
+        # only apply in manual mode
+        self._view_controller.set_heading(0)
+        self.scl_rudder.set(0)
 
 class RouteFrame(Frame, object):
     """ UI Frame with buttons for user interactions. """
