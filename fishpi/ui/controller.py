@@ -111,10 +111,10 @@ class MainViewController:
     
     def set_throttle(self, throttle_level):
         throttle_act = float(throttle_level)/100.0
-        # adjustment for slider so min +/- .3 so if in .1 to .3 range, jump to .3
-        if throttle_act > 0.1 and throttle_act < 0.3:
+        # adjustment for slider so min +/- .3 so if in .05 to .3 range, jump to .3
+        if throttle_act > 0.05 and throttle_act < 0.3:
             throttle_act = 0.3
-        elif throttle_act < -0.1 and throttle_act > -0.3:
+        elif throttle_act < -0.05 and throttle_act > -0.3:
             throttle_act = -0.3
         self._kernel.set_throttle(throttle_act)
     
