@@ -22,8 +22,9 @@ class CameraController(object):
     default_res = (320,240)    
     default_colorspace = "RGB"
 
-    def __init__(self, configuration):
+    def __init__(self, configuration, debug=False):
         self.configuration = configuration
+        self.debug = debug
         self._tick_count = self.TICK_DELAY
         self.enabled = False
         # set capture path

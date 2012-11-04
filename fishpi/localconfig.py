@@ -108,11 +108,11 @@ class FishPiConfig(object):
         try:
             logging.info("Configuring i2c devices...")
             # scan for connected devices
-            i2c_addresses = self.scan_i2c()
+            i2c_addresses = self.scan_i2c(debug=debug)
 
             # lookup available device drivers by address
             for addr, in_use in i2c_addresses:
-                device_name, device_driver = self.lookup(addr, debug)
+                device_name, device_driver = self.lookup(addr, debug=debug)
                 self._devices.append([addr, device_name, device_driver, in_use])
                             
         except Exception as ex:
@@ -129,7 +129,7 @@ class FishPiConfig(object):
         # CameraController (over USB)
         try:
             from sensor.camera import CameraController
-            self.camera_controller = CameraController(self)
+            self.camera_controller = CameraController(self, debug=debug)
         except Exception as ex:
             logging.info("Camera support unavailable - %s" % ex)
             self.camera_controller = DummyCameraController(self.resources_folder())
@@ -204,7 +204,7 @@ class FishPiConfig(object):
         else:
             return "unknown", None
 
-    def scan_i2c(self):
+    def scan_i2c(self, debug=False):
         """scans i2c port returning a list of detected addresses.
             Requires sudo access.
             Returns True for in use by a device already (ie UU observed)"""
@@ -214,6 +214,10 @@ class FishPiConfig(object):
                 close_fds = True)
         std_out_txt, std_err_txt = proc.communicate()
 
+        if debug:
+            logging.debug(std_out_txt)
+            logging.debug(std_err_txt)
+        
         # TODO could probably be neater with eg format or regex
         # i2c returns
         #  -- for unused addresses

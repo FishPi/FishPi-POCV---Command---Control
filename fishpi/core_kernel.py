@@ -23,8 +23,9 @@ from perception.world import PerceptionUnit
 class FishPiKernel:
     """ Coordinator between different layers. """
     
-    def __init__(self, config):
+    def __init__(self, config, debug=False):
         self.config = config
+        self.debug = debug
         
         # pull over all hw devices (or proxies) from config
         

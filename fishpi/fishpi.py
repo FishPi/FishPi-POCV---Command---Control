@@ -19,6 +19,7 @@
 
 import sys
 import logging
+import argparse
 
 import ui.controller
 from core_kernel import FishPiKernel
@@ -27,23 +28,33 @@ from localconfig import FishPiConfig
 FISH_PI_VERSION = 0.1
 
 class FishPiRunMode:
-    Inactive, ManualWithUI, ManualHeadless, FullAuto = range(4)
+    Inactive = 'inactive'
+    Manual = 'manual'
+    Remote = 'remote'
+    Auto = 'auto'
+    Modes = [Inactive, Manual, Remote, Auto]
 
 class FishPi:
     """ Entrypoint and setup class. """
-    selected_mode = FishPiRunMode.ManualWithUI
+    selected_mode = FishPiRunMode.Manual
     config = FishPiConfig()
 
-    def __init__(self, args):
-        logging.info("Initializing FishPi (v{0})...".format(FISH_PI_VERSION))
-        # TODO replace with standard cmd line parsing (eg argparse module)
-        if args and len(args) >= 0:
-            try:
-                self.selected_mode = int(args[0])
-            except ValueError:
-                logging.warning("Usage 0:inactive, 1:manualWithUI, 2:manualHeadless, 3:fullAuto")
-                logging.warning("Defaulting to {0}.".format(self.selected_mode))
+    def __init__(self):
+        # parse cmd line args
+        parser = argparse.ArgumentParser(description='FishPi - An autonomous drop in the ocean.')
+        parser.add_argument("-m", "--mode", help="operational mode to run", choices=FishPiRunMode.Modes, default=FishPiRunMode.Manual, type=str, action='store')
+        parser.add_argument("-d", "--debug", help="increase debugging information output", action='store_true')
+        parser.add_argument("--version", action='version', version='%(prog)s {0}'.format(FISH_PI_VERSION))
+        # TODO - add further arguments here
+        #parser.add_argument(...)        
         
+        # and parse
+        selected_args = parser.parse_args()
+        self.selected_mode = selected_args.mode
+        self.debug = selected_args.debug
+
+        # init rest
+        logging.info("Initializing FishPi (v{0})...".format(FISH_PI_VERSION))
 
     def self_check(self):
         # TODO implement check for .lastState file
@@ -57,7 +68,7 @@ class FishPi:
 
     def configure_devices(self):
         """ Configures eg i2c and other attached devices."""
-        self.config.configure_devices()
+        self.config.configure_devices(self.debug)
 
     def run(self):
         """ Runs selected FishPi mode."""
@@ -65,11 +76,11 @@ class FishPi:
         if self.selected_mode == FishPiRunMode.Inactive:
             logging.info("Inactive mode set - exiting.")
             return 0
-        elif self.selected_mode == FishPiRunMode.ManualWithUI:
+        elif self.selected_mode == FishPiRunMode.Manual:
             return self.run_ui()
-        elif self.selected_mode == FishPiRunMode.ManualHeadless:
+        elif self.selected_mode == FishPiRunMode.Remote:
             return self.run_headless()
-        elif self.selected_mode == FishPiRunMode.FullAuto:
+        elif self.selected_mode == FishPiRunMode.Auto:
             return self.run_auto()
         else:
             logging.error("Invalid mode! Exiting.")
@@ -81,7 +92,7 @@ class FishPi:
         self.configure_devices()
         
         # create controller
-        controller = FishPiKernel(self.config)
+        controller = FishPiKernel(self.config, debug=self.debug)
         
         # run ui loop
         logging.info("Launching UI...")
@@ -97,7 +108,7 @@ class FishPi:
         self.configure_devices()
 
         # create controller
-        controller = FishPiKernel(self.config)
+        controller = FishPiKernel(self.config, debug=self.debug)
 
         # testing
         controller.list_devices()
@@ -115,7 +126,7 @@ class FishPi:
         self.configure_devices()
         
         # create controller
-        controller = FishPiKernel(self.config)
+        controller = FishPiKernel(self.config, debug=self.debug)
         
         # testing
         controller.list_devices()
@@ -128,7 +139,7 @@ class FishPi:
         return 0
 
 def main():
-    fishPi = FishPi(sys.argv[1:])
+    fishPi = FishPi()
     fishPi.self_check()
     return fishPi.run()
 
