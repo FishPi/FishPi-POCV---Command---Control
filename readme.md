@@ -26,10 +26,10 @@ The FishPi software is being developed in Python (2.7) inline with the education
 Start the software by running `./fishpi/fishpi.py`.
 
 Additional arguments supported include:
-* `--help            show this help message and exit`
-* `--mode {inactive,manual,remote,auto}   operational mode to run`
-* `--debug           increase debugging information output`
-* `--version         show program's version number and exit`
+* `--help:            show this help message and exit`
+* `--mode {inactive,manual,remote,auto}:   operational mode to run`
+* `--debug:           increase debugging information output`
+* `--version:         show program's version number and exit`
 
 ### Structure ###
 
