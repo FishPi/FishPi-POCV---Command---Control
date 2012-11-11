@@ -51,9 +51,25 @@ class FishPiKernel:
         """ Update loop for sensors. """
         try:
             self.read_time()
+        except Exception as ex:
+            logging.info('Error in update loop - %s' % ex)
+        
+        try:
             self.read_compass()
+        except Exception as ex:
+            logging.info('Error in update loop - %s' % ex)
+
+        try:
             self.read_GPS()
+        except Exception as ex:
+            logging.info('Error in update loop - %s' % ex)
+
+        try:
             self.capture_img()
+        except Exception as ex:
+            logging.info('Error in update loop - %s' % ex)
+
+        try:
             self.read_temperature()
         except Exception as ex:
             logging.info('Error in update loop - %s' % ex)
