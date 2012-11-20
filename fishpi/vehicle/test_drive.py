@@ -9,11 +9,11 @@
 import raspberrypi
 
 from time import sleep
-from drive_controller import DriveController
+from drive_controller import AdafruitDriveController
 
 if __name__ == "__main__":
     print "testing drive controller..."
-    drive = DriveController(debug=True, i2c_bus=raspberrypi.i2c_bus())
+    drive = AdafruitDriveController(debug=True, i2c_bus=raspberrypi.i2c_bus())
 
     print "run full ahead for 5 sec..."
     drive.set_throttle(1.0)
