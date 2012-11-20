@@ -144,7 +144,9 @@ class FishPiConfig(object):
         """ lookup available device drivers by hex address,
             import and create driver class,
             setup particular devices so easily retrieved by consumers. """
-                
+        if(self.debug):
+            logging.debug("Checking for driver for device at i2c %s", % addr)
+        
         # TODO replace with reading from config? probably use ConfigParser?
         # note: i2c addresses can conflict
         # could scan registers etc to confirm count etc?
@@ -178,16 +180,27 @@ class FishPiConfig(object):
             return "COMPASS", self.compass_sensor
         
         elif addr == 0x40: #or addr == 0x70:
-            # DriveController (not sure what 0x70 address is for...)
+            # DriveController (using Adafruit PWM board) (not sure what 0x70 address is for...)
             try:
-                from vehicle.drive_controller import DriveController
+                from vehicle.drive_controller import AdafruitDriveController
                 # TODO pwm addresses from config?
-                self.drive_controller = DriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
+                self.drive_controller = AdafruitDriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
                 logging.info("Error setting up DRIVECONTROLLER over i2c - %s" % ex)
                 self.drive_controller = DummyDriveController()
             return "DRIVECONTROLLER", self.drive_controller
-                
+        
+        elif addr == 0x32:
+            # DriveController (using RaspyJuice)
+            try:
+                from vehicle.drive_controller import PyJuiceDriveController
+                # TODO pwm addresses from config?
+                self.drive_controller = PyJuiceDriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
+            except Exception as ex:
+                logging.info("Error setting up DRIVECONTROLLER over i2c - %s" % ex)
+                self.drive_controller = DummyDriveController()
+            return "DRIVECONTROLLER", self.drive_controller
+    
         elif addr == 0x1E:
             return "COMPASS", "Driver not loaded - HMC5883L"
                 
