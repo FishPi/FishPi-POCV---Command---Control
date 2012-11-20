@@ -8,10 +8,12 @@
 #
 
 import logging
+import logging.handlers
 
 import os
 import platform
 import subprocess
+import time
 
 class FishPiConfig(object):
     """ Responsible for configuration of FishPi. 
@@ -25,7 +27,11 @@ class FishPiConfig(object):
 
     def __init__(self):
         # TODO setup logging (from config)
-        logging.getLogger().setLevel(logging.DEBUG)
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+        console = logging.StreamHandler()
+        logger.addHandler(console)
+        
         if os.path.exists(self.config_file):
             # TODO read any static config from file
             pass
@@ -40,6 +46,15 @@ class FishPiConfig(object):
         if not os.path.exists(self.logs_path):
             os.makedirs(self.logs_path)
 
+        # add file logging
+        log_file_stem = os.path.join(self.logs_path, 'fishpi_%s.log' % time.strftime('%Y%m%d_%H%M%S'))
+        handler = logging.handlers.RotatingFileHandler(log_file_stem, backupCount=50)
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        # can force new file start if needed
+        #handler.doRollover()
+        
         # default attachments to None
         self.gps_sensor = None
         self.compass_sensor = None

@@ -16,8 +16,9 @@ import gpxpy.gpx
 
 class PerceptionUnit:
 
-    def __init__(self):
-        pass
+    def __init__(self, kernel):
+        self._kernel = kernel
+    
 
     def load_gpx(self, filename):
         gpx_file = open(filename)

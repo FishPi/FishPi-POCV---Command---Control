@@ -41,7 +41,7 @@ class FishPiKernel:
         self._camera_controller = config.camera_controller
 
         # supporting classes
-        self.perception_unit = PerceptionUnit()
+        self.perception_unit = PerceptionUnit(self)
         self.navigation_unit = NavigationUnit(self._drive_controller, self.perception_unit)
         
         # data class
