@@ -94,10 +94,10 @@ class FishPiConfig(object):
         
         # although i2c may work if in correct user group, GPIO needs confirming.
         # for now, clearer just to object if not running as root (sudo)
-        if not(os.getuid() == 0):
-            logging.info("Not running on as root. Not configuring i2c or other devices.")
-            self.set_dummy_devices()
-            return
+        #if not(os.getuid() == 0):
+        #    logging.info("Not running on as root. Not configuring i2c or other devices.")
+        #    self.set_dummy_devices()
+        #    return
             
         # running as root on linux so can scan for devices and configure them
         # although inline imports normally not encouraged
@@ -144,8 +144,8 @@ class FishPiConfig(object):
         """ lookup available device drivers by hex address,
             import and create driver class,
             setup particular devices so easily retrieved by consumers. """
-        if(self.debug):
-            logging.debug("Checking for driver for device at i2c %s", % addr)
+        if(debug):
+            logging.debug("Checking for driver for device at i2c %s" % addr)
         
         # TODO replace with reading from config? probably use ConfigParser?
         # note: i2c addresses can conflict
@@ -222,7 +222,9 @@ class FishPiConfig(object):
             Requires sudo access.
             Returns True for in use by a device already (ie UU observed)"""
         
-        proc = subprocess.Popen(['sudo', 'i2cdetect', '-y', '0'], 
+        import raspberrypi
+	
+        proc = subprocess.Popen(['sudo', 'i2cdetect', '-y', raspberrypi.i2c_bus_num()], 
                 stdout = subprocess.PIPE,
                 close_fds = True)
         std_out_txt, std_err_txt = proc.communicate()
