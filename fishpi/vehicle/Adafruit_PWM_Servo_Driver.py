@@ -1,1 +1,1 @@
-../../external/Adafruit_PWM_Servo_Driver.py
+../../external/adafruit/Adafruit_PWM_Servo_Driver.py
