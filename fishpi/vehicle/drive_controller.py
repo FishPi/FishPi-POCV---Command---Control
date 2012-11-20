@@ -85,7 +85,7 @@ class PyJuiceDriveController(DriveController):
         # Initialise the PWM device
         if i2c_bus is None:
             self.i2c_bus = Adafruit_I2C(i2c_addr, debug=debug)
-        else
+    	else:
             self.i2c_bus = Adafruit_I2C(i2c_addr, bus=i2c_bus, debug=debug)
         # Set initial positions to centre
         self.set_servo_pulse(self.prop_channel, 1.5)
@@ -93,7 +93,7 @@ class PyJuiceDriveController(DriveController):
     
     def set_servo_pulse(self, channel, pulse):
         """ 1000 is ~1ms pulse so standard servo would be in range 1000 <- 1500 -> 2000 """
-        actual_pulse_value = pulse * 1000
+        actual_pulse_value = int(pulse * 1000)
         self.i2c_bus.writeWord(channel, actual_pulse_value)
 
 class AdafruitDriveController(DriveController):

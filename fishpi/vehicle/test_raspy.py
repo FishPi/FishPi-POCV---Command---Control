@@ -31,7 +31,7 @@ if __name__ == "__main__":
     i2c_bus.write_word_data(addr, servo_number, 1500)
     
     print "testing drive controller..."
-    drive = PyJuiceDriveController(debug=True, i2c_bus)
+    drive = PyJuiceDriveController(debug=True, i2c_bus=i2c_bus)
     
     print "run full ahead for 5 sec..."
     drive.set_throttle(1.0)
