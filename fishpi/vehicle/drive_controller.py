@@ -14,14 +14,14 @@
 # RaspyJuice servo drive as per http://code.google.com/p/raspy-juice/
 #
 # MicroViper Marine10 - http://www.mtroniks.net/details1.asp/ProductID/185/MicroViper-marine10.htm
-# Standard meduim model servo for heading
+# Standard meduim model servo for steering
 #
 
 import time
 from Adafruit_I2C import Adafruit_I2C
 
 class DriveController:
-    """ Provides drive and heading control abstraction from eg PWM servo or ESC devices. """
+    """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
         
     # initially setting to full left / right (of servo) to +/- Pi/2
     FULL_LEFT_SERVO = -1.570796
@@ -43,24 +43,24 @@ class DriveController:
         # set PWM pulse length
         self.set_servo_pulse(self.prop_channel, pulse_time)
 
-    def set_heading(self, heading):
-        """ Set heading to angle between FULL_LEFT and FULL_RIGHT.
+    def set_steering(self, angle):
+        """ Set steering to angle between FULL_LEFT and FULL_RIGHT.
             Input expected as between (-Pi/2) and (Pi/2) and is in radians.
-            Negative heading is to port (left) and positive to starboard (right).
+            Negative steering is to port (left) and positive to starboard (right).
             """
         # TODO represents Servo angle not rudder angle - check translation
-        # if incoming heading is outside allowable rotation, set to max allowable (eg physical turn of rudder)
-        if heading > self.FULL_RIGHT_ALLOWED:
-            heading = self.FULL_RIGHT_ALLOWED
-        elif heading < self.FULL_LEFT_ALLOWED:
-            heading = self.FULL_LEFT_ALLOWED
+        # if incoming angle is outside allowable rotation, set to max allowable (eg physical turn of rudder)
+        if angle > self.FULL_RIGHT_ALLOWED:
+            angle = self.FULL_RIGHT_ALLOWED
+        elif angle < self.FULL_LEFT_ALLOWED:
+            angle = self.FULL_LEFT_ALLOWED
         # set proportion of desired turn out of full range of servo movement
         # ie if servo can move through -90 to 90 but rudder restricted to -60 to 60 then full left will be -2/3
         # ie a pulse length of 1.33 ms and full right will be 2/3 ie a pulse length of 1.67 ms.
         full_range = self.FULL_RIGHT_SERVO - self.FULL_LEFT_SERVO   # Pi
-        pulse_time = (heading/full_range)+1.5
+        pulse_time = (angle/full_range)+1.5
         if (self.debug):
-            print "Setting pulse length to :%f for heading %f" % (pulse_time, heading)
+            print "Setting pulse length to :%f for steering angle %f" % (pulse_time, angle)
         # set PWM pulse length
         self.set_servo_pulse(self.servo_channel, pulse_time)
 
@@ -76,7 +76,7 @@ class DriveController:
         pass
 
 class PyJuiceDriveController(DriveController):
-    """ Provides drive and heading control abstraction from eg PWM servo or ESC devices. """
+    """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
 
     def __init__(self, i2c_addr=0x32, i2c_bus=None, prop_channel=2, servo_channel=1, debug=False):
         self.debug = debug
@@ -97,7 +97,7 @@ class PyJuiceDriveController(DriveController):
         self.i2c_bus.writeWord(channel, actual_pulse_value)
 
 class AdafruitDriveController(DriveController):
-    """ Provides drive and heading control abstraction from eg PWM servo or ESC devices. """
+    """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
 
     # TODO might need tuning or configuring
     #servoMin = 150  # Min pulse length out of 4096

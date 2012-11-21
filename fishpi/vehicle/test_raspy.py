@@ -56,27 +56,27 @@ def test_drive(i2c_bus):
     
     # test steering
     print "steer hard to port for 5 sec"
-    drive.set_heading(-0.785398)
+    drive.set_steering(-0.785398)
     sleep(5)
     
     print "steer to port for 5 sec"
-    drive.set_heading(-0.3927)
+    drive.set_steering(-0.3927)
     sleep(5)
     
     print "and back to neutral..."
-    drive.set_heading(0.0)
+    drive.set_steering(0.0)
     sleep(5)
     
     print "steer to starboard for 5 sec"
-    drive.set_heading(0.3927)
+    drive.set_steering(0.3927)
     sleep(5)
     
     print "steer hard to starboard for 5 sec"
-    drive.set_heading(0.785398)
+    drive.set_steering(0.785398)
     sleep(5)
     
     print "and back to neutral..."
-    drive.set_heading(0.0)
+    drive.set_steering(0.0)
     sleep(5)
 
 if __name__ == "__main__":

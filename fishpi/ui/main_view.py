@@ -221,7 +221,7 @@ class ControlsFrame(Frame, object):
     def on_rudder(self, value):
         """ event handler for heading change """
         # only apply in manual mode
-        self._view_controller.set_heading(value)
+        self._view_controller.set_steering(value)
     
     def on_throttle(self, value):
         """ event handler for throttle change """
@@ -237,7 +237,7 @@ class ControlsFrame(Frame, object):
     def on_zero_heading(self):        
         """ event handler for heading change """
         # only apply in manual mode
-        self._view_controller.set_heading(0)
+        self._view_controller.set_steering(0)
         self.scl_rudder.set(0)
 
 class RouteFrame(Frame, object):

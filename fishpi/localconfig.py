@@ -309,8 +309,8 @@ class DummyDriveController(object):
         logging.debug("Throttle set to: %s" % throttle_level)
         pass
     
-    def set_heading(self, heading):
-        logging.debug("Heading set to: %s" % heading)
+    def set_steering(self, angle):
+        logging.debug("Steering set to: %s" % angle)
         pass
     
     def halt(self):

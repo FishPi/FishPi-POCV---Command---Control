@@ -12,20 +12,40 @@
 class NavigationUnit:
     """ Coordinator between internal perception model, outer high level command software (UI or AI), path planning through to drive control and course maintainence."""
     
-    def __init__(self, driveController, perceptionUnit):
-        self.driveController = driveController
-        self.perceptionUnit = perceptionUnit
+    def __init__(self, drive_controller, perception_unit):
+        self._drive_controller = drive_controller
+        self._perception_unit = perception_unit
+    
+        self._enabled = False
+        self._heading = 0.0
+        self._speed = 0.0
     
     def navigate_to(self, route):
         """ Navigate a given route. """
         pass
-
-    def start(self):
-        pass
     
-    def halt(self):
-        """ All HALT the engines...! """
-        pass
+    def set_speed(self, speed):
+        """ Set speed to maintain. """
+        self._speed = speed
+        self._start()
+    
+    def set_heading(self, heading):
+        """ Set heading to maintain. """
+        self._heading = heading
+        self.start()
+    
+    def start(self):
+        """ Enable navigation control. """
+        self._enabled = True
+    
+    def stop(self):
+        """ All HALT the engines...! Disable self-navigation control. """
+        # stop navigation control
+        self._enabled = False
+
+        # stop engines
+        self._drive_controller.halt()
+
 
 
 

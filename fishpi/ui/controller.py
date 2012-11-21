@@ -94,13 +94,11 @@ class MainViewController:
     # Control modes (Manual, AutoPilot)
     def set_manual_mode(self):
         """ Stops navigation unit and current auto-pilot drive. """
-        self._kernel.navigation_unit.halt()
-        self._kernel.halt()
+        self._kernel.set_manual_mode()
     
     def set_auto_pilot_mode(self):
         """ Stops current manual drive and starts navigation unit. """
-        self._kernel.halt()
-        self._kernel.navigation_unit.start()
+        self._kernel.set_auto_pilot_mode()
     
     def halt(self):
         """ Commands the NavigationUnit and Drive Control to Halt! """
@@ -118,17 +116,21 @@ class MainViewController:
             throttle_act = -0.3
         self._kernel.set_throttle(throttle_act)
     
-    def set_heading(self, heading):
-        heading_in_rad = (float(heading)/180.0)*math.pi
+    def set_steering(self, angle):
+        angle_in_rad = (float(angle)/180.0)*math.pi
         # adjustment for slider in opposite direction - TODO - move to drive controller
-        heading_in_rad = heading_in_rad * -1.0
-        self._kernel.set_heading(heading_in_rad)
+        angle_in_rad = angle_in_rad * -1.0
+        self._kernel.set_steering(angle_in_rad)
     
     # Route Planning and Navigation
     
+    # set speed
+    
+    # set heading
+    
     def navigate_to(self):
         """ Commands the NavigationUnit to commence navigation of a route. """
-        #self.navigation_unit.NavigateTo(route)
+        #self._kernel.navigate_to(route)
         pass
     
     def get_current_map(self):

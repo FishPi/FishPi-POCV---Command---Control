@@ -40,39 +40,39 @@ class FishPiKernel:
         # camera
         self._camera_controller = config.camera_controller
 
-        # supporting classes
-        self.perception_unit = PerceptionUnit(self)
-        self.navigation_unit = NavigationUnit(self._drive_controller, self.perception_unit)
-        
         # data class
         self.data = POCVModelData()
 
+        # supporting classes
+        self._perception_unit = PerceptionUnit(self)
+        self._navigation_unit = NavigationUnit(self._drive_controller, self._perception_unit)
+        
     def update(self):
         """ Update loop for sensors. """
         try:
             self.read_time()
         except Exception as ex:
-            logging.info('Error in update loop - %s' % ex)
+            logging.info('Error in update loop (TIME) - %s' % ex)
         
         try:
             self.read_compass()
         except Exception as ex:
-            logging.info('Error in update loop - %s' % ex)
+            logging.info('Error in update loop (COMPASS) - %s' % ex)
 
         try:
             self.read_GPS()
         except Exception as ex:
-            logging.info('Error in update loop - %s' % ex)
+            logging.info('Error in update loop (GPS) - %s' % ex)
 
         try:
             self.capture_img()
         except Exception as ex:
-            logging.info('Error in update loop - %s' % ex)
+            logging.info('Error in update loop (CAMERA) - %s' % ex)
 
         try:
             self.read_temperature()
         except Exception as ex:
-            logging.info('Error in update loop - %s' % ex)
+            logging.info('Error in update loop (TEMPERATURE) - %s' % ex)
 
     # Devices
     
@@ -130,10 +130,28 @@ class FishPiKernel:
     def set_throttle(self, throttle_level):
         self._drive_controller.set_throttle(throttle_level)
 
-    def set_heading(self, heading):
-        self._drive_controller.set_heading(heading)
+    def set_steering(self, angle):
+        self._drive_controller.set_steering(angle)
+    
+    # Control modes (Manual, AutoPilot)
+    def set_manual_mode(self):
+        """ Stops navigation unit and current auto-pilot drive. """
+        self._navigation_unit.stop()
+        self.halt()
+
+    def set_auto_pilot_mode(self):
+        """ Stops current manual drive and starts navigation unit. """
+        self.halt()
+        self._navigation_unit.start()
     
     # Route Planning and Navigation
+    def set_speed(self, speed):
+        """ Commands the NavigationUnit to set and hold a given speed. """
+        self._navigation_unit.set_speed(speed)
+    
+    def set_heading(self, heading):
+        """ Commands the NavigationUnit to set and hold a given heading. """
+        self._navigation_unit.set_heading(heading)
     
     def navigate_to(self):
         """ Commands the NavigationUnit to commence navigation of a route. """
@@ -142,7 +160,7 @@ class FishPiKernel:
     
     def halt(self):
         """ Commands the NavigationUnit and Drive Control to Halt! """
-        self.navigation_unit.halt()
+        self._navigation_unit.stop()
         self._drive_controller.halt()
 
     def load_gpx(self, filename):
