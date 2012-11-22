@@ -80,6 +80,7 @@ class DriveController:
         # TODO check current motor direction and brake to zero.
         # for now, just set to zero output
         self.set_throttle(0.0)
+        self.set_steering(0.0)
 
     def set_servo_pulse(self, channel, pulse):
         """ Standard servo would be in range 1ms <- 1.5ms -> 2.0ms """

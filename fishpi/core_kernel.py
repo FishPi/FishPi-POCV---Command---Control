@@ -169,6 +169,10 @@ class FishPiKernel:
         self.halt()
         self._navigation_unit.start()
     
+    @property
+    def auto_mode_enabled(self):
+        return self._navigation_unit.auto_mode_enabled
+                
     # Route Planning and Navigation
     def set_speed(self, speed):
         """ Commands the NavigationUnit to set and hold a given speed. """

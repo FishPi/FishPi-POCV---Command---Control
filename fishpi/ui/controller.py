@@ -104,6 +104,10 @@ class MainViewController:
         """ Commands the NavigationUnit and Drive Control to Halt! """
         self._kernel.halt()
 
+    @property
+    def auto_mode_enabled(self):
+        return self._kernel.auto_mode_enabled
+    
     # Drive control
     # temporary direct access to DriveController to test hardware.
     
@@ -123,10 +127,13 @@ class MainViewController:
         self._kernel.set_steering(angle_in_rad)
     
     # Route Planning and Navigation
+    def set_speed(self, speed):
+        """ Commands the NavigationUnit to set and hold a given speed. """
+        self._kernel.set_speed(float(speed))
     
-    # set speed
-    
-    # set heading
+    def set_heading(self, heading):
+        """ Commands the NavigationUnit to set and hold a given heading. """
+        self._kernel.set_heading(float(heading))
     
     def navigate_to(self):
         """ Commands the NavigationUnit to commence navigation of a route. """

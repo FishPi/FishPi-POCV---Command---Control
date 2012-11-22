@@ -322,5 +322,6 @@ class DummyDriveController(object):
     def halt(self):
         logging.debug("DRIVE:\tDrive halting.")
         self.throttle_level = 0.0
+        self.steering_angle = 0.0
         pass
 
