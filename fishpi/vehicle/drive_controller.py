@@ -18,6 +18,8 @@
 #
 
 import time
+import logging
+
 from Adafruit_I2C import Adafruit_I2C
 
 class DriveController:
@@ -30,24 +32,31 @@ class DriveController:
     # initially setting to full left / right (of allowed movement) to +/- Pi/4
     FULL_LEFT_ALLOWED = -0.785398
     FULL_RIGHT_ALLOWED = 0.785398
+    
+    # current state
+    throttle_level = 0.0
+    steering_angle = 0.0
 
     def set_throttle(self, throttle_level):
         """ Set drive throttle between -1.0 and 1.0 with 0.0 for zero drive. """
+        logging.debug("DRIVE:\tThrottle set to: %s" % throttle_level)
         # TODO check break vs reverse state by storing last set level
         if throttle_level > 1.0 or throttle_level < -1.0:
             raise ValueError("throttle_level %f must be between -1.0 and 1.0." % throttle_level)
         # map input from (-1)..(0)..(1) to (1.0)..(1.5)..(2.0)
         pulse_time = (throttle_level/2.0)+1.5
         if (self.debug):
-            print "Setting pulse length to: %f for throttle level %f" % (pulse_time, throttle_level)
+            logging.debug("DRIVE:\tSetting pulse length to: %f for throttle level %f", pulse_time, throttle_level)
         # set PWM pulse length
         self.set_servo_pulse(self.prop_channel, pulse_time)
+        self.throttle_level = throttle_level
 
     def set_steering(self, angle):
         """ Set steering to angle between FULL_LEFT and FULL_RIGHT.
             Input expected as between (-Pi/2) and (Pi/2) and is in radians.
             Negative steering is to port (left) and positive to starboard (right).
             """
+        logging.debug("DRIVE:\tSteering set to: %s" % angle)
         # TODO represents Servo angle not rudder angle - check translation
         # if incoming angle is outside allowable rotation, set to max allowable (eg physical turn of rudder)
         if angle > self.FULL_RIGHT_ALLOWED:
@@ -60,9 +69,10 @@ class DriveController:
         full_range = self.FULL_RIGHT_SERVO - self.FULL_LEFT_SERVO   # Pi
         pulse_time = (angle/full_range)+1.5
         if (self.debug):
-            print "Setting pulse length to :%f for steering angle %f" % (pulse_time, angle)
+            logging.debug("DRIVE:\tSetting pulse length to :%f for steering angle %f", pulse_time, angle)
         # set PWM pulse length
         self.set_servo_pulse(self.servo_channel, pulse_time)
+        self.steering_angle = angle
 
     def halt(self):
         """ Halt the drive. """
@@ -123,13 +133,13 @@ class AdafruitDriveController(DriveController):
         pulseLength = 1000000                   # 1,000,000 us per second
         pulseLength /= self.ic_pwm_freq         # 60 Hz
         if (self.debug):
-            print "%d us per period" % pulseLength
+            logging.debug("DRIVE:\t%d us per period", pulseLength)
         pulseLength /= 4096                     # 12 bits of resolution
         if (self.debug):
-            print "%d us per bit" % pulseLength
+            logging.debug("DRIVE:\t%d us per bit", pulseLength)
         pulse *= 1000
         pulse /= pulseLength
         if (self.debug):
-            print "%d pulse sent" % pulse
+            logging.debug("DRIVE:\t%d pulse sent", pulse)
         self._pwm.setPWM(channel, 0, int(pulse))
 

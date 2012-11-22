@@ -44,36 +44,51 @@ class FishPiKernel:
         self.data = POCVModelData()
 
         # supporting classes
-        self._perception_unit = PerceptionUnit(self)
-        self._navigation_unit = NavigationUnit(self._drive_controller, self._perception_unit)
+        self._perception_unit = PerceptionUnit(self.data)
+        self._navigation_unit = NavigationUnit(self._perception_unit, self._drive_controller)
         
     def update(self):
-        """ Update loop for sensors. """
+        """ Update loop for sensors->perception->control(->vehicle). """
         try:
             self.read_time()
         except Exception as ex:
-            logging.info('Error in update loop (TIME) - %s' % ex)
-        
-        try:
-            self.read_compass()
-        except Exception as ex:
-            logging.info('Error in update loop (COMPASS) - %s' % ex)
-
+            self.data.has_time = False
+            logging.info('CORE:\tError in update loop (TIME) - %s' % ex)
+                
         try:
             self.read_GPS()
         except Exception as ex:
-            logging.info('Error in update loop (GPS) - %s' % ex)
+            self.data.has_GPS = False
+            logging.info('CORE:\tError in update loop (GPS) - %s' % ex)
 
         try:
-            self.capture_img()
+            self.read_compass()
         except Exception as ex:
-            logging.info('Error in update loop (CAMERA) - %s' % ex)
+            self.data.has_compass = False
+            logging.info('CORE:\tError in update loop (COMPASS) - %s' % ex)
 
         try:
             self.read_temperature()
         except Exception as ex:
-            logging.info('Error in update loop (TEMPERATURE) - %s' % ex)
+            self.data.has_temperature = False
+            logging.info('CORE:\tError in update loop (TEMPERATURE) - %s' % ex)
+        
+        try:
+            self.capture_img()
+        except Exception as ex:
+            logging.info('CORE:\tError in update loop (CAMERA) - %s' % ex)
 
+        try:
+            self._perception_unit.update(self.data)
+        except Exception as ex:
+            logging.info('CORE:\tError in update loop (PERCEPTION) - %s' % ex)
+        
+        try:
+            self._navigation_unit.update()
+        except Exception as ex:
+            logging.info('CORE:\tError in update loop (NAVIGATION) - %s' % ex)
+        
+            
     # Devices
     
     def list_devices(self):
@@ -100,6 +115,7 @@ class FishPiKernel:
         dt = datetime.today()
         self.data.timestamp = dt.time()
         self.data.datestamp = dt.date()
+        self.data.has_time = True
     
     def read_GPS(self):
         if self._gps_sensor:
@@ -113,16 +129,25 @@ class FishPiKernel:
             self.data.num_sat = num_sat
             self.data.timestamp = timestamp
             self.data.datestamp = datestamp
-    
+            self.data.has_GPS = True
+        else:
+            self.data.has_GPS = False
+
     def read_compass(self):
         if self._compass_sensor:
             heading = self._compass_sensor.read_sensor()
             self.data.compass_heading = heading
+            self.data.has_compass = True
+        else:
+            self.data.has_compass = False
 
     def read_temperature(self):
         if self._temperature_sensor:
             temperature = self._temperature_sensor.read_sensor()
             self.data.temperature = temperature
+            self.data.has_temperature = True
+        else:
+            self.data.has_temperature = False
     
     # Control Systems
     # temporary direct access to DriveController to test hardware.

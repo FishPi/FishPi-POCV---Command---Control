@@ -9,16 +9,49 @@
 #       - controlling drive and steering to maintain course
 #
 
+import logging
+
 class NavigationUnit:
     """ Coordinator between internal perception model, outer high level command software (UI or AI), path planning through to drive control and course maintainence."""
     
-    def __init__(self, drive_controller, perception_unit):
-        self._drive_controller = drive_controller
+    def __init__(self, perception_unit, drive_controller):
         self._perception_unit = perception_unit
+        self._drive_controller = drive_controller
     
         self._enabled = False
-        self._heading = 0.0
-        self._speed = 0.0
+        self._desired_speed = 0.0
+        self._desired_heading = 0.0
+    
+    # update loop
+    
+    def update(self):
+        """ Update drive output for new observations. """
+        if self._enabled:
+            # current observed state
+            observed_speed = self._perception_unit.observed_speed
+            observed_heading = self._perception_unit.observed_heading
+            
+            # TODO: update desired speed and heading from path / waypoint checks
+            desired_speed, desired_heading = self._desired_speed, self._desired_heading
+        
+            logging.debug("NAV:\tobserved vs desired (speed, heading): (%d, %d) vs (%d, %d)", observed_speed, observed_heading, desired_speed, desired_heading)
+            
+            # current drive settings
+            current_throttle = self._drive_controller.throttle_level
+            current_steering = self._drive_controller.steering_angle
+            
+            # TODO: determine new drive settings based on desired vs observed speed and heading values
+            new_throttle, new_steering = current_throttle, current_steering
+            
+            logging.debug("NAV:\tcurrent vs new (throttle, steering) cmds: (%d, %d) vs (%d, %d)", current_steering, current_throttle, new_throttle, new_steering)
+            
+            # set new drive settings (could return these)
+            self._drive_controller.set_throttle(new_throttle)
+            self._drive_controller.set_steering(new_steering)
+        else:
+            pass
+    
+    # control commands
     
     def navigate_to(self, route):
         """ Navigate a given route. """
@@ -26,12 +59,12 @@ class NavigationUnit:
     
     def set_speed(self, speed):
         """ Set speed to maintain. """
-        self._speed = speed
+        self._desired_speed = speed
         self._start()
     
     def set_heading(self, heading):
         """ Set heading to maintain. """
-        self._heading = heading
+        self._desired_heading = heading
         self.start()
     
     def start(self):

@@ -54,16 +54,16 @@ class FishPi:
         self.debug = selected_args.debug
 
         # init rest
-        logging.info("Initializing FishPi (v{0})...".format(FISH_PI_VERSION))
+        logging.info("FISHPI:\tInitializing FishPi (v{0})...".format(FISH_PI_VERSION))
 
     def self_check(self):
         # TODO implement check for .lastState file
         # check contents for run mode and stable exit
-        logging.info("Checking last running state...")
+        logging.info("FISHPI:\tChecking last running state...")
         
         # TODO check for sufficient power for normal operation
         # otherwise implement eg emergency beacon mode
-        logging.info("Checking sufficient power...")
+        logging.info("FISHPI:\tChecking sufficient power...")
 
 
     def configure_devices(self):
@@ -72,9 +72,9 @@ class FishPi:
 
     def run(self):
         """ Runs selected FishPi mode."""
-        logging.info("Starting FishPi in mode: {0}".format(self.selected_mode))
+        logging.info("FISHPI:\tStarting FishPi in mode: {0}".format(self.selected_mode))
         if self.selected_mode == FishPiRunMode.Inactive:
-            logging.info("Inactive mode set - exiting.")
+            logging.info("FISHPI:\tInactive mode set - exiting.")
             return 0
         elif self.selected_mode == FishPiRunMode.Manual:
             return self.run_ui()
@@ -83,7 +83,7 @@ class FishPi:
         elif self.selected_mode == FishPiRunMode.Auto:
             return self.run_auto()
         else:
-            logging.error("Invalid mode! Exiting.")
+            logging.error("FISHPI:\tInvalid mode! Exiting.")
             return 1
 
     def run_ui(self):
@@ -95,9 +95,9 @@ class FishPi:
         controller = FishPiKernel(self.config, debug=self.debug)
         
         # run ui loop
-        logging.info("Launching UI...")
+        logging.info("FISHPI:\tLaunching UI...")
         ui.controller.run_main_view(controller)
-        logging.info("Program complete - exiting.")
+        logging.info("FISHPI:\tProgram complete - exiting.")
         
         # done
         return 0
@@ -114,9 +114,9 @@ class FishPi:
         controller.list_devices()
 
         # TODO wait for commands...
-        logging.info("Waiting for commands...")
+        logging.info("FISHPI:\tWaiting for commands...")
         pass
-        logging.info("No command scripts implemented - exiting.")
+        logging.info("FISHPI:\tNo command scripts implemented - exiting.")
         
         # done
         return 0
@@ -132,9 +132,9 @@ class FishPi:
         controller.list_devices()
 
         # run scripts
-        logging.info("Running autonomous scripts...")
+        logging.info("FISHPI:\tRunning autonomous scripts...")
         pass
-        logging.info("No autonomous scripts implemented - exiting.")
+        logging.info("FISHPI:\tNo autonomous scripts implemented - exiting.")
         # done
         return 0
 
