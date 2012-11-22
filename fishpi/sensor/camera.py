@@ -46,7 +46,7 @@ class CameraController(object):
             return
 
         if self._tick_count >= self.TICK_DELAY:
-            logging.debug('Updating image...')
+            logging.debug("CAMERA:\tUpdating image...")
             self._camera.capture(self.imgs_path)
             # might be more performat to just reload from filesystem into 'correct' library
             self._pil_img = self.pygame_to_pil(self._camera.last_img)
