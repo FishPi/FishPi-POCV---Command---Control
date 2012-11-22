@@ -47,7 +47,7 @@ class NavigationUnit:
             # TODO: determine new drive settings based on desired vs observed speed and heading values
             new_throttle, new_steering = current_throttle, current_steering
             
-            logging.debug("NAV:\tcurrent vs new (throttle, steering) cmds:\t(%f, %f) vs (%f, %f)", current_steering, current_throttle, new_throttle, new_steering)
+            logging.debug("NAV:\tcurrent vs new (throttle, steering):\t(%f, %f) vs (%f, %f)", current_steering, current_throttle, new_throttle, new_steering)
             
             # set new drive settings (could return these)
             self._drive_controller.set_throttle(new_throttle)

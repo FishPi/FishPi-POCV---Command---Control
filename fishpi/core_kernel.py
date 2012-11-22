@@ -53,40 +53,40 @@ class FishPiKernel:
             self.read_time()
         except Exception as ex:
             self.data.has_time = False
-            logging.info("CORE:\tError in update loop (TIME) - %s" % ex)
+            logging.exception("CORE:\tError in update loop (TIME) - %s" % ex)
                 
         try:
             self.read_GPS()
         except Exception as ex:
             self.data.has_GPS = False
-            logging.info("CORE:\tError in update loop (GPS) - %s" % ex)
+            logging.exception("CORE:\tError in update loop (GPS) - %s" % ex)
 
         try:
             self.read_compass()
         except Exception as ex:
             self.data.has_compass = False
-            logging.info("CORE:\tError in update loop (COMPASS) - %s" % ex)
+            logging.exception("CORE:\tError in update loop (COMPASS) - %s" % ex)
 
         try:
             self.read_temperature()
         except Exception as ex:
             self.data.has_temperature = False
-            logging.info("CORE:\tError in update loop (TEMPERATURE) - %s" % ex)
+            logging.exception("CORE:\tError in update loop (TEMPERATURE) - %s" % ex)
         
         try:
             self.capture_img()
         except Exception as ex:
-            logging.info("CORE:\tError in update loop (CAMERA) - %s" % ex)
+            logging.exception("CORE:\tError in update loop (CAMERA) - %s" % ex)
 
         try:
             self._perception_unit.update(self.data)
         except Exception as ex:
-            logging.info("CORE:\tError in update loop (PERCEPTION) - %s" % ex)
+            logging.exception("CORE:\tError in update loop (PERCEPTION) - %s" % ex)
         
         try:
             self._navigation_unit.update()
         except Exception as ex:
-            logging.info("CORE:\tError in update loop (NAVIGATION) - %s" % ex)
+            logging.exception("CORE:\tError in update loop (NAVIGATION) - %s" % ex)
         
             
     # Devices

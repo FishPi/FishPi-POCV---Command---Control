@@ -92,11 +92,11 @@ class FishPi:
         self.configure_devices()
         
         # create controller
-        controller = FishPiKernel(self.config, debug=self.debug)
+        kernel = FishPiKernel(self.config, debug=self.debug)
         
         # run ui loop
         logging.info("FISHPI:\tLaunching UI...")
-        ui.controller.run_main_view(controller)
+        ui.controller.run_main_view(kernel)
         logging.info("FISHPI:\tProgram complete - exiting.")
         
         # done
@@ -108,15 +108,18 @@ class FishPi:
         self.configure_devices()
 
         # create controller
-        controller = FishPiKernel(self.config, debug=self.debug)
+        kernel = FishPiKernel(self.config, debug=self.debug)
 
         # testing
-        controller.list_devices()
+        kernel.list_devices()
 
-        # TODO wait for commands...
+        # wait for commands...
         logging.info("FISHPI:\tWaiting for commands...")
-        pass
-        logging.info("FISHPI:\tNo command scripts implemented - exiting.")
+
+        # run internal webhost
+        import web.webhost
+        web.webhost.run_main_host(kernel)
+        logging.info("FISHPI:\tProgram complete - exiting.")
         
         # done
         return 0
@@ -126,10 +129,10 @@ class FishPi:
         self.configure_devices()
         
         # create controller
-        controller = FishPiKernel(self.config, debug=self.debug)
+        kernel = FishPiKernel(self.config, debug=self.debug)
         
         # testing
-        controller.list_devices()
+        kernel.list_devices()
 
         # run scripts
         logging.info("FISHPI:\tRunning autonomous scripts...")
