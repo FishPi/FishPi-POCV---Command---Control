@@ -54,7 +54,9 @@ def test_drive(i2c_bus):
     drive.set_throttle(0.0)
     sleep(5)
     
+def test_steer(i2c_bus):
     # test steering
+    drive = PyJuiceDriveController(debug=True, i2c_bus=i2c_bus)
     print "steer hard to port for 5 sec"
     drive.set_steering(-0.785398)
     sleep(5)
@@ -84,8 +86,10 @@ if __name__ == "__main__":
     i2c_bus=raspberrypi.i2c_bus()
     
     # test servo
-    test_servo(i2c_bus, 0x32, 3)
+    test_servo(i2c_bus, 0x32, 1)
 
     # test drive
-    test_drive(i2c_bus)
+    #test_drive(i2c_bus)
 
+    # test steer
+    #test_steer(i2c_bus)
