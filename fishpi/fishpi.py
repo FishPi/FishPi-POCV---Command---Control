@@ -25,7 +25,7 @@ import ui.controller
 from core_kernel import FishPiKernel
 from localconfig import FishPiConfig
 
-FISH_PI_VERSION = 0.1
+FISH_PI_VERSION = 0.2
 
 class FishPiRunMode:
     Inactive = 'inactive'
