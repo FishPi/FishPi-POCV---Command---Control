@@ -51,10 +51,11 @@ class NavigationUnit:
             current_steering = self._drive_controller.steering_angle
             
             # TODO: determine new drive settings based on desired vs observed speed and heading values
-            new_throttle = self._drive_ctrl.update(desired_speed, observed_speed)
-            new_steering = self._heading_ctrl.update(desired_heading, observed_heading)
+            dt = 0.2
+            new_throttle = self._drive_ctrl.update(desired_speed, observed_speed, dt)
+            new_steering = self._heading_ctrl.update(desired_heading, observed_heading, dt)
             
-            logging.debug("NAV:\tcurrent vs new (throttle, steering):\t(%f, %f) vs (%f, %f)", current_steering, current_throttle, new_throttle, new_steering)
+            logging.debug("NAV:\tcurrent vs new (throttle, steering):\t(%f, %f) vs (%f, %f)", current_throttle, current_steering, new_throttle, new_steering)
             
             # set new drive settings (could return these)
             self._drive_controller.set_throttle(new_throttle)
@@ -111,7 +112,7 @@ class BasicPIDControl:
         """ Calculate the plant signal based on variables (desired vs measured) for given update time (dt). """
 
         # check if need reset
-        if self.v_d != self.last_var_desired:
+        if v_d != self.last_var_desired:
             self.reset()
             self.last_var_desired = v_d
         

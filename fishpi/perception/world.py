@@ -53,7 +53,7 @@ class PerceptionUnit:
                 
         # temp - use GPS speed
         if data.has_GPS and data.fix:
-            self._observed_speed = gps_speed
+            self._observed_speed = 0.0 #gps_speed
 
         # temp - average compass and GPS headings
         if data.has_compass and data.has_GPS and data.fix:
