@@ -135,8 +135,10 @@ class FishPiKernel:
 
     def read_compass(self):
         if self._compass_sensor:
-            heading = self._compass_sensor.read_sensor()
+            (heading, pitch, roll) = self._compass_sensor.read_sensor()
             self.data.compass_heading = heading
+	    self.data.compass_pitch = pitch
+	    self.data.compass_roll = roll
             self.data.has_compass = True
         else:
             self.data.has_compass = False

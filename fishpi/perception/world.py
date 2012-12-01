@@ -37,26 +37,29 @@ class PerceptionUnit:
             pass
 
         if data.has_compass:
-            compass_heading = model_data.compass_heading
+            compass_heading = data.compass_heading
+	    compass_pitch = data.compass_pitch
+	    compass_roll = data.compass_roll
             
         if data.has_GPS and data.fix:
             lat = data.lat
             lon = data.lon
-            gps_heading = self.data.gps_heading
-            gps_speed = self.data.speed
+	    # heading only vaild above speed x
+            gps_heading = data.gps_heading
+            gps_speed = data.speed
             altitude = data.altitude
             num_sat = data.num_sat
                 
         # temp - use GPS speed
-        if data.has_GPS:
+        if data.has_GPS and data.fix:
             self._observed_speed = gps_speed
 
         # temp - average compass and GPS headings
-        if data.has_compass and data.has_GPS:
+        if data.has_compass and data.has_GPS and data.fix:
             self._observed_heading = (compass_heading + gps_heading) / 2.0
         elif data.has_compass:
             self._observed_heading = compass_heading
-        elif data.has_GPS:
+        elif data.has_GPS and data.fix:
             self._observed_heading = gps_heading
 
         

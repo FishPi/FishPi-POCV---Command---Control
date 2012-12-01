@@ -28,6 +28,8 @@ class POCVModelData:
         # compass
         self.has_compass = False
         self.compass_heading = 0.0
+        self.compass_pitch = 0.0
+        self.compass_roll = 0.0
 
         # gyro
         self.has_gyro = False
