@@ -14,9 +14,15 @@ import logging
 class NavigationUnit:
     """ Coordinator between internal perception model, outer high level command software (UI or AI), path planning through to drive control and course maintainence."""
     
-    def __init__(self, perception_unit, drive_controller):
+    def __init__(self, perception_unit, drive_controller, vehicle_constants):
         self._perception_unit = perception_unit
         self._drive_controller = drive_controller
+        self._vehicle_constants = vehicle_constants
+        
+        # local behaviour components
+        self._drive_ctrl = BasicPIDControl(vehicle_constants.pid_drive_gain_p, vehicle_constants.pid_drive_gain_i, vehicle_constants.pid_drive_gain_d)
+        self._heading_ctrl = BasicPIDControl(vehicle_constants.pid_heading_gain_p, vehicle_constants.pid_heading_gain_i, vehicle_constants.pid_heading_gain_d)
+        
     
         self._enabled = False
         self._desired_speed = 0.0
@@ -45,7 +51,8 @@ class NavigationUnit:
             current_steering = self._drive_controller.steering_angle
             
             # TODO: determine new drive settings based on desired vs observed speed and heading values
-            new_throttle, new_steering = current_throttle, current_steering
+            new_throttle = self._drive_ctrl.update(desired_speed, observed_speed)
+            new_steering = self._heading_ctrl.update(desired_heading, observed_heading)
             
             logging.debug("NAV:\tcurrent vs new (throttle, steering):\t(%f, %f) vs (%f, %f)", current_steering, current_throttle, new_throttle, new_steering)
             
@@ -87,6 +94,52 @@ class NavigationUnit:
         self._desired_speed = 0.0
         self._desired_heading = 0.0
 
+class BasicPIDControl:
+    """ Basic discrete PID controller for supplied gain. """
+
+    def __init__(self, gain_p, gain_i = 0.0, gain_d = 0.0):
+        # setup constants
+        self.gain_p = gain_p
+        self.gain_i = gain_i
+        self.gain_d = gain_d
+        # initialise loop variables
+        self.integrated_error = 0.0
+        self.last_error = 0.0
+        self.last_var_desired = 0.0
+
+    def update(self, v_d, v_m, dt):
+        """ Calculate the plant signal based on variables (desired vs measured) for given update time (dt). """
+
+        # check if need reset
+        if self.v_d != self.last_var_desired:
+            self.reset()
+            self.last_var_desired = v_d
+        
+        # calculate error
+        error = v_d - v_m
+        
+        # calculate response
+        p = self.gain_p * error
+            
+        self.integrated_error += error * dt
+        i = self.gain_i * self.integrated_error
+
+        d_error = (error - self.last_error) / dt
+        d = self.gain_d * d_error
+        self.last_error = error
+        
+        response = p + i + d
+                
+        # TODO: apply eg deadband, saturation
+        
+        # return response
+        return response
+
+    def reset(self):
+        """ Resets the integral and derivative parts of loop, eg after a change to the desired variable. """
+        self.integrated_error = 0.0
+        self.last_error = 0.0
+        self.last_var_desired = 0.0
 
 
 class PathPlanner:

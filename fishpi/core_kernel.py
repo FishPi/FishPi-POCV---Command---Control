@@ -34,6 +34,8 @@ class FishPiKernel:
         self._compass_sensor = config.compass_sensor
         self._temperature_sensor = config.temperature_sensor
         
+        self._vehicle_constants = config.vehicle_constants
+        
         # vehicle
         self._drive_controller = config.drive_controller
         
@@ -44,8 +46,8 @@ class FishPiKernel:
         self.data = POCVModelData()
 
         # supporting classes
-        self._perception_unit = PerceptionUnit(self.data)
-        self._navigation_unit = NavigationUnit(self._perception_unit, self._drive_controller)
+        self._perception_unit = PerceptionUnit(self._vehicle_constants, self.data)
+        self._navigation_unit = NavigationUnit(self._perception_unit, self._drive_controller, self._vehicle_constants)
         
     def update(self):
         """ Update loop for sensors->perception->control(->vehicle). """
@@ -137,8 +139,8 @@ class FishPiKernel:
         if self._compass_sensor:
             (heading, pitch, roll) = self._compass_sensor.read_sensor()
             self.data.compass_heading = heading
-	    self.data.compass_pitch = pitch
-	    self.data.compass_roll = roll
+            self.data.compass_pitch = pitch
+            self.data.compass_roll = roll
             self.data.has_compass = True
         else:
             self.data.has_compass = False

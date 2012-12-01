@@ -16,7 +16,8 @@ import gpxpy.gpx
 
 class PerceptionUnit:
 
-    def __init__(self, data):
+    def __init__(self, vehicle_constants, data):
+        self._vehicle_constants = vehicle_constants
         self._observed_speed = 0.0
         self._observed_heading = 0.0
         self.update(data)
@@ -38,13 +39,13 @@ class PerceptionUnit:
 
         if data.has_compass:
             compass_heading = data.compass_heading
-	    compass_pitch = data.compass_pitch
-	    compass_roll = data.compass_roll
+            compass_pitch = data.compass_pitch
+            compass_roll = data.compass_roll
             
         if data.has_GPS and data.fix:
             lat = data.lat
             lon = data.lon
-	    # heading only vaild above speed x
+            # heading only vaild above speed x
             gps_heading = data.gps_heading
             gps_speed = data.speed
             altitude = data.altitude
@@ -62,8 +63,7 @@ class PerceptionUnit:
         elif data.has_GPS and data.fix:
             self._observed_heading = gps_heading
 
-        
-                
+
     def load_gpx(self, filename):
         gpx_file = open(filename)
         gpx = gpxpy.parse(gpx_file)

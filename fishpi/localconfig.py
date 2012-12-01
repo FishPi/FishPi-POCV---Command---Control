@@ -62,8 +62,15 @@ class FishPiConfig(object):
         self.drive_controller = None
         self.camera_controller = None
         
+        # load vehicle constants
+        self._vehicle_constants = VehicleConstants()
+                
         # TODO any other init
         pass
+    
+    @property
+    def vehicle_constants(self):
+        return self._vehicle_constants
     
     #
     # file / paths section
@@ -324,4 +331,23 @@ class DummyDriveController(object):
         self.throttle_level = 0.0
         self.steering_angle = 0.0
         pass
+
+class VehicleConstants:
+    """ Constants as configured for a particular physical vehicle. """
+
+    def __init__(self):
+        # TODO: calibrate, test and read from config
+        
+        # constants for pid controller of throttle
+        self.pid_drive_gain_p = 1.0
+        self.pid_drive_gain_i = 0.0
+        self.pid_drive_gain_d = 0.0
+
+        # constants for pid controller of steering
+        self.pid_heading_gain_p = 0.9
+        self.pid_heading_gain_i = 0.4
+        self.pid_heading_gain_d = 0.1
+
+
+
 
