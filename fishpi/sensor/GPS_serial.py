@@ -96,6 +96,9 @@ class GPS_AdafruitSensor:
         speed = gps_rmc.spd_over_grnd
 
         # and done
+        if self.debug:
+            logging.debug("SENSOR:\tGPS_serial:\t(fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp): (%d, %f, %f, %f, %f, %f, %d, %s, %s)", fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp)
+        
         return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
 
     def read_sensor_raw(self):
@@ -114,12 +117,12 @@ class GPS_AdafruitSensor:
                 line = self._GPS.readline()
                 if line.startswith(wait4me):
                     if line.startswith('$GPGGA'):
-                        logging.debug("Received GPGGA: %s", line)
+                        logging.debug("SENSOR:\tGPS_serial:\tReceived GPGGA: %s", line)
                         p = pynmea.nmea.GPGGA()
                         p.parse(line)
                         return True, p
                     if line.startswith('$GPRMC'):
-                        logging.debug("Received GPRMC: %s", line)
+                        logging.debug("SENSOR:\tGPS_serial:\tReceived GPRMC: %s", line)
                         p = pynmea.nmea.GPRMC()
                         p.parse(line)
                         return True, p

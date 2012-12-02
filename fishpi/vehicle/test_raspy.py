@@ -3,18 +3,33 @@
 #
 # FishPi - An autonomous drop in the ocean
 #
-# Simple test of PWM motor and servo drive
+# Simple test of Raspy Juice
 #
 
 import raspberrypi
 
 from time import sleep
-from drive_controller import AdafruitDriveController
+from drive_controller import PyJuiceDriveController
 
-if __name__ == "__main__":
+def test_servo(i2c_bus, addr, servo_number):
+    print "init i2c bus"
+
+    print "full left"
+    i2c_bus.write_word_data(addr, servo_number, 1000)
+    sleep(5)
+    
+    print "full right"
+    i2c_bus.write_word_data(addr, servo_number, 2000)
+    sleep(5)
+    
+    print "centre"
+    i2c_bus.write_word_data(addr, servo_number, 1500)
+    sleep(5)
+
+def test_drive(i2c_bus):
     print "testing drive controller..."
-    drive = AdafruitDriveController(debug=True, i2c_bus=raspberrypi.i2c_bus())
-
+    drive = PyJuiceDriveController(debug=True, i2c_bus=i2c_bus)
+    
     print "run full ahead for 5 sec..."
     drive.set_throttle(1.0)
     sleep(5)
@@ -22,11 +37,11 @@ if __name__ == "__main__":
     print "run 50% ahead for 5 sec..."
     drive.set_throttle(0.5)
     sleep(5)
-
+    
     print "run 0% for 5 sec..."
     drive.set_throttle(0.0)
     sleep(5)
-
+    
     print "run 50% reverse for 5 sec"
     drive.set_throttle(-0.5)
     sleep(5)
@@ -38,23 +53,14 @@ if __name__ == "__main__":
     print "and back to neutral..."
     drive.set_throttle(0.0)
     sleep(5)
-
-    print "check out of bounds errors"
-    try:
-        drive.set_throttle(15.0)
-    except ValueError:
-        print "caught 15"
     
-    try:
-        drive.set_throttle(-10.0)
-    except ValueError:
-        print "caught -10"
-
+def test_steer(i2c_bus):
     # test steering
+    drive = PyJuiceDriveController(debug=True, i2c_bus=i2c_bus)
     print "steer hard to port for 5 sec"
     drive.set_steering(-0.785398)
     sleep(5)
-
+    
     print "steer to port for 5 sec"
     drive.set_steering(-0.3927)
     sleep(5)
@@ -62,16 +68,28 @@ if __name__ == "__main__":
     print "and back to neutral..."
     drive.set_steering(0.0)
     sleep(5)
-
+    
     print "steer to starboard for 5 sec"
     drive.set_steering(0.3927)
     sleep(5)
-
+    
     print "steer hard to starboard for 5 sec"
     drive.set_steering(0.785398)
     sleep(5)
-
+    
     print "and back to neutral..."
     drive.set_steering(0.0)
     sleep(5)
 
+if __name__ == "__main__":
+    # init
+    i2c_bus=raspberrypi.i2c_bus()
+    
+    # test servo
+    test_servo(i2c_bus, 0x32, 1)
+
+    # test drive
+    #test_drive(i2c_bus)
+
+    # test steer
+    #test_steer(i2c_bus)
