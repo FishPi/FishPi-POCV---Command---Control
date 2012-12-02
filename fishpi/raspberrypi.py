@@ -26,6 +26,14 @@ def i2c_bus():
     else:
         return smbus.SMBus(0)
 
+def i2c_bus_num():
+    ver = board_ver()
+    if int(ver) > 4:
+        return '1'
+    else:
+        return '0'
+
 def serial_bus():
-    return "/dev/ttyAMA0"
+    return "/dev/ttyUSB0"
+    #return "/dev/ttyAMA0"
 

@@ -35,6 +35,16 @@ class Adafruit_I2C :
       print "Error accessing 0x%02X: Check your I2C address" % self.address
       return -1
 
+  def writeWord(self, reg, value):
+    "Writes a word value to the specified register/address"
+    try:
+      self.bus.write_word_data(self.address, reg, value)
+      if (self.debug):
+        print "I2C: Wrote 0x%02X to register 0x%02X" % (value, reg)
+    except IOError, err:
+      print "Error accessing 0x%02X: Check your I2C address" % self.address
+      return -1
+
   def writeList(self, reg, list):
     "Writes an array of bytes using I2C format"
     try:
@@ -56,7 +66,7 @@ class Adafruit_I2C :
         print results
       return results
     except IOError, err:
-      print "Error accessing 09x%02X: Check your I2C address" % self.address
+      print "Error accessing 0x%02X: Check your I2C address" % self.address
       return -1
 
   def readU8(self, reg):

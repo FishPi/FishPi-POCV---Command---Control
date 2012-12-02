@@ -180,15 +180,20 @@ class ControlsFrame(Frame, object):
         self.btn_auto.pack(side=LEFT, padx=3)
         
         # centre frame
-        Label(self, text = "Heading:", pady=6, bd=1, anchor=W, justify=LEFT).pack(fill=X, padx=2, expand=True)
+        self.lbl_heading = Label(self, text = "Steering (Manual)", pady=6, bd=1, anchor=W, justify=LEFT)
+        self.lbl_heading.pack(fill=X, padx=2, expand=True)
         
         # rudder heading
         self.scl_rudder = Scale(self, orient=HORIZONTAL, from_=-45, to=45, command=self.on_rudder)
         self.scl_rudder.set(0)
         self.scl_rudder.pack(fill=X, expand=True, padx=5)
         
+        self.btn_zero_heading = Button(self, text="Centre Rudder", command=self.on_zero_heading)
+        self.btn_zero_heading.pack(padx=3)
+
         # throttle level
-        Label(self, text = "Throttle:", pady=6, bd=1, anchor=W, justify=LEFT).pack(fill=X, padx=2, expand=True)
+        self.lbl_throttle = Label(self, text = "Throttle (Manual):", pady=6, bd=1, anchor=W, justify=LEFT)
+        self.lbl_throttle.pack(fill=X, padx=2, expand=True)
         
         self.btn_zero_throttle = Button(self, text="Zero Throttle", command=self.on_zero_throttle)
         self.btn_zero_throttle.pack(side=RIGHT, padx=3)
@@ -199,37 +204,73 @@ class ControlsFrame(Frame, object):
 
     def on_set_manual_mode(self):
         """ event handler for mode change """
+        # set ui
+        self.scl_speed_controller.set(0)
+        self.scl_speed_controller.config(from_=100, to=-100)
+        self.lbl_throttle.config(text="Throttle (Manual):")
+        self.btn_zero_throttle.config(text="Zero Throttle")
+        self.scl_rudder.set(0)
+        self.scl_rudder.config(from_=-45, to=45)
+        self.lbl_heading.config(text="Steering (Manual):")
+        self.btn_zero_heading.config(text="Centre Rudder")
         self.btn_manual.config(relief=SUNKEN)
         self.btn_auto.config(relief=RAISED)
+        # set controller
         self._view_controller.set_manual_mode()
     
     def on_pause(self):
         """ event handler for mode change """
+        # set ui
+        self.scl_speed_controller.set(0)
+        self.scl_rudder.set(0)
         self.btn_manual.config(relief=RAISED)
         self.btn_auto.config(relief=RAISED)
+        # set controller
         self._view_controller.halt()
     
     def on_set_auto_pilot_mode(self):
-        """ event handler for mode change """
+        """ event handler for mode change """        
+        # set ui
+        self.scl_speed_controller.set(0)
+        self.scl_speed_controller.config(from_=100, to=-100)
+        self.lbl_throttle.config(text="Speed (Auto):")
+        self.btn_zero_throttle.config(text="Zero Speed")
+        self.scl_rudder.set(0)
+        self.scl_rudder.config(from_=-180, to=180)
+        self.lbl_heading.config(text="Heading (Auto):")
+        self.btn_zero_heading.config(text="Centre Heading")
         self.btn_manual.config(relief=RAISED)
         self.btn_auto.config(relief=SUNKEN)
+        # set controller
         self._view_controller.set_auto_pilot_mode()
+    
+    def on_zero_throttle(self):
+        """ event handler for throttle change """
+        self.scl_speed_controller.set(0)
+    
+    def on_zero_heading(self):
+        """ event handler for heading change """
+        # only apply in manual mode
+        self.scl_rudder.set(0)
     
     def on_rudder(self, value):
         """ event handler for heading change """
-        # only apply in manual mode
-        self._view_controller.set_heading(value)
+        if self._view_controller.auto_mode_enabled:
+            # auto mode
+            self._view_controller.set_heading(value)
+        else:
+            # manual mode
+            self._view_controller.set_steering(value)
     
     def on_throttle(self, value):
         """ event handler for throttle change """
-        # only apply in manual mode
-        self._view_controller.set_throttle(value)
+        if self._view_controller.auto_mode_enabled:
+            # auto mode
+            self._view_controller.set_speed(value)
+        else:
+            # manual mode
+            self._view_controller.set_throttle(value)
     
-    def on_zero_throttle(self):        
-        """ event handler for throttle change """
-        # only apply in manual mode
-        self._view_controller.set_throttle(0)
-        self.scl_speed_controller.set(0)
 
 class RouteFrame(Frame, object):
     """ UI Frame with buttons for user interactions. """

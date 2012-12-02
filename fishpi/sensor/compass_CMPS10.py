@@ -20,6 +20,7 @@
 #
 # Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
 
+import logging
 from Adafruit_I2C import Adafruit_I2C
 
 class Cmps10_Sensor:
@@ -34,7 +35,7 @@ class Cmps10_Sensor:
         self.debug = debug
         self.version = self.i2c.readU8(0)
         if self.debug:
-            print "CMPS10 software v:%d" % self.version
+            logging.debug("SENSOR:\tCMPS10:\tSoftware v:%d", self.version)
 
     def read_sensor(self):
         """ Read sensor values. """
@@ -44,7 +45,7 @@ class Cmps10_Sensor:
         pitch = self.i2c.readS8(4)
         roll = self.i2c.readS8(5)
         if self.debug:
-            print "Heading %f, pitch %f, roll %f" % (heading, pitch, roll)
+            logging.debug("SENSOR:\tCMPS10\tHeading %f, pitch %f, roll %f", heading, pitch, roll)
         return heading, pitch, roll
 
     def read_sensor_raw(self):
@@ -59,6 +60,6 @@ class Cmps10_Sensor:
         a_y = float(self.i2c.readS16(18))
         a_z = float(self.i2c.readS16(20))
         if self.debug:
-            print "Raw values: M(x,y,z)=(%f,%f,%f) A(x,y,z)=(%f,%f,%f)" % (m_x, m_y, m_z, a_x, a_y, a_z)
+            logging.debug("SENSOR:\tCMPS10\tRaw values: M(x,y,z)=(%f,%f,%f) A(x,y,z)=(%f,%f,%f)", m_x, m_y, m_z, a_x, a_y, a_z)
         return (m_x, m_y, m_z, a_x, a_y, a_z)
 

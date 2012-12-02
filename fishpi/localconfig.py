@@ -8,10 +8,12 @@
 #
 
 import logging
+import logging.handlers
 
 import os
 import platform
 import subprocess
+import time
 
 class FishPiConfig(object):
     """ Responsible for configuration of FishPi. 
@@ -25,7 +27,11 @@ class FishPiConfig(object):
 
     def __init__(self):
         # TODO setup logging (from config)
-        logging.getLogger().setLevel(logging.DEBUG)
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+        console = logging.StreamHandler()
+        logger.addHandler(console)
+        
         if os.path.exists(self.config_file):
             # TODO read any static config from file
             pass
@@ -40,6 +46,15 @@ class FishPiConfig(object):
         if not os.path.exists(self.logs_path):
             os.makedirs(self.logs_path)
 
+        # add file logging
+        log_file_stem = os.path.join(self.logs_path, 'fishpi_%s.log' % time.strftime('%Y%m%d_%H%M%S'))
+        handler = logging.handlers.RotatingFileHandler(log_file_stem, backupCount=50)
+        formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        # can force new file start if needed
+        #handler.doRollover()
+        
         # default attachments to None
         self.gps_sensor = None
         self.compass_sensor = None
@@ -47,8 +62,15 @@ class FishPiConfig(object):
         self.drive_controller = None
         self.camera_controller = None
         
+        # load vehicle constants
+        self._vehicle_constants = VehicleConstants()
+                
         # TODO any other init
         pass
+    
+    @property
+    def vehicle_constants(self):
+        return self._vehicle_constants
     
     #
     # file / paths section
@@ -88,16 +110,16 @@ class FishPiConfig(object):
         
         # only configure devices for Linux
         if not(platform.system() == "Linux"):
-            logging.info("Not running on Linux distro. Not configuring i2c or other devices.")
+            logging.info("CFG:\tNot running on Linux distro. Not configuring i2c or other devices.")
             self.set_dummy_devices()
             return
         
         # although i2c may work if in correct user group, GPIO needs confirming.
         # for now, clearer just to object if not running as root (sudo)
-        if not(os.getuid() == 0):
-            logging.info("Not running on as root. Not configuring i2c or other devices.")
-            self.set_dummy_devices()
-            return
+        #if not(os.getuid() == 0):
+        #    logging.info("Not running on as root. Not configuring i2c or other devices.")
+        #    self.set_dummy_devices()
+        #    return
             
         # running as root on linux so can scan for devices and configure them
         # although inline imports normally not encouraged
@@ -106,17 +128,17 @@ class FishPiConfig(object):
     
         # i2c devices
         try:
-            logging.info("Configuring i2c devices...")
+            logging.info("CFG:\tConfiguring i2c devices...")
             # scan for connected devices
-            i2c_addresses = self.scan_i2c()
+            i2c_addresses = self.scan_i2c(debug=debug)
 
             # lookup available device drivers by address
             for addr, in_use in i2c_addresses:
-                device_name, device_driver = self.lookup(addr, debug)
+                device_name, device_driver = self.lookup(addr, debug=debug)
                 self._devices.append([addr, device_name, device_driver, in_use])
                             
         except Exception as ex:
-            logging.exception("Error scanning i2c devices - %s" % ex)
+            logging.exception("CFG:\tError scanning i2c devices - %s" % ex)
 
         # if no GPS (eg i2c) set up, then import a serial one. Should check for device present first.
         if not(self.gps_sensor):
@@ -124,14 +146,14 @@ class FishPiConfig(object):
                 from sensor.GPS_serial import GPS_AdafruitSensor
                 self.gps_sensor = GPS_AdafruitSensor(serial_bus=raspberrypi.serial_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up GPS over serial - %s" % ex)
+                logging.warning("CFG:\tError setting up GPS over serial - %s" % ex)
 
         # CameraController (over USB)
         try:
             from sensor.camera import CameraController
-            self.camera_controller = CameraController(self)
+            self.camera_controller = CameraController(self, debug=debug)
         except Exception as ex:
-            logging.info("Camera support unavailable - %s" % ex)
+            logging.info("CFG:\tCamera support unavailable - %s" % ex)
             self.camera_controller = DummyCameraController(self.resources_folder())
 
         # any remaining dummy devices
@@ -144,7 +166,9 @@ class FishPiConfig(object):
         """ lookup available device drivers by hex address,
             import and create driver class,
             setup particular devices so easily retrieved by consumers. """
-                
+        if(debug):
+            logging.debug("CFG:\tChecking for driver for device at i2c %s" % addr)
+        
         # TODO replace with reading from config? probably use ConfigParser?
         # note: i2c addresses can conflict
         # could scan registers etc to confirm count etc?
@@ -158,7 +182,7 @@ class FishPiConfig(object):
                 from sensor.GPS_I2C import GPS_NavigatronSensor
                 self.gps_sensor = GPS_NavigatronSensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up GPS over i2c - %s" % ex)
+                logging.warning("CFG:\tError setting up GPS over i2c - %s" % ex)
             return "GPS", self.gps_sensor
         
         elif addr == 0x48:
@@ -166,7 +190,7 @@ class FishPiConfig(object):
                 from sensor.temperature_TMP102 import TemperatureSensor
                 self.temperature_sensor = TemperatureSensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up TEMPERATURE over i2c - %s" % ex)
+                logging.warning("CFG:\tError setting up TEMPERATURE over i2c - %s" % ex)
             return "TEMPERATURE", self.temperature_sensor
                     
         elif addr == 0x60:
@@ -174,20 +198,31 @@ class FishPiConfig(object):
                 from sensor.compass_CMPS10 import Cmps10_Sensor
                 self.compass_sensor = Cmps10_Sensor(i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.warning("Error setting up COMPASS over i2c - %s" % ex)
+                logging.warning("CFG:\tError setting up COMPASS over i2c - %s" % ex)
             return "COMPASS", self.compass_sensor
         
         elif addr == 0x40: #or addr == 0x70:
-            # DriveController (not sure what 0x70 address is for...)
+            # DriveController (using Adafruit PWM board) (not sure what 0x70 address is for...)
             try:
-                from vehicle.drive_controller import DriveController
+                from vehicle.drive_controller import AdafruitDriveController
                 # TODO pwm addresses from config?
-                self.drive_controller = DriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
+                self.drive_controller = AdafruitDriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
             except Exception as ex:
-                logging.info("Error setting up DRIVECONTROLLER over i2c - %s" % ex)
+                logging.info("CFG:\tError setting up DRIVECONTROLLER over i2c - %s" % ex)
                 self.drive_controller = DummyDriveController()
             return "DRIVECONTROLLER", self.drive_controller
-                
+        
+        elif addr == 0x32:
+            # DriveController (using RaspyJuice)
+            try:
+                from vehicle.drive_controller import PyJuiceDriveController
+                # TODO pwm addresses from config?
+                self.drive_controller = PyJuiceDriveController(i2c_addr=addr, i2c_bus=raspberrypi.i2c_bus(), debug=debug)
+            except Exception as ex:
+                logging.info("CFG:\tError setting up DRIVECONTROLLER over i2c - %s" % ex)
+                self.drive_controller = DummyDriveController()
+            return "DRIVECONTROLLER", self.drive_controller
+    
         elif addr == 0x1E:
             return "COMPASS", "Driver not loaded - HMC5883L"
                 
@@ -204,16 +239,22 @@ class FishPiConfig(object):
         else:
             return "unknown", None
 
-    def scan_i2c(self):
+    def scan_i2c(self, debug=False):
         """scans i2c port returning a list of detected addresses.
             Requires sudo access.
             Returns True for in use by a device already (ie UU observed)"""
         
-        proc = subprocess.Popen(['sudo', 'i2cdetect', '-y', '0'], 
+        import raspberrypi
+	
+        proc = subprocess.Popen(['sudo', 'i2cdetect', '-y', raspberrypi.i2c_bus_num()], 
                 stdout = subprocess.PIPE,
                 close_fds = True)
         std_out_txt, std_err_txt = proc.communicate()
 
+        if debug:
+            logging.debug(std_out_txt)
+            logging.debug(std_err_txt)
+        
         # TODO could probably be neater with eg format or regex
         # i2c returns
         #  -- for unused addresses
@@ -258,7 +299,7 @@ class DummyCameraController(object):
     
     def capture_now(self):
         if self.enabled:
-            logging.debug("Capture image.")
+            logging.debug("CAM:\tCapture image.")
         pass
     
     @property
@@ -268,18 +309,45 @@ class DummyCameraController(object):
 class DummyDriveController(object):
     """ 'Dummy' drive controller that just logs. """
     
+    # current state
+    throttle_level = 0.0
+    steering_angle = 0.0
+    
     def __init__(self):
         pass
     
     def set_throttle(self, throttle_level):
-        logging.debug("Throttle set to: %s" % throttle_level)
+        logging.debug("DRIVE:\tThrottle set to: %s" % throttle_level)
+        self.throttle_level = throttle_level
         pass
     
-    def set_heading(self, heading):
-        logging.debug("Heading set to: %s" % heading)
+    def set_steering(self, angle):
+        logging.debug("DRIVE:\tSteering set to: %s" % angle)
+        self.steering_angle = angle
         pass
     
     def halt(self):
-        logging.debug("Drive halting.")
+        logging.debug("DRIVE:\tDrive halting.")
+        self.throttle_level = 0.0
+        self.steering_angle = 0.0
         pass
+
+class VehicleConstants:
+    """ Constants as configured for a particular physical vehicle. """
+
+    def __init__(self):
+        # TODO: calibrate, test and read from config
+        
+        # constants for pid controller of throttle
+        self.pid_drive_gain_p = 1.0
+        self.pid_drive_gain_i = 0.0
+        self.pid_drive_gain_d = 0.0
+
+        # constants for pid controller of steering
+        self.pid_heading_gain_p = 0.9
+        self.pid_heading_gain_i = 0.4
+        self.pid_heading_gain_d = 0.1
+
+
+
 

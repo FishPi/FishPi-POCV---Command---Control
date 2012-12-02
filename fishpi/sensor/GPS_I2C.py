@@ -16,6 +16,7 @@
 #
 # Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
 
+import logging
 from datetime import datetime
 
 from Adafruit_I2C import Adafruit_I2C
@@ -60,53 +61,53 @@ class GPS_NavigatronSensor:
         self.address = address
         self.debug = debug
         if self.debug:
-            print "GPS: Checking firmware version..."
+            logging.debug("SENSOR:\tGPS_I2C:\tChecking firmware version...")
         self.version = self.i2c.readU8(self.I2C_GPS_REG_VERSION)
         if self.debug:
-            print "GPS: Firmware v:%d" % self.version
+            logging.debug("SENSOR:\tGPS_I2C:\tFirmware v:%d", self.version)
 
     def read_sensor(self):
         """ Read sensor values. """
         # read status
         if self.debug:
-            print "GPS: reading status..."
+            logging.debug("SENSOR:\tGPS_I2C:\tReading status...")
         status = self.i2c.readU8(self.I2C_GPS_STATUS)
         if self.debug:
-            print "GPS: status %s" % hex(status)
+            logging.debug("SENSOR:\tGPS_I2C:\tStatus %s", hex(status))
         
         fix = 1
         num_sat = 1
     
         # read data
         if self.debug:
-            print "GPS: reading location..."
+            logging.debug("SENSOR:\tGPS_I2C:\tReading location...")
         loc_buffer = self.i2c.readList(self.I2C_GPS_LOCATION, 8)
         (lat, lon) = self.convert_buffer(loc_buffer)
         if self.debug:
-            print "GPS: (lat,lon) = (%f, %f)" % (lat,lon)
+            logging.debug("SENSOR:\tGPS_I2C:\t(lat,lon) = (%f, %f)", lat, lon)
     
         # read remaining data
         if self.debug:
-            print "GPS: reading nav heading..."
+            logging.debug("SENSOR:\tGPS_I2C:\tReading nav heading...")
         nav_lat = self.i2c.readS16(self.I2C_GPS_NAV_LAT)
         nav_lon = self.i2c.readS16(self.I2C_GPS_NAV_LON)
         if self.debug:
-            print "GPS: bearing to (N/S, E/W) = (%f, %f)" % (nav_lat, nav_lon)
+            logging.debug("SENSOR:\tGPS_I2C:\tBearing to (N/S, E/W) = (%f, %f)", nav_lat, nav_lon)
         if self.debug:
-            print "GPS: reading ground speed and altitude..."
+            logging.debug("SENSOR:\tGPS_I2C:\tReading ground speed and altitude...")
         speed = self.i2c.readU16(self.I2C_GPS_GROUND_SPEED)/100.0
         altitude = self.i2c.readU16(self.I2C_GPS_ALTITUDE)
         heading = self.i2c.readU16(self.I2C_GPS_GROUND_COURSE)
         if self.debug:
-            print "GPS: (ground speed, altitude, ground course) = (%f, %f, %f)" % (speed, altitude, heading)
+            logging.debug("SENSOR:\tGPS_I2C:\t(ground speed, altitude, ground course) = (%f, %f, %f)", speed, altitude, heading)
 
         # read time
         if self.debug:
-            print "GPS: reading time..."
+            logging.debug("SENSOR:\tGPS_I2C:\tReading time...")
         time_buffer = self.i2c.readList(self.I2C_GPS_TIME, 4)
         time = float((time_buffer[3]<<24)|(time_buffer[2]<<16)|(time_buffer[1]<<8)|(time_buffer[0]))/10000.0
         if self.debug:
-            print "GPS: time = %f" % time
+            logging.debug("SENSOR:\tGPS_I2C:\ttime = %f", time)
         dt = datetime.today()
         timestamp = dt.time()
         datestamp = dt.date()
