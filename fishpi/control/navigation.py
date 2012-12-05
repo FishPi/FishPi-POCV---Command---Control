@@ -9,6 +9,7 @@
 #       - controlling drive and steering to maintain course
 #
 
+import math
 import logging
 
 class NavigationUnit:
@@ -20,8 +21,8 @@ class NavigationUnit:
         self._vehicle_constants = vehicle_constants
         
         # local behaviour components
-        self._drive_ctrl = BasicPIDControl(vehicle_constants.pid_drive_gain_p, vehicle_constants.pid_drive_gain_i, vehicle_constants.pid_drive_gain_d)
-        self._heading_ctrl = BasicPIDControl(vehicle_constants.pid_heading_gain_p, vehicle_constants.pid_heading_gain_i, vehicle_constants.pid_heading_gain_d)
+        self._drive_ctrl = BasicPIDControl(vehicle_constants.pid_drive_gain_p, vehicle_constants.pid_drive_gain_i, vehicle_constants.pid_drive_gain_d, vehicle_constants.drive_dead_zone, vehicle_constants.drive_max_response)
+        self._heading_ctrl = BasicPIDControl(vehicle_constants.pid_heading_gain_p, vehicle_constants.pid_heading_gain_i, vehicle_constants.pid_heading_gain_d, vehicle_constants.heading_dead_zone, vehicle_constants.heading_max_response)
         
     
         self._enabled = False
@@ -39,7 +40,7 @@ class NavigationUnit:
         if self._enabled:
             # current observed state
             observed_speed = self._perception_unit.observed_speed
-            observed_heading = self._perception_unit.observed_heading
+            observed_heading = self.map_heading_range(self._perception_unit.observed_heading)
             
             # TODO: update desired speed and heading from path / waypoint checks
             desired_speed, desired_heading = self._desired_speed, self._desired_heading
@@ -76,7 +77,7 @@ class NavigationUnit:
     
     def set_heading(self, heading):
         """ Set heading to maintain. """
-        self._desired_heading = heading
+        self._desired_heading = self.map_heading_range(heading)
         self.start()
     
     def start(self):
@@ -95,14 +96,24 @@ class NavigationUnit:
         self._desired_speed = 0.0
         self._desired_heading = 0.0
 
+    def map_heading_range(self, angle):
+        """ Maps angle to +/-180.0 """
+        if angle > 180.0:
+            return self.map_heading_range(angle-360.0)
+        else:
+            return angle
+
 class BasicPIDControl:
     """ Basic discrete PID controller for supplied gain. """
 
-    def __init__(self, gain_p, gain_i = 0.0, gain_d = 0.0):
+    def __init__(self, gain_p, gain_i=0.0, gain_d=0.0, dead_zone=None, max_response=None):
         # setup constants
         self.gain_p = gain_p
         self.gain_i = gain_i
         self.gain_d = gain_d
+        # setup constraints
+        self.dead_zone = dead_zone
+        self.max_response = max_response
         # initialise loop variables
         self.integrated_error = 0.0
         self.last_error = 0.0
@@ -131,8 +142,17 @@ class BasicPIDControl:
         
         response = p + i + d
                 
-        # TODO: apply eg deadband, saturation
-        
+        # apply eg deadband, saturation
+        if self.dead_zone:
+            dz = self.dead_zone
+            if abs(response) < dz:
+                return 0.0
+
+        if self.max_response:
+            max_r = self.max_response
+            if abs(response) > max_r:
+                return math.copysign(max_r, response)
+
         # return response
         return response
 
