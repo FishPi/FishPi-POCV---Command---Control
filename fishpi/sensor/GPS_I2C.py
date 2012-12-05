@@ -65,34 +65,66 @@ class GPS_NavigatronSensor:
         self.version = self.i2c.readU8(self.I2C_GPS_REG_VERSION)
         if self.debug:
             logging.debug("SENSOR:\tGPS_I2C:\tFirmware v:%d", self.version)
+        # init 'last' values
+        self._read_errors = 100
+        self._last_lat = 0.0
+        self._last_lon = 0.0
+        self._last_heading = 0.0
+        self._last_speed = 0.0
+        self._last_altitude = 0.0
 
     def read_sensor(self):
         """ Read sensor values. """
+        read_errors = 0
+
         # read status
         if self.debug:
             logging.debug("SENSOR:\tGPS_I2C:\tReading status...")
         status = self.i2c.readU8(self.I2C_GPS_STATUS)
-        if self.debug:
-            logging.debug("SENSOR:\tGPS_I2C:\tStatus %s", hex(status))
-        
-        fix = 1
-        num_sat = 1
+
+        # check and parse status
+        if status == -1:
+            fix = 0
+            num_sat = 0
+            read_errors += 10
+            if self.debug:
+                logging.debug("SENSOR:\tGPS_I2C:\tFailed to read status.")
+        else:
+            # new GGA frame
+            new_data = status & 0x1
+            # fix?
+            fix_2d = (status & 0x2) >> 1
+            fix_3d = (status & 0x3) >> 2
+            fix = fix_2d or fix_3d
+            num_sat = status >> 4
+
+            if self.debug:
+                logging.debug("SENSOR:\tGPS_I2C:\tStatus %s\tFix %d\tNum Sat %d", hex(status), fix, num_sat)
     
-        # read data
+        # read lat, lon data
         if self.debug:
             logging.debug("SENSOR:\tGPS_I2C:\tReading location...")
         loc_buffer = self.i2c.readList(self.I2C_GPS_LOCATION, 8)
-        (lat, lon) = self.convert_buffer(loc_buffer)
-        if self.debug:
-            logging.debug("SENSOR:\tGPS_I2C:\t(lat,lon) = (%f, %f)", lat, lon)
+
+        # check and parse lat, lon
+        if loc_buffer == -1:
+            (lat,lon) = (self._last_lat, self._last_lon)
+            read_errors += 10
+            if self.debug:
+                logging.debug("SENSOR:\tGPS_I2C:Failed to read lat, lon, using last values.")
+        else:
+            (lat, lon) = self.convert_buffer(loc_buffer)
+            (self._last_lat, self._last_lon) = (lat, lon)
+            if self.debug:
+                logging.debug("SENSOR:\tGPS_I2C:\t(lat,lon) = (%f, %f)", lat, lon)
     
         # read remaining data
-        if self.debug:
-            logging.debug("SENSOR:\tGPS_I2C:\tReading nav heading...")
-        nav_lat = self.i2c.readS16(self.I2C_GPS_NAV_LAT)
-        nav_lon = self.i2c.readS16(self.I2C_GPS_NAV_LON)
-        if self.debug:
-            logging.debug("SENSOR:\tGPS_I2C:\tBearing to (N/S, E/W) = (%f, %f)", nav_lat, nav_lon)
+        #if self.debug:
+        #    logging.debug("SENSOR:\tGPS_I2C:\tReading nav heading...")
+        #nav_lat = self.i2c.readS16(self.I2C_GPS_NAV_LAT)
+        #nav_lon = self.i2c.readS16(self.I2C_GPS_NAV_LON)
+        #if self.debug:
+        #    logging.debug("SENSOR:\tGPS_I2C:\tBearing to (N/S, E/W) = (%f, %f)", nav_lat, nav_lon)
         if self.debug:
             logging.debug("SENSOR:\tGPS_I2C:\tReading ground speed and altitude...")
         speed = self.i2c.readU16(self.I2C_GPS_GROUND_SPEED)/100.0
@@ -102,18 +134,23 @@ class GPS_NavigatronSensor:
             logging.debug("SENSOR:\tGPS_I2C:\t(ground speed, altitude, ground course) = (%f, %f, %f)", speed, altitude, heading)
 
         # read time
-        if self.debug:
-            logging.debug("SENSOR:\tGPS_I2C:\tReading time...")
-        time_buffer = self.i2c.readList(self.I2C_GPS_TIME, 4)
-        time = float((time_buffer[3]<<24)|(time_buffer[2]<<16)|(time_buffer[1]<<8)|(time_buffer[0]))/10000.0
-        if self.debug:
-            logging.debug("SENSOR:\tGPS_I2C:\ttime = %f", time)
+        #if self.debug:
+        #    logging.debug("SENSOR:\tGPS_I2C:\tReading time...")
+        #time_buffer = self.i2c.readList(self.I2C_GPS_TIME, 4)
+        #time = float((time_buffer[3]<<24)|(time_buffer[2]<<16)|(time_buffer[1]<<8)|(time_buffer[0]))/10000.0
+        #if self.debug:
+        #    logging.debug("SENSOR:\tGPS_I2C:\ttime = %f", time)
         dt = datetime.today()
         timestamp = dt.time()
         datestamp = dt.date()
         #timestamp = datetime.strptime(int(time), "%H%M%S").time()
         #datestamp = x
-                
+        
+        if read_errors == 0:
+            self._read_errors = 0
+        else:
+            self._read_errors += read_errors
+
         # and return
         return fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp
     

@@ -6,6 +6,9 @@
 # Simple test of GPS sensor
 #
 
+import logging
+import logging.handlers
+
 import raspberrypi
 
 from time import sleep
@@ -21,10 +24,13 @@ def test_buffer_conversion(gps_sensor):
     print "%s maps to (%s, %s)" % (buffer_2, lat_2, lon_2)
 
 if __name__ == "__main__":
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
     print "Testing GPS sensor (running 5x with 5s pause)..."
 
     print "Initialising..."
-    gps_sensor = GPS_NavigatronSensor(debug=True, i2c_bus=raspberrypi.i2c_bus())
+    gps_sensor = GPS_NavigatronSensor(i2c_bus=raspberrypi.i2c_bus(), debug=True)
 
     # test raw conversion logic
     #test_buffer_conversion(gps_sensor)

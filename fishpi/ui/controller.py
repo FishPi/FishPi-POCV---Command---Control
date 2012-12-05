@@ -17,7 +17,7 @@ from PIL import Image
 from ui.main_view import MainView
 
 # callback interval in milli seconds
-callback_interval = 1000
+callback_interval = 50
 
 def run_main_view(kernel):
     """ Runs main UI view. """

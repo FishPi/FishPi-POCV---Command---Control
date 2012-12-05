@@ -342,12 +342,16 @@ class VehicleConstants:
         self.pid_drive_gain_p = 1.0
         self.pid_drive_gain_i = 0.0
         self.pid_drive_gain_d = 0.0
+        self.drive_dead_zone = 0.3
+        self.drive_max_response = 1.0
 
         # constants for pid controller of steering
         self.pid_heading_gain_p = 0.9
         self.pid_heading_gain_i = 0.4
         self.pid_heading_gain_d = 0.1
-
+        self.heading_dead_zone = None
+        # Pi/4
+        self.heading_max_response = 0.785398
 
 
 
