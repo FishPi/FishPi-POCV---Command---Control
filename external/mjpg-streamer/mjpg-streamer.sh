@@ -10,7 +10,7 @@ YUV="true"
 
 MJPG_STREAMER_DIR="$(dirname $0)"
 MJPG_STREAMER_BIN="mjpg_streamer"
-LOG_FILE="/home/pi/fishpi/logs/mjpg-streamer.log"
+LOG_FILE="~/fishpi/logs/mjpg-streamer.log"
 RUNNING_CHECK_INTERVAL="2" # how often to check to make sure the server is running (in seconds)
 HANGING_CHECK_INTERVAL="3" # how often to check to make sure the server is not hanging (in seconds)
 

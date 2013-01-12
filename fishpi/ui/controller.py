@@ -13,15 +13,29 @@ import os
 import Tkinter
 import tkFileDialog
 from PIL import Image
-
-from ui.main_view import MainView
+from ui.main_view_wx import MainWindow
 
 # callback interval in milli seconds
 callback_interval = 50
 
 def run_main_view(kernel):
-    """ Runs main UI view. """
-    
+    """ Runs the main UI view. """
+    run_main_view_wx(kernel)
+
+def run_main_view_wx(kernel):
+    """ Runs main UI view based on wx framework. """
+    # imports
+    import wx
+    from ui.main_view import MainView
+
+    app = wx.App(False)
+    frame = MainWindow(None, "fishpi - Proof Of Concept Vehicle control")
+    app.MainLoop()
+
+def run_main_view_tk(kernel):
+    """ Runs main UI view based on tk framework. """
+    # move imports here
+
     # initialise UI system
     root = Tkinter.Tk()
     root.title("fishpi - Proof Of Concept Vehicle control")
