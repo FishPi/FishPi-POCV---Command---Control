@@ -4,10 +4,8 @@
 # Main View classes for POCV UI.
 #
 
-import urllib
-import StringIO
-
 import wx
+from camera_view import CameraPanel
 
 class MainWindow(wx.Frame):
 
@@ -23,9 +21,12 @@ class MainWindow(wx.Frame):
         # map frame
         self.map_frame = MapPanel(self.panel)
         self.sizer_view.Add(self.map_frame, 3, wx.EXPAND)
-            
+        
+        server = "raspberrypi.local"
+        port = "8080"
+        
         # camera frame
-        self.camera_frame = CameraPanel(self.panel)
+        self.camera_frame = CameraPanel(self.panel, server, port)
         self.sizer_view.Add(self.camera_frame, 1, wx.EXPAND)
         
         # waypoint frame
@@ -56,21 +57,7 @@ class MapPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         self.header = wx.StaticText(self, label="Navigation Map")
-        self.SetBackgroundColour('#3333FF')
-
-class CameraPanel(wx.Panel):
-    
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent, size=(320,240))
-        #self.header = wx.StaticText(self, label="Onboard View")
-        self._url = "http://raspberrypi.local:8080/?action=snapshot"
-        fp = urllib.urlopen(self._url)
-        data = fp.read()
-        fp.close()
-        img = wx.ImageFromStream(StringIO.StringIO(data))
-        bmp = wx.BitmapFromImage(img)
-        ctrl = wx.StaticBitmap(self, -1, bmp)
-        
+        self.SetBackgroundColour('#3333FF')        
 
 class WayPointPanel(wx.Panel):
     
