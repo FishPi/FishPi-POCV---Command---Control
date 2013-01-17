@@ -1,3 +1,4 @@
+
 #
 # FishPi - An autonomous drop in the ocean
 #
@@ -9,8 +10,11 @@ from camera_view import CameraPanel
 
 class MainWindow(wx.Frame):
 
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, rpc_client):
         wx.Frame.__init__(self, parent, title=title, size=(1024, 800))
+        self.rpc_client = rpc_client
+        
+        #build ui
         self.panel = wx.Panel(self)
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer_view = wx.BoxSizer(wx.HORIZONTAL)
@@ -22,11 +26,8 @@ class MainWindow(wx.Frame):
         self.map_frame = MapPanel(self.panel)
         self.sizer_view.Add(self.map_frame, 3, wx.EXPAND)
         
-        server = "raspberrypi.local"
-        port = "8080"
-        
         # camera frame
-        self.camera_frame = CameraPanel(self.panel, server, port)
+        self.camera_frame = CameraPanel(self.panel, rpc_client.server, rpc_client.camera_port)
         self.sizer_view.Add(self.camera_frame, 1, wx.EXPAND)
         
         # waypoint frame

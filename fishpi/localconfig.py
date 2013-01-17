@@ -149,6 +149,7 @@ class FishPiConfig(object):
                 logging.warning("CFG:\tError setting up GPS over serial - %s" % ex)
 
         # CameraController (over USB)
+        # TODO: look at different controller, eg m-jpeg stream over local connection, start script from here
         try:
             from sensor.camera import CameraController
             self.camera_controller = CameraController(self, debug=debug)
