@@ -48,8 +48,8 @@ class FishPi:
         parser.add_argument("-d", "--debug", help="increase debugging information output", action='store_true')
         parser.add_argument("--version", action='version', version='%(prog)s {0}'.format(FISH_PI_VERSION))
         parser.add_argument("-s", "--server", help="server for remote device", default="raspberrypi.local", type=str, action='store')
-        parser.add_argument("-dp", "--devport", help="port for device rpc", default="2040", type=str, action='store')
-        parser.add_argument("-cp", "--camport", help="port for camera stream", default="8080", type=str, action='store')
+        parser.add_argument("-dp", "--devport", help="port for device rpc", default=2040, type=int, action='store')
+        parser.add_argument("-cp", "--camport", help="port for camera stream", default=8080, type=int, action='store')
         
         # TODO - add further arguments here
         #parser.add_argument(...)        
@@ -111,12 +111,9 @@ class FishPi:
             ui.controller.run_main_view_tk(kernel)
             logging.info("FISHPI:\tProgram complete - exiting.")
         else:
-            # create rpc client
-            from web.webclient import RPCClient
-            rpc_client = RPCClient(self.server, self.rpc_port, self.camera_port)
             # run ui loop
             logging.info("FISHPI:\tLaunching UI...")
-            ui.controller.run_main_view_wx(rpc_client)
+            ui.controller.run_main_view_wx(self.server, self.rpc_port, self.camera_port)
             logging.info("FISHPI:\tProgram complete - exiting.")
         # done
         return 0
@@ -137,7 +134,7 @@ class FishPi:
 
         # run internal webhost
         import web.webhost
-        web.webhost.run_main_host(kernel)
+        web.webhost.run_main_host(kernel, self.rpc_port)
         logging.info("FISHPI:\tProgram complete - exiting.")
         
         # done

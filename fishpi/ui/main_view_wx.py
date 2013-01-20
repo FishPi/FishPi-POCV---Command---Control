@@ -5,14 +5,21 @@
 # Main View classes for POCV UI.
 #
 
+import logging
+import socket
+
 import wx
 from camera_view import CameraPanel
 
 class MainWindow(wx.Frame):
 
-    def __init__(self, parent, title, rpc_client):
+    def __init__(self, parent, title, server, rpc_port, camera_port):
+        self._server = server
+        self._rpc_port = rpc_port
+        self._camera_port = camera_port
+        self.rpc_client = None
+        
         wx.Frame.__init__(self, parent, title=title, size=(1024, 800))
-        self.rpc_client = rpc_client
         
         #build ui
         self.panel = wx.Panel(self)
@@ -27,7 +34,7 @@ class MainWindow(wx.Frame):
         self.sizer_view.Add(self.map_frame, 3, wx.EXPAND)
         
         # camera frame
-        self.camera_frame = CameraPanel(self.panel, rpc_client.server, rpc_client.camera_port)
+        self.camera_frame = CameraPanel(self.panel, server, camera_port, True)
         self.sizer_view.Add(self.camera_frame, 1, wx.EXPAND)
         
         # waypoint frame
@@ -35,11 +42,11 @@ class MainWindow(wx.Frame):
         self.sizer_control.Add(self.waypoint_frame, 1, wx.EXPAND)
             
         # display frame
-        self.display_frame = DisplayPanel(self.panel)
+        self.display_frame = DisplayPanel(self.panel, self)
         self.sizer_control.Add(self.display_frame, 1, wx.EXPAND)
             
         # auto pilot frame
-        self.autopilot_frame = AutoPilotPanel(self.panel)
+        self.autopilot_frame = AutoPilotPanel(self.panel, self)
         self.sizer_control.Add(self.autopilot_frame, 1, wx.EXPAND)
             
         # manual pilot frame
@@ -50,8 +57,42 @@ class MainWindow(wx.Frame):
 
         self.panel.SetSizerAndFit(self.sizer)
         #self.Fit()
+    
+        # bind events
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
-        self.Show(True)
+        # setup callback timer
+        interval_time = 250
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
+        self.timer.Start(interval_time, False)
+
+    def on_timer(self, event):
+        self.update()
+    
+    def OnClose(self, event):
+        logging.debug("UI:\tMain window closing.")
+        if self.rpc_client:
+            self.rpc_client.close_connection()
+
+    def update(self):
+        self.display_frame.update()
+        self.camera_frame.update()
+
+    @property
+    def server(self):
+        """ Server address for remote device. """
+        return self._server
+    
+    @property
+    def rpc_port(self):
+        """ Port for RPC. """
+        return self._rpc_port
+    
+    @property
+    def camera_port(self):
+        """ Port for camera stream. """
+        return self._camera_port
 
 class MapPanel(wx.Panel):
 
@@ -69,19 +110,47 @@ class WayPointPanel(wx.Panel):
 
 class DisplayPanel(wx.Panel):
     
-    def __init__(self, parent):
+    def __init__(self, parent, host):
         wx.Panel.__init__(self, parent)
+        self.host = host
         self.header = wx.StaticText(self, label="Current Status")
         self.SetBackgroundColour('#CC9966')
 
+        self.btnUpdate = wx.Button(self, -1, "Update")
+        self.btnUpdate.Bind(wx.EVT_BUTTON, self.update)
+
+    def update(self):
+        if self.host.rpc_client:
+            self.host.rpc_client.update()
+
 class AutoPilotPanel(wx.Panel):
     
-    def __init__(self, parent):
+    def __init__(self, parent, host):
         wx.Panel.__init__(self, parent)
+        self.host = host
         self.header = wx.StaticText(self, label="Auto Pilot")
         self.SetBackgroundColour('#CC0000')
         self.speed = wx.Slider(self, value=0, minValue=-100, maxValue=100, style=wx.SL_VERTICAL)
         self.heading = wx.Slider(self, value=0, minValue=-45, maxValue=45, style=wx.SL_HORIZONTAL)
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.txtA = wx.TextCtrl(self, -1)
+        self.sizer.Add(self.txtA)
+        
+        self.txtB = wx.TextCtrl(self, -1)
+        self.sizer.Add(self.txtB)
+    
+        self.btnAuto = wx.Button(self, -1, "Engage Autopilot")
+        self.btnAuto.Bind(wx.EVT_BUTTON, self.engage)
+        self.sizer.Add(self.btnAuto)
+
+        self.SetSizerAndFit(self.sizer)
+
+    
+    def engage(self, event):
+        if self.host.rpc_client:
+            self.host.rpc_client.sum(self.txtA.GetValue(), self.txtB.GetValue())
 
 class ManualPilotPanel(wx.Panel):
     
