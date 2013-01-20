@@ -21,20 +21,52 @@ callback_interval = 50
 #   """ Runs the main UI view. """
 #   run_main_view_wx(kernel)
 
-def run_main_view_wx(rpc_client):
+def run_main_view_wx(server, rpc_port, camera_port):
     """ Runs main UI view based on wx framework. """
     # imports
     import wx
+    import socket
+    # might be some cross platform (windows) issues reported with wxReactor
+    from twisted.internet import wxreactor
+    # add twisted / wx interaction support
+    wxreactor.install()
+    # add logging observer
+    from twisted.python.log import PythonLoggingObserver
+    observer = PythonLoggingObserver()
+    observer.start()
+    # add some extra logging (temp - merge later)
+    #from sys import stdout
+    #from twisted.python.log import startLogging, err
+    #startLogging(stdout)
+
+    # then can do normal reactor imports
+    from twisted.internet import reactor
     from ui.main_view_wx import MainWindow
 
-    app = wx.App(False)
-    frame = MainWindow(None, "fishpi - Proof Of Concept Vehicle control", rpc_client)
-    app.MainLoop()
+    # ip address *much* faster than by device name
+    ipaddr = socket.gethostbyname(server)
+
+    # create rpc client
+    from web.webclient import RPCClient, RPCClientFactory
+    rpc_client = RPCClient()
+    
+    # create wxApp and main window
+    wxApp = wx.App(False)
+    frame = MainWindow(None, "fishpi - Proof Of Concept Vehicle control", ipaddr, rpc_port, camera_port)
+    frame.Show()
+    
+    # run reactor rather than usual 'wxApp.MainLoop()'
+    reactor.registerWxApp(wxApp)
+    logging.debug("RPC:\tconnecting to %s (%s) on port %s" % (server, ipaddr, rpc_port))
+    reactor.connectTCP(ipaddr, rpc_port, RPCClientFactory(frame))
+    #reactor.callLater(5, update_callback)
+    reactor.run()
 
 def run_main_view_tk(kernel):
     """ Runs main UI view based on tk framework. """
     # move imports here
-    from ui.main_view import MainView
+    from ui.view_model_tk import MainViewModel
+    from ui.main_view_tk import MainView
     
     # initialise UI system
     root = Tkinter.Tk()
@@ -175,36 +207,3 @@ class MainViewController:
     def save_gpx(self):
         pass
 
-class MainViewModel:
-    """ UI Model containing bindable variables. """
-
-    def __init__(self, root):
-        # GPS data
-        self.GPS_latitude = Tkinter.StringVar(master=root, value="##d ##.####' X")
-        self.GPS_longitude = Tkinter.StringVar(master=root, value="##d ##.####' X")
-        
-        self.GPS_heading = Tkinter.DoubleVar(master=root, value=0.0)
-        self.GPS_speed = Tkinter.DoubleVar(master=root, value=0.0)
-        self.GPS_altitude = Tkinter.DoubleVar(master=root, value=0.0)
-
-        self.GPS_fix = Tkinter.IntVar(master=root, value=0)
-        self.GPS_satellite_count = Tkinter.IntVar(master=root, value=0)
-
-        # compass data
-        self.compass_heading = Tkinter.DoubleVar(master=root, value=0.0)
-
-        # time data
-        self.time = Tkinter.StringVar(master=root, value="hh:mm:ss")
-        self.date = Tkinter.StringVar(master=root, value="dd:MM:yyyy")
-
-        # other data
-        self.temperature = Tkinter.DoubleVar(master=root, value=0.0)
-
-        # other settings
-        self.capture_img_enabled = Tkinter.IntVar(master=root, value=0)
-
-        # route data
-        self.waypoints = []
-
-    def clear_waypoints(self):
-        del self.waypoints[0:len(self.waypoints)]
