@@ -16,20 +16,23 @@ import wx
 
 class CameraPanel(wx.Panel):
     
-    def __init__(self, parent, server, port):
+    def __init__(self, parent, server, port, enabled=True):
         wx.Panel.__init__(self, parent, size=(320,240))
-        ipaddr = socket.gethostbyname(server)
-        self._conn = httplib.HTTPConnection(ipaddr, port)
-        self.update()
-        
+        self.enabled = enabled
+        if self.enabled:
+            ipaddr = socket.gethostbyname(server)
+            self._conn = httplib.HTTPConnection(ipaddr, port)
+            self.update()
+    
     def update(self):
         """ Update panel with new image. """
-        self._conn.request("GET", "/?action=snapshot")
-        r1 = self._conn.getresponse()
-        data = r1.read()
-        img = wx.ImageFromStream(StringIO(data))
-        bmp = wx.BitmapFromImage(img)
-        ctrl = wx.StaticBitmap(self, -1, bmp)
+        if self.enabled:
+            self._conn.request("GET", "/?action=snapshot")
+            r1 = self._conn.getresponse()
+            data = r1.read()
+            img = wx.ImageFromStream(StringIO(data))
+            bmp = wx.BitmapFromImage(img)
+            ctrl = wx.StaticBitmap(self, -1, bmp)
 
 class CameraViewer(wx.Frame):
     """ Simple Frame containing CameraPanel and timer callback. """
@@ -56,7 +59,7 @@ def main():
     # parse cmd line args
     parser = argparse.ArgumentParser(description="raspberry pi - onboard view")
     parser.add_argument("-server", help="server for camera stream", default="raspberrypi.local", type=str, action='store')
-    parser.add_argument("-port", help="port for camera stream", default="8080", type=str, action='store')
+    parser.add_argument("-port", help="port for camera stream", default=8080, type=int, action='store')
     selected_args = parser.parse_args()
     server = selected_args.server
     port = selected_args.port
