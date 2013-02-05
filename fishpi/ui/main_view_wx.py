@@ -34,7 +34,7 @@ class MainWindow(wx.Frame):
         self.sizer_view.Add(self.map_frame, 3, wx.EXPAND)
         
         # camera frame
-        self.camera_frame = CameraPanel(self.panel, server, camera_port, True)
+        self.camera_frame = CameraPanel(self.panel, server, camera_port, False)
         self.sizer_view.Add(self.camera_frame, 1, wx.EXPAND)
         
         # waypoint frame
@@ -74,6 +74,7 @@ class MainWindow(wx.Frame):
         logging.debug("UI:\tMain window closing.")
         if self.rpc_client:
             self.rpc_client.close_connection()
+        self.Close(True)
 
     def update(self):
         self.display_frame.update()
@@ -113,11 +114,49 @@ class DisplayPanel(wx.Panel):
     def __init__(self, parent, host):
         wx.Panel.__init__(self, parent)
         self.host = host
-        self.header = wx.StaticText(self, label="Current Status")
-        self.SetBackgroundColour('#CC9966')
+        
+        self.sizer = wx.GridBagSizer()
+        self.SetSizerAndFit(self.sizer)
 
-        self.btnUpdate = wx.Button(self, -1, "Update")
-        self.btnUpdate.Bind(wx.EVT_BUTTON, self.update)
+        self.header = wx.StaticText(self, label="Current Status")
+        self.sizer.Add(self.header, (0,0), (1,2), wx.EXPAND)
+        self.SetBackgroundColour('#CC9966')
+        
+
+        self.l1 = wx.StaticText(self, label="Location Info:")
+        self.sizer.Add(self.l1, (1,0), (1,1), wx.EXPAND)
+        self.l2 = wx.StaticText(self, label="Latitude:")
+        self.sizer.Add(self.l2, (2,0), (1,1), wx.EXPAND)
+        self.l3 = wx.StaticText(self, label="Longitude:")
+        self.sizer.Add(self.l3, (3,0), (1,1), wx.EXPAND)
+        self.l4 = wx.StaticText(self, label="Compass Heading:")
+        self.sizer.Add(self.l4, (4,0), (1,1), wx.EXPAND)
+        self.l5 = wx.StaticText(self, label="GPS Heading:")
+        self.sizer.Add(self.l5, (5,0), (1,1), wx.EXPAND)
+        self.l6 = wx.StaticText(self, label="GPS Speed (knots):")
+        self.sizer.Add(self.l6, (6,0), (1,1), wx.EXPAND)
+        self.l7 = wx.StaticText(self, label="GPS Altitude:")
+        self.sizer.Add(self.l7, (7,0), (1,1), wx.EXPAND)
+
+        self.cb_fix = wx.CheckBox(self, label="GPS fix?")
+        self.cb_fix.SetValue(False)
+        self.sizer.Add(self.cb_fix, (8,0), (1,1), wx.EXPAND)
+
+        self.l8 = wx.StaticText(self, label="# satellites:")
+        self.sizer.Add(self.l8, (9,0), (1,1), wx.EXPAND)
+
+        self.l9 = wx.StaticText(self, label="Other Info:")
+        self.sizer.Add(self.l9, (10,0), (1,1), wx.EXPAND)
+        self.l10 = wx.StaticText(self, label="Time:")
+        self.sizer.Add(self.l10, (11,0), (1,1), wx.EXPAND)
+        self.l11 = wx.StaticText(self, label="Date:")
+        self.sizer.Add(self.l11, (12,0), (1,1), wx.EXPAND)
+        self.l12 = wx.StaticText(self, label="Temperature:")
+        self.sizer.Add(self.l12, (13,0), (1,1), wx.EXPAND)
+            
+        #self.btnUpdate = wx.Button(self, -1, "Update")
+        #self.btnUpdate.Bind(wx.EVT_BUTTON, self.update)
+        self.sizer.AddGrowableCol(0)
 
     def update(self):
         if self.host.rpc_client:
@@ -131,8 +170,10 @@ class AutoPilotPanel(wx.Panel):
         self.header = wx.StaticText(self, label="Auto Pilot")
         self.SetBackgroundColour('#CC0000')
         self.speed = wx.Slider(self, value=0, minValue=-100, maxValue=100, style=wx.SL_VERTICAL)
+        self.speed.Bind(wx.EVT_SCROLL, self.on_speed_scroll)
         self.heading = wx.Slider(self, value=0, minValue=-45, maxValue=45, style=wx.SL_HORIZONTAL)
-
+        self.heading.Bind(wx.EVT_SCROLL, self.on_heading_scroll)
+        
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.txtA = wx.TextCtrl(self, -1)
@@ -151,6 +192,12 @@ class AutoPilotPanel(wx.Panel):
     def engage(self, event):
         if self.host.rpc_client:
             self.host.rpc_client.sum(self.txtA.GetValue(), self.txtB.GetValue())
+
+    def on_speed_scroll(self, event):
+        pass
+
+    def on_heading_scroll(self, event):
+        pass
 
 class ManualPilotPanel(wx.Panel):
     
