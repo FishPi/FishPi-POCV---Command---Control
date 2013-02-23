@@ -13,8 +13,9 @@ from camera_view import CameraPanel
 
 class MainWindow(wx.Frame):
 
-    def __init__(self, parent, title, server, rpc_port, camera_port):
-        self._server = server
+    def __init__(self, parent, title, controller, server_name, rpc_port, camera_port):
+        self.controller = controller
+        self._server_name = server_name
         self._rpc_port = rpc_port
         self._camera_port = camera_port
         self.rpc_client = None
@@ -30,11 +31,12 @@ class MainWindow(wx.Frame):
         self.sizer.Add(self.sizer_control, 1, wx.EXPAND | wx.ALL, 4)
             
         # map frame
-        self.map_frame = MapPanel(self.panel)
+        self.map_frame = MapPanel(self.panel, controller)
         self.sizer_view.Add(self.map_frame, 3, wx.EXPAND | wx.RIGHT, 4)
         
         # camera frame
-        self.camera_frame = CameraPanel(self.panel, server, camera_port, False)
+        cam_enabled = self.controller.model.capture_img_enabled
+        self.camera_frame = CameraPanel(self.panel, server_name, camera_port, cam_enabled)
         self.sizer_view.Add(self.camera_frame, 1, wx.EXPAND)
         
         # waypoint frame
@@ -56,7 +58,6 @@ class MainWindow(wx.Frame):
         self.CreateStatusBar()
 
         self.panel.SetSizerAndFit(self.sizer)
-        #self.Fit()
     
         # bind events
         self.Bind(wx.EVT_CLOSE, self.OnClose)
@@ -77,6 +78,12 @@ class MainWindow(wx.Frame):
         self.Close(True)
 
     def update(self):
+        """ Callback to perform updates etc. """
+        logging.debug("UI:\tIn update...")
+        self.controller._kernel.update()
+        # tell controller to update model (from kernel)
+        self.controller.update()
+        # update screens
         self.display_frame.update()
         self.camera_frame.update()
 
@@ -97,9 +104,16 @@ class MainWindow(wx.Frame):
 
 class MapPanel(wx.Panel):
 
-    def __init__(self, parent):
+    def __init__(self, parent, view_controller):
         wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
-        self.header = wx.StaticText(self, label="Navigation Map")
+        #self.header = wx.StaticText(self, label="Navigation Map")
+
+        self._view_controller = view_controller
+            
+        # get map image
+        #image = view_controller.get_current_map()
+        #wx.StaticBitmap(self, -1, image, (10, 5), (image.GetWidth(), image.GetHeight()))
+        #wx.StaticBitmap(self, -1, image, (10, 5), (640, 320))
 
 class WayPointPanel(wx.Panel):
     
