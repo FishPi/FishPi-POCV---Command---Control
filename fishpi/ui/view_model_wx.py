@@ -18,28 +18,38 @@ class MainViewController:
         self.model = view_model
         self.config = config
     
+    # rpc related items
+    def set_rpc_factory(self, rpc_factory):
+        self._rpc_factory = rpc_factory
+    
+    def close_connection(self):
+        # tell protocol factory not to attempt reconnects
+        self._rpc_factory.stopTrying()
+        # close the actual connection
+        self._rpc_client.close_connection()
+    
     def update(self):
-        """ Updates view model from kernel. """
+        """ Updates view model from rpc channel. """
         # GPS data
-        self.model.GPS_latitude.set(self._kernel.data.lat)
-        self.model.GPS_longitude.set(self._kernel.data.lon)
+        self.model.GPS_latitude = self._rpc_client.data.lat
+        self.model.GPS_longitude = self._rpc_client.data.lon
         
-        self.model.GPS_heading.set(self._kernel.data.gps_heading)
-        self.model.GPS_speed.set(self._kernel.data.speed)
-        self.model.GPS_altitude.set(self._kernel.data.altitude)
+        self.model.GPS_heading = self._rpc_client.data.gps_heading
+        self.model.GPS_speed = self._rpc_client.data.speed
+        self.model.GPS_altitude = self._rpc_client.data.altitude
         
-        self.model.GPS_fix.set(self._kernel.data.fix)
-        self.model.GPS_satellite_count.set(self._kernel.data.num_sat)
+        self.model.GPS_fix = self._rpc_client.data.fix
+        self.model.GPS_satellite_count = self._rpc_client.data.num_sat
         
         # compass data
-        self.model.compass_heading.set(self._kernel.data.compass_heading)
+        self.model.compass_heading = self._rpc_client.data.compass_heading
         
         # time data
-        self.model.time.set(self._kernel.data.timestamp.isoformat())
-        self.model.date.set(self._kernel.data.datestamp.isoformat())
+        self.model.time = self._rpc_client.data.timestamp.isoformat()
+        self.model.date = self._rpc_client.data.datestamp.isoformat()
         
         # other data
-        self.model.temperature.set(self._kernel.data.temperature)
+        self.model.temperature = self._rpc_client.data.temperature
     
     @property
     def last_img(self):

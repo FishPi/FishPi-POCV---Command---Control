@@ -32,7 +32,8 @@ class RPCClient(AMP):
     def close_connection(self):
         logging.debug("RPC:\tClosing RPC connection.")
         # TODO: not sure this is the cleanest way to close - check
-        self.transport.loseConnection()
+        if self.transport:
+            self.transport.loseConnection()
         reactor.stop()
 
     def sum(self, a, b):

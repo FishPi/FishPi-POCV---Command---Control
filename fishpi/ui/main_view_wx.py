@@ -18,7 +18,6 @@ class MainWindow(wx.Frame):
         self._server_name = server_name
         self._rpc_port = rpc_port
         self._camera_port = camera_port
-        self.rpc_client = None
         
         wx.Frame.__init__(self, parent, title=title, size=(1024, 800))
         
@@ -44,15 +43,15 @@ class MainWindow(wx.Frame):
         self.sizer_control.Add(self.waypoint_frame, 1, wx.EXPAND | wx.RIGHT, 4)
             
         # display frame
-        self.display_frame = DisplayPanel(self.panel, self)
+        self.display_frame = DisplayPanel(self.panel, controller)
         self.sizer_control.Add(self.display_frame, 1, wx.EXPAND | wx.RIGHT, 4)
             
         # auto pilot frame
-        self.autopilot_frame = AutoPilotPanel(self.panel, self)
+        self.autopilot_frame = AutoPilotPanel(self.panel, controller)
         self.sizer_control.Add(self.autopilot_frame, 1, wx.EXPAND | wx.RIGHT, 4)
             
         # manual pilot frame
-        self.manualpilot_frame = ManualPilotPanel(self.panel)
+        self.manualpilot_frame = ManualPilotPanel(self.panel, controller)
         self.sizer_control.Add(self.manualpilot_frame, 1, wx.EXPAND)
             
         self.CreateStatusBar()
@@ -66,22 +65,21 @@ class MainWindow(wx.Frame):
         interval_time = 250
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
-        self.timer.Start(interval_time, False)
+        self.timer.Start(interval_time, True)
 
     def on_timer(self, event):
         self.update()
     
     def OnClose(self, event):
         logging.debug("UI:\tMain window closing.")
-        if self.rpc_client:
-            self.rpc_client.close_connection()
-        self.Close(True)
+        if self.controller:
+            self.controller.close_connection()
+        #self.Close(True)
 
     def update(self):
         """ Callback to perform updates etc. """
         logging.debug("UI:\tIn update...")
-        self.controller._kernel.update()
-        # tell controller to update model (from kernel)
+        # update controller
         self.controller.update()
         # update screens
         self.display_frame.update()
@@ -109,7 +107,6 @@ class MapPanel(wx.Panel):
         #self.header = wx.StaticText(self, label="Navigation Map")
 
         self._view_controller = view_controller
-            
         # get map image
         #image = view_controller.get_current_map()
         #wx.StaticBitmap(self, -1, image, (10, 5), (image.GetWidth(), image.GetHeight()))
@@ -131,9 +128,9 @@ class WayPointPanel(wx.Panel):
 
 class DisplayPanel(wx.Panel):
     
-    def __init__(self, parent, host):
+    def __init__(self, parent, controller):
         wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
-        self.host = host
+        self.controller = controller
         
         self.sizer = wx.GridBagSizer(vgap=2, hgap=2)
 
@@ -204,14 +201,13 @@ class DisplayPanel(wx.Panel):
 
 
     def update(self):
-        if self.host.rpc_client:
-            self.host.rpc_client.update()
+        pass
 
 class AutoPilotPanel(wx.Panel):
     
-    def __init__(self, parent, host):
+    def __init__(self, parent, controller):
         wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
-        self.host = host
+        self.controller = controller
         self.sizer = wx.GridBagSizer(vgap=4, hgap=4)
         self.SetSizerAndFit(self.sizer)
         
@@ -250,8 +246,7 @@ class AutoPilotPanel(wx.Panel):
 
     
     def engage(self, event):
-        if self.host.rpc_client:
-            self.host.rpc_client.sum(self.txtA.GetValue(), self.txtB.GetValue())
+        pass
 
     def on_speed_scroll(self, event):
         pass
@@ -261,8 +256,9 @@ class AutoPilotPanel(wx.Panel):
 
 class ManualPilotPanel(wx.Panel):
     
-    def __init__(self, parent):
+    def __init__(self, parent, controller):
         wx.Panel.__init__(self, parent, style=wx.SUNKEN_BORDER)
+        self.controller = controller
         
         self.sizer = wx.GridBagSizer(vgap=4, hgap=4)
         
