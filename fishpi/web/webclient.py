@@ -43,6 +43,8 @@ class RPCClient(AMP):
             self.transport.loseConnection()
         reactor.stop()
 
+    # RPC Commands
+    
     def update(self):
         """ RPC call to get status update. """
         self.callRemote(QueryStatus).addCallback(self.status_update)
@@ -66,6 +68,38 @@ class RPCClient(AMP):
         self.data.timestamp = result['timestamp']
     
         self.data.temperature = result['temperature']
+
+    def cmd_callback(self):
+        """ General callback. """
+        logging.debug("RPC:\Command executed.")
+    
+    def halt(self):
+        """ RPC call to get call HaltCmd. """
+        self.callRemote(HaltCmd).addCallback(self.cmd_callback)
+
+    def set_manual_mode(self):
+        """ RPC call to get call ModeCmd. """
+        self.callRemote(ModeCmd, mode="manual").addCallback(self.cmd_callback)
+    
+    def set_auto_mode(self):
+        """ RPC call to get call ModeCmd. """
+        self.callRemote(ModeCmd, mode="auto").addCallback(self.cmd_callback)
+
+    def set_navigation(self, speed, heading):
+        """ RPC call to get call NavigationCmd (for auto-pilot). """
+        self.callRemote(NavigationCmd, speed=speed, heading=heading).addCallback(self.cmd_callback)
+
+    def set_drive(self, throttle, steering):
+        """ RPC call to get call ManualDriveCmd (for manual drive). """
+        self.callRemote(ManualDriveCmd, throttle=throttle, steering=steering).addCallback(self.cmd_callback)
+
+    def pulse_heartbeat(self):
+        """ RPC call to get call HeartbeatCmd. """
+        self.callRemote(HeartbeatCmd).addCallback(self.cmd_callback)
+    
+    def exit(self):
+        """ RPC call to get call ExitCmd. """
+        self.callRemote(ExitCmd).addCallback(self.cmd_callback)
 
 class StatusData:
     """ Data from the rpc client calls. """

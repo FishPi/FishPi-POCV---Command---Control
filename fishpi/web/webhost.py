@@ -73,13 +73,6 @@ class RPCHost(AMP):
         self._heartbeat.reset()
         self._kernel.halt()
 
-    @Sum.responder
-    def sum(self, a, b):
-        self._heartbeat.pulse()
-        total = a + b
-        logging.debug("RPC:\tSummed %d + %d = %d" % (a, b, total))
-        return {'status':total}
-
     @HeartbeatCmd.responder
     def heartbeat_cmd(self, enabled):
         """ Enable or disable keep alive signal (or just pulse if no content). """
