@@ -7,6 +7,7 @@
 
 import logging
 import math
+from datetime import datetime
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ReconnectingClientFactory
@@ -22,6 +23,8 @@ class RPCClient(AMP):
     
     def __init__(self):
         logging.debug("RPC:\tCreating Protocol...")
+        self.factory = None
+        self.data = StatusData()
 
     def connectionMade(self):
         logging.debug("RPC:\tConnection made.")
@@ -31,23 +34,55 @@ class RPCClient(AMP):
     
     def close_connection(self):
         logging.debug("RPC:\tClosing RPC connection.")
-        # TODO: not sure this is the cleanest way to close - check
+        # tell protocol factory not to attempt reconnects
+        if self.factory:
+            self.factory.stopTrying()
+        # close the actual connection
+        # TODO: transport not set
         if self.transport:
             self.transport.loseConnection()
         reactor.stop()
 
-    def sum(self, a, b):
-        self.callRemote(SumCmd, a=a, b=b).addCallback(self.gotResult)
-
-    def gotResult(self, result):
-        logging.debug("RPC:\tResponse: %d" % result['status'])
-
     def update(self):
+        """ RPC call to get status update. """
         self.callRemote(QueryStatus).addCallback(self.status_update)
 
     def status_update(self, result):
-        logging.debug(result)
+        """ callback from status update. """
+        logging.debug("RPC:\tResponse - %s" % result)
+        self.data.lat = result['lat']
+        self.data.lon = result['lon']
+    
+        self.data.gps_heading = result['gps_heading']
+        self.data.gps_speed = result['gps_speed']
+        self.data.altitude = result['altitude']
+    
+        self.data.fix = result['fix']
+        self.data.num_sat = result['num_sat']
+    
+        self.data.compass_heading = result['compass_heading']
+    
+        self.data.datestamp = result['datestamp']
+        self.data.timestamp = result['timestamp']
+    
+        self.data.temperature = result['temperature']
 
+class StatusData:
+    """ Data from the rpc client calls. """
+
+    def __init__(self):
+        self.lat = None
+        self.lon = None
+        self.gps_heading = None
+        self.gps_speed = None
+        self.altitude = None
+        self.fix = None
+        self.num_sat = None
+        self.compass_heading = None
+        dt = datetime.today()
+        self.timestamp = dt.time()
+        self.datestamp = dt.date()
+        self.temperature = None
 
 class RPCClientFactory(ReconnectingClientFactory):
     """ Factory for rpc client connection. Manages UI reference to active protocol. """
@@ -64,15 +99,16 @@ class RPCClientFactory(ReconnectingClientFactory):
         self.resetDelay()
         # build protocol
         rpc_protocol = self.protocol()
-        self.gui.rpc_client = rpc_protocol
+        rpc_protocol.factory = self
+        self.gui.set_rpc_client(rpc_protocol)
         return rpc_protocol
     
     def clientConnectionLost(self, transport, reason):
         logging.debug("RPC:\tConnection lost - %s" % reason)
-        self.gui.rpc_client = None
+        self.gui.lost_rpc_client()
         ReconnectingClientFactory.clientConnectionLost(self, transport, reason)
 
     def clientConnectionFailed(self, transport, reason):
         logging.debug("RPC:\tConnection failed - %s" % reason)
-        self.gui.rpc_client = None
+        self.gui.lost_rpc_client()
         ReconnectingClientFactory.clientConnectionFailed(self, transport, reason)

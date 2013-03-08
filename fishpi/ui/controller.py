@@ -55,11 +55,9 @@ def run_main_view_wx(config):
     frame.Show()
     
     # run reactor rather than usual 'wxApp.MainLoop()'
-    rpc_factory = RPCClientFactory(frame)
-    controller.set_rpc_factory(rpc_factory)
     reactor.registerWxApp(wxApp)
     logging.debug("RPC:\tconnecting to %s (%s) on port %s" % (config.server_name, ipaddr, config.rpc_port))
-    reactor.connectTCP(ipaddr, config.rpc_port, rpc_factory)
+    reactor.connectTCP(ipaddr, config.rpc_port, RPCClientFactory(controller))
     #reactor.callLater(5, update_callback)
     reactor.run()
 

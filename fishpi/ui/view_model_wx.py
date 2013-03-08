@@ -19,58 +19,59 @@ class MainViewController:
         self.config = config
     
     # rpc related items
-    def set_rpc_factory(self, rpc_factory):
-        self._rpc_factory = rpc_factory
+    def set_rpc_client(self, rpc_client):
+        self._rpc_client = rpc_client
+    
+    def lost_rpc_client(self):
+        self._rpc_client = None
     
     def close_connection(self):
-        # tell protocol factory not to attempt reconnects
-        self._rpc_factory.stopTrying()
-        # close the actual connection
-        self._rpc_client.close_connection()
+        if self._rpc_client:
+            self._rpc_client.close_connection()
     
     def update(self):
         """ Updates view model from rpc channel. """
-        # GPS data
-        self.model.GPS_latitude = self._rpc_client.data.lat
-        self.model.GPS_longitude = self._rpc_client.data.lon
+        if self._rpc_client:
+            # trigger update
+            self._rpc_client.update()
         
-        self.model.GPS_heading = self._rpc_client.data.gps_heading
-        self.model.GPS_speed = self._rpc_client.data.speed
-        self.model.GPS_altitude = self._rpc_client.data.altitude
+            # GPS data
+            self.model.GPS_latitude = self._rpc_client.data.lat
+            self.model.GPS_longitude = self._rpc_client.data.lon
         
-        self.model.GPS_fix = self._rpc_client.data.fix
-        self.model.GPS_satellite_count = self._rpc_client.data.num_sat
+            self.model.GPS_heading = self._rpc_client.data.gps_heading
+            self.model.GPS_speed = self._rpc_client.data.gps_speed
+            self.model.GPS_altitude = self._rpc_client.data.altitude
         
-        # compass data
-        self.model.compass_heading = self._rpc_client.data.compass_heading
+            self.model.GPS_fix = self._rpc_client.data.fix
+            self.model.GPS_satellite_count = self._rpc_client.data.num_sat
         
-        # time data
-        self.model.time = self._rpc_client.data.timestamp.isoformat()
-        self.model.date = self._rpc_client.data.datestamp.isoformat()
+            # compass data
+            self.model.compass_heading = self._rpc_client.data.compass_heading
         
-        # other data
-        self.model.temperature = self._rpc_client.data.temperature
-    
-    @property
-    def last_img(self):
-        return self._kernel.last_img
+            # time data
+            self.model.time = self._rpc_client.data.timestamp.isoformat()
+            self.model.date = self._rpc_client.data.datestamp.isoformat()
+        
+            # other data
+            self.model.temperature = self._rpc_client.data.temperature
     
     # Control modes (Manual, AutoPilot)
     def set_manual_mode(self):
         """ Stops navigation unit and current auto-pilot drive. """
-        self._kernel.set_manual_mode()
+        self._rpc_client.set_manual_mode()
     
     def set_auto_pilot_mode(self):
         """ Stops current manual drive and starts navigation unit. """
-        self._kernel.set_auto_pilot_mode()
+        self._rpc_client.set_auto_pilot_mode()
     
     def halt(self):
         """ Commands the NavigationUnit and Drive Control to Halt! """
-        self._kernel.halt()
+        self._rpc_client.halt()
     
     @property
     def auto_mode_enabled(self):
-        return self._kernel.auto_mode_enabled
+        return self._rpc_client.auto_mode_enabled
     
     # Drive control
     # temporary direct access to DriveController to test hardware.
