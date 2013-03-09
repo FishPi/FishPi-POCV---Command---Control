@@ -58,9 +58,9 @@ class FishPi:
         selected_args = parser.parse_args()
         self.selected_mode = selected_args.mode
         self.debug = selected_args.debug
-        self.server = selected_args.server
-        self.rpc_port = selected_args.devport
-        self.camera_port = selected_args.camport
+        self.config.server_name = selected_args.server
+        self.config.rpc_port = selected_args.devport
+        self.config.camera_port = selected_args.camport
 
         # init rest
         logging.info("FISHPI:\tInitializing FishPi (v{0})...".format(FISH_PI_VERSION))
@@ -113,7 +113,7 @@ class FishPi:
         else:
             # run ui loop
             logging.info("FISHPI:\tLaunching UI...")
-            ui.controller.run_main_view_wx(self.server, self.rpc_port, self.camera_port)
+            ui.controller.run_main_view_wx(self.config)
             logging.info("FISHPI:\tProgram complete - exiting.")
         # done
         return 0
@@ -134,7 +134,7 @@ class FishPi:
 
         # run internal webhost
         import web.webhost
-        web.webhost.run_main_host(kernel, self.rpc_port)
+        web.webhost.run_main_host(kernel, self.config.rpc_port)
         logging.info("FISHPI:\tProgram complete - exiting.")
         
         # done
