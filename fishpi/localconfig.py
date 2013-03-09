@@ -64,6 +64,11 @@ class FishPiConfig(object):
         
         # load vehicle constants
         self._vehicle_constants = VehicleConstants()
+    
+        # RPC config
+        self._server_name = None
+        self._rpc_port = None
+        self._camera_port = None
                 
         # TODO any other init
         pass
@@ -71,6 +76,34 @@ class FishPiConfig(object):
     @property
     def vehicle_constants(self):
         return self._vehicle_constants
+
+    #
+    # RPC config
+    #
+    
+    @property
+    def server_name(self):
+        return self._server_name
+    
+    @server_name.setter
+    def server_name(self, value):
+        self._server_name = value
+
+    @property
+    def rpc_port(self):
+        return self._rpc_port
+
+    @rpc_port.setter
+    def rpc_port(self, value):
+        self._rpc_port = value
+    
+    @property
+    def camera_port(self):
+        return self._camera_port
+
+    @camera_port.setter
+    def camera_port(self, value):
+        self._camera_port = value
     
     #
     # file / paths section
