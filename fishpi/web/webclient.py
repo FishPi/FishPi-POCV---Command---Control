@@ -59,7 +59,7 @@ class RPCClient(AMP):
         self.data.gps_speed = result['gps_speed']
         self.data.altitude = result['altitude']
     
-        self.data.fix = result['fix']
+        self.data.fix = True if result['fix'] == 1 else False
         self.data.num_sat = result['num_sat']
     
         self.data.compass_heading = result['compass_heading']

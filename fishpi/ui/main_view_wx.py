@@ -199,9 +199,27 @@ class DisplayPanel(wx.Panel):
         self.sizer.AddGrowableCol(0)
         self.SetSizerAndFit(self.sizer)
 
-
     def update(self):
-        pass
+        self.t2.label = self.controller.model.GPS_latitude
+        self.t3.label = self.controller.model.GPS_longitude
+            
+        self.t5.label = self.controller.model.GPS_heading
+        self.t6.label = self.controller.model.GPS_speed
+        self.t7.label = self.controller.model.GPS_altitude
+        
+        #self.cb_fix.SetValue(self.controller.model.GPS_fix)
+        self.t8.label = self.controller.model.GPS_satellite_count
+            
+        # compass data
+        self.t4.label = self.controller.model.compass_heading
+            
+        # time data
+        self.t10.label = self.controller.model.time
+        self.t11.label = self.controller.model.date
+    
+        # other data
+        self.t12.label = self.controller.model.temperature
+
 
 class AutoPilotPanel(wx.Panel):
     

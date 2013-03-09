@@ -6,6 +6,7 @@
 #
 
 import os
+import logging
 import wx
 
 from PIL import Image
@@ -32,7 +33,7 @@ class MainViewController:
     def update(self):
         """ Updates view model from rpc channel. """
         if self._rpc_client:
-            # trigger update
+            # trigger update (async though so only pick up response on next update)
             self._rpc_client.update()
         
             # GPS data
@@ -76,33 +77,31 @@ class MainViewController:
     # Drive control
     # temporary direct access to DriveController to test hardware.
     
-    def set_throttle(self, throttle_level):
+    def set_drive(self, throttle_level, angle):
+        # throttle
         throttle_act = float(throttle_level)/100.0
         # adjustment for slider so min +/- .3 so if in .05 to .3 range, jump to .3
         if throttle_act > 0.05 and throttle_act < 0.3:
             throttle_act = 0.3
         elif throttle_act < -0.05 and throttle_act > -0.3:
             throttle_act = -0.3
-        self._kernel.set_throttle(throttle_act)
-    
-    def set_steering(self, angle):
+        
+        # steering
         angle_in_rad = (float(angle)/180.0)*math.pi
         # adjustment for slider in opposite direction - TODO - move to drive controller
         angle_in_rad = angle_in_rad * -1.0
-        self._kernel.set_steering(angle_in_rad)
+    
+        # call rpc
+        self._rpc_client.set_drive(throttle_act, angle_in_rad)
     
     # Route Planning and Navigation
-    def set_speed(self, speed):
-        """ Commands the NavigationUnit to set and hold a given speed. """
-        self._kernel.set_speed(float(speed))
-    
-    def set_heading(self, heading):
-        """ Commands the NavigationUnit to set and hold a given heading. """
-        self._kernel.set_heading(float(heading))
-    
+    def set_navigation(self, speed, heading):
+        """ Commands the NavigationUnit to set and hold a given speed and heading. """
+        self._rpc_client.set_navigation(float(speed), float(heading))
+        
     def navigate_to(self):
         """ Commands the NavigationUnit to commence navigation of a route. """
-        #self._kernel.navigate_to(route)
+        #self._rpc_client.navigate_to(route)
         pass
     
     def get_current_map(self):
@@ -123,26 +122,26 @@ class MainViewModel:
     
     def __init__(self):
         # GPS data
-        """self.GPS_latitude = Tkinter.StringVar(master=root, value="##d ##.####' X")
-        self.GPS_longitude = Tkinter.StringVar(master=root, value="##d ##.####' X")
+        self.GPS_latitude = "##d ##.####' X"
+        self.GPS_longitude = "##d ##.####' X"
         
-        self.GPS_heading = Tkinter.DoubleVar(master=root, value=0.0)
-        self.GPS_speed = Tkinter.DoubleVar(master=root, value=0.0)
-        self.GPS_altitude = Tkinter.DoubleVar(master=root, value=0.0)
+        self.GPS_heading = 0.0
+        self.GPS_speed = 0.0
+        self.GPS_altitude = 0.0
         
-        self.GPS_fix = Tkinter.IntVar(master=root, value=0)
-        self.GPS_satellite_count = Tkinter.IntVar(master=root, value=0)
+        self.GPS_fix = False
+        self.GPS_satellite_count = 0
         
         # compass data
-        self.compass_heading = Tkinter.DoubleVar(master=root, value=0.0)
+        self.compass_heading = 0.0
         
         # time data
-        self.time = Tkinter.StringVar(master=root, value="hh:mm:ss")
-        self.date = Tkinter.StringVar(master=root, value="dd:MM:yyyy")
+        self.time = "hh:mm:ss"
+        self.date = "dd:MM:yyyy"
         
         # other data
-        self.temperature = Tkinter.DoubleVar(master=root, value=0.0)
-        """
+        self.temperature = 0.0
+        
         # other settings
         self.capture_img_enabled = False
         
