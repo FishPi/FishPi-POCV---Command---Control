@@ -7,6 +7,7 @@
 
 import os
 import logging
+import math
 import wx
 
 from PIL import Image
@@ -51,8 +52,10 @@ class MainViewController:
             self.model.compass_heading = self._rpc_client.data.compass_heading
         
             # time data
-            self.model.time = self._rpc_client.data.timestamp.isoformat()
-            self.model.date = self._rpc_client.data.datestamp.isoformat()
+            self.model.time = self._rpc_client.data.timestamp
+            #strftime(self._rpc_client.data.timestamp).isoformat()
+            self.model.date = self._rpc_client.data.datestamp
+            #strftime(self._rpc_client.data.datestamp).isoformat()
         
             # other data
             self.model.temperature = self._rpc_client.data.temperature
@@ -64,7 +67,7 @@ class MainViewController:
     
     def set_auto_pilot_mode(self):
         """ Stops current manual drive and starts navigation unit. """
-        self._rpc_client.set_auto_pilot_mode()
+        self._rpc_client.set_auto_mode()
     
     def halt(self):
         """ Commands the NavigationUnit and Drive Control to Halt! """

@@ -7,6 +7,7 @@
 
 import logging
 import socket
+import datetime
 
 import wx
 from camera_view import CameraPanel
@@ -65,7 +66,7 @@ class MainWindow(wx.Frame):
         interval_time = 250
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
-        self.timer.Start(interval_time, True)
+        self.timer.Start(interval_time, False)
 
     def on_timer(self, event):
         self.update()
@@ -141,31 +142,31 @@ class DisplayPanel(wx.Panel):
         
         self.l1 = wx.StaticText(self, label="Location Info:")
         self.sizer.Add(self.l1, (2,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t1 = wx.StaticText(self, label="----")
-        self.sizer.Add(self.t1, (2,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
+        #self.t1 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
+        #self.sizer.Add(self.t1, (2,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l2 = wx.StaticText(self, label="Latitude:")
         self.sizer.Add(self.l2, (3,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t2 = wx.StaticText(self, label="----")
+        self.t2 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t2, (3,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l3 = wx.StaticText(self, label="Longitude:")
         self.sizer.Add(self.l3, (4,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t3 = wx.StaticText(self, label="----")
+        self.t3 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t3, (4,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l4 = wx.StaticText(self, label="Compass Heading:")
         self.sizer.Add(self.l4, (5,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t4 = wx.StaticText(self, label="----")
+        self.t4 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t4, (5,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l5 = wx.StaticText(self, label="GPS Heading:")
         self.sizer.Add(self.l5, (6,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t5 = wx.StaticText(self, label="----")
+        self.t5 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t5, (6,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l6 = wx.StaticText(self, label="GPS Speed (knots):")
         self.sizer.Add(self.l6, (7,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t6 = wx.StaticText(self, label="----")
+        self.t6 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t6, (7,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l7 = wx.StaticText(self, label="GPS Altitude:")
         self.sizer.Add(self.l7, (8,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t7 = wx.StaticText(self, label="----")
+        self.t7 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t7, (8,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
     
         self.cb_fix = wx.CheckBox(self, label="GPS fix?")
@@ -174,7 +175,7 @@ class DisplayPanel(wx.Panel):
         
         self.l8 = wx.StaticText(self, label="# satellites:")
         self.sizer.Add(self.l8, (10,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t8 = wx.StaticText(self, label="----")
+        self.t8 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t8, (10,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
 
         self.sizer.Add(wx.StaticLine(self), (11,0), (1,2), wx.EXPAND | wx.ALL, 4)
@@ -183,15 +184,15 @@ class DisplayPanel(wx.Panel):
         self.sizer.Add(self.l9, (12,0), (1,1), wx.EXPAND | wx.ALL, 4)
         self.l10 = wx.StaticText(self, label="Time:")
         self.sizer.Add(self.l10, (13,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t10 = wx.StaticText(self, label="----")
+        self.t10 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t10, (13,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l11 = wx.StaticText(self, label="Date:")
         self.sizer.Add(self.l11, (14,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t11 = wx.StaticText(self, label="----")
+        self.t11 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t11, (14,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         self.l12 = wx.StaticText(self, label="Temperature:")
         self.sizer.Add(self.l12, (15,0), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
-        self.t12 = wx.StaticText(self, label="----")
+        self.t12 = wx.TextCtrl(self, value="----", style=wx.TE_READONLY)
         self.sizer.Add(self.t12, (15,1), (1,1), wx.EXPAND | wx.LEFT | wx.RIGHT, 2)
         
         #self.btnUpdate = wx.Button(self, -1, "Update")
@@ -200,26 +201,25 @@ class DisplayPanel(wx.Panel):
         self.SetSizerAndFit(self.sizer)
 
     def update(self):
-        self.t2.label = self.controller.model.GPS_latitude
-        self.t3.label = self.controller.model.GPS_longitude
+        self.t2.SetValue(str(self.controller.model.GPS_latitude))
+        self.t3.SetValue(str(self.controller.model.GPS_longitude))
             
-        self.t5.label = self.controller.model.GPS_heading
-        self.t6.label = self.controller.model.GPS_speed
-        self.t7.label = self.controller.model.GPS_altitude
+        self.t5.SetValue(str(self.controller.model.GPS_heading))
+        self.t6.SetValue(str(self.controller.model.GPS_speed))
+        self.t7.SetValue(str(self.controller.model.GPS_altitude))
         
-        #self.cb_fix.SetValue(self.controller.model.GPS_fix)
-        self.t8.label = self.controller.model.GPS_satellite_count
+        self.cb_fix.SetValue(self.controller.model.GPS_fix)
+        self.t8.SetValue(str(self.controller.model.GPS_satellite_count))
             
         # compass data
-        self.t4.label = self.controller.model.compass_heading
+        self.t4.SetValue(str(self.controller.model.compass_heading))
             
         # time data
-        self.t10.label = self.controller.model.time
-        self.t11.label = self.controller.model.date
+        self.t10.SetValue(str(self.controller.model.time))
+        self.t11.SetValue(str(self.controller.model.date))
     
         # other data
-        self.t12.label = self.controller.model.temperature
-
+        self.t12.SetValue(str(self.controller.model.temperature))
 
 class AutoPilotPanel(wx.Panel):
     
@@ -242,7 +242,7 @@ class AutoPilotPanel(wx.Panel):
         self.sizer.Add(self.heading, (4, 0), (1,3), wx.EXPAND | wx.ALL, 2)
 
         self.btnCentreRudder = wx.Button(self, -1, "Zero Heading")
-        #self.btnCentreRudder.Bind(wx.EVT_BUTTON, self.centre_rudder)
+        self.btnCentreRudder.Bind(wx.EVT_BUTTON, self.zero_heading)
         self.sizer.Add(self.btnCentreRudder, (5,0), (1,3), wx.ALIGN_CENTER | wx.ALL, 2)
         
         self.lblThrottle = wx.StaticText(self, label="--")
@@ -253,24 +253,53 @@ class AutoPilotPanel(wx.Panel):
         self.sizer.Add(self.speed, (7, 1), (3,1), wx.EXPAND | wx.ALL, 2)
         
         self.btnZeroThrottle = wx.Button(self, -1, "Zero Speed")
-        #self.btnZeroThrottle.Bind(wx.EVT_BUTTON, self.zero_throttle)
+        self.btnZeroThrottle.Bind(wx.EVT_BUTTON, self.zero_speed)
         self.sizer.Add(self.btnZeroThrottle, (7,2), (3,1), wx.ALIGN_CENTER | wx.ALL, 2)
             
         self.btnAuto = wx.Button(self, -1, "Engage Autopilot")
         self.btnAuto.Bind(wx.EVT_BUTTON, self.engage)
         self.sizer.Add(self.btnAuto, (2,0), (1,1), wx.ALL, 2)
 
+        self.btnHalt = wx.Button(self, -1, "Halt!")
+        self.btnHalt.Bind(wx.EVT_BUTTON, self.halt)
+        self.sizer.Add(self.btnHalt, (10,2), (1,1), wx.ALL, 2)
+        
         self.SetSizerAndFit(self.sizer)
-
+    
     
     def engage(self, event):
-        pass
+        # tell controller to engage autopilot
+        self.controller.set_auto_pilot_mode()
+        self.send_update()
 
+    def halt(self, event):
+        # tell controller to halt
+        self.speed.SetValue(0.0)
+        self.heading.SetValue(0.0)
+        self.controller.halt()
+
+    def zero_speed(self, event):
+        self.speed.SetValue(0.0)
+        self.send_update()
+    
+    def zero_heading(self, event):
+        self.heading.SetValue(0.0)
+        self.send_update()
+    
     def on_speed_scroll(self, event):
-        pass
-
+        #value = event.GetEventObject().GetValue()
+        #print value
+        self.send_update()
+    
     def on_heading_scroll(self, event):
-        pass
+        #value = event.GetEventObject().GetValue()
+        #print value
+        self.send_update()
+
+    def send_update(self):
+        sp = self.speed.GetValue()
+        he = self.heading.GetValue()
+        self.controller.set_navigation(sp, he)
 
 class ManualPilotPanel(wx.Panel):
     
@@ -289,36 +318,64 @@ class ManualPilotPanel(wx.Panel):
         self.sizer.Add(self.lblHeading, (3,0), (1,3), wx.CENTER | wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 2)
         
         self.steering = wx.Slider(self, value=0, minValue=-45, maxValue=45, style=wx.SL_HORIZONTAL)
-        self.steering.Bind(wx.EVT_SCROLL, self.OnSteeringChange)
+        self.steering.Bind(wx.EVT_SCROLL, self.on_steering_scroll)
         self.sizer.Add(self.steering, (4, 0), (1,3), wx.EXPAND | wx.ALL, 2)
 
         self.btnCentreRudder = wx.Button(self, -1, "Centre Rudder")
-        #self.btnCentreRudder.Bind(wx.EVT_BUTTON, self.centre_rudder)
+        self.btnCentreRudder.Bind(wx.EVT_BUTTON, self.centre_rudder)
         self.sizer.Add(self.btnCentreRudder, (5,0), (1,3), wx.ALIGN_CENTER | wx.ALL, 2)
 
         self.lblThrottle = wx.StaticText(self, label="--")
         self.sizer.Add(self.lblThrottle, (7,0), (3,1), wx.CENTER | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 2)
         
         self.throttle = wx.Slider(self, value=0, minValue=-100, maxValue=100, style=wx.SL_VERTICAL)
-        self.throttle.Bind(wx.EVT_SCROLL, self.OnThrottleChange)
+        self.throttle.Bind(wx.EVT_SCROLL, self.on_throttle_scroll)
         self.sizer.Add(self.throttle, (7, 1), (3,1), wx.EXPAND | wx.ALL, 2)
     
         self.btnZeroThrottle = wx.Button(self, -1, "Zero Throttle")
-        #self.btnZeroThrottle.Bind(wx.EVT_BUTTON, self.zero_throttle)
+        self.btnZeroThrottle.Bind(wx.EVT_BUTTON, self.zero_throttle)
         self.sizer.Add(self.btnZeroThrottle, (7,2), (3,1), wx.ALIGN_CENTER | wx.ALL, 2)
         
         self.btnManual = wx.Button(self, -1, "Engage Manual")
-        #self.btnManual.Bind(wx.EVT_BUTTON, self.engage)
+        self.btnManual.Bind(wx.EVT_BUTTON, self.engage)
         self.sizer.Add(self.btnManual, (2,0), (1,1), wx.ALL, 2)
-    
+
+        self.btnHalt = wx.Button(self, -1, "Halt!")
+        self.btnHalt.Bind(wx.EVT_BUTTON, self.halt)
+        self.sizer.Add(self.btnHalt, (10,2), (1,1), wx.ALL, 2)
+        
         self.SetSizerAndFit(self.sizer)
 
+    def engage(self, event):
+        # tell controller to engage manual
+        self.controller.set_manual_mode()
+        self.send_update()
 
-    def OnThrottleChange(self, e):
-        value = e.GetEventObject().GetValue()
+    def halt(self, event):
+        # tell controller to halt
+        self.throttle.SetValue(0.0)
+        self.steering.SetValue(0.0)
+        self.controller.halt()
 
-    def OnSteeringChange(self, e):
-        value = e.GetEventObject().GetValue()
-
-
-
+    def zero_throttle(self, event):
+        self.throttle.SetValue(0.0)
+        self.send_update()
+    
+    def centre_rudder(self, event):
+        self.steering.SetValue(0.0)
+        self.send_update()
+    
+    def on_throttle_scroll(self, event):        
+        #value = event.GetEventObject().GetValue()
+        #print value
+        self.send_update()
+            
+    def on_steering_scroll(self, event):
+        #value = event.GetEventObject().GetValue()
+        #print value
+        self.send_update()
+    
+    def send_update(self):
+        th = self.throttle.GetValue()
+        st = self.steering.GetValue()
+        self.controller.set_drive(th, st)
