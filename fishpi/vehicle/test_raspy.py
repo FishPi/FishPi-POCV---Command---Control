@@ -85,11 +85,12 @@ if __name__ == "__main__":
     # init
     i2c_bus=raspberrypi.i2c_bus()
     
+    #i2c_bus.write_word_data(0x32, 1, 1500)
     # test servo
-    test_servo(i2c_bus, 0x32, 1)
+    #test_servo(i2c_bus, 0x32, 1)
 
     # test drive
-    #test_drive(i2c_bus)
+    test_drive(i2c_bus)
 
     # test steer
-    #test_steer(i2c_bus)
+    test_steer(i2c_bus)

@@ -59,7 +59,7 @@ class RPCClient(AMP):
         self.data.gps_speed = result['gps_speed']
         self.data.altitude = result['altitude']
     
-        self.data.fix = True if result['fix'] == 1 else False
+        self.data.fix = result['fix']
         self.data.num_sat = result['num_sat']
     
         self.data.compass_heading = result['compass_heading']
@@ -75,23 +75,23 @@ class RPCClient(AMP):
     
     def halt(self):
         """ RPC call to get call HaltCmd. """
-        self.callRemote(HaltCmd).addCallback(self.cmd_callback)
+        self.callRemote(HaltCmd)
 
     def set_manual_mode(self):
         """ RPC call to get call ModeCmd. """
-        self.callRemote(ModeCmd, mode="manual").addCallback(self.cmd_callback)
+        self.callRemote(ModeCmd, mode="manual")
     
     def set_auto_mode(self):
         """ RPC call to get call ModeCmd. """
-        self.callRemote(ModeCmd, mode="auto").addCallback(self.cmd_callback)
+        self.callRemote(ModeCmd, mode="auto")
 
     def set_navigation(self, speed, heading):
         """ RPC call to get call NavigationCmd (for auto-pilot). """
-        self.callRemote(NavigationCmd, speed=speed, heading=heading).addCallback(self.cmd_callback)
+        self.callRemote(NavigationCmd, speed=speed, heading=heading)
 
     def set_drive(self, throttle, steering):
         """ RPC call to get call ManualDriveCmd (for manual drive). """
-        self.callRemote(ManualDriveCmd, throttle=throttle, steering=steering).addCallback(self.cmd_callback)
+        self.callRemote(ManualDriveCmd, throttle=throttle, steering=steering)
 
     def pulse_heartbeat(self):
         """ RPC call to get call HeartbeatCmd. """
@@ -110,7 +110,7 @@ class StatusData:
         self.gps_heading = None
         self.gps_speed = None
         self.altitude = None
-        self.fix = None
+        self.fix = False
         self.num_sat = None
         self.compass_heading = None
         dt = datetime.today()

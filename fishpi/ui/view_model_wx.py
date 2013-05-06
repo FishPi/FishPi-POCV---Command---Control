@@ -7,6 +7,7 @@
 
 import os
 import logging
+import math
 import wx
 
 from PIL import Image
@@ -51,8 +52,10 @@ class MainViewController:
             self.model.compass_heading = self._rpc_client.data.compass_heading
         
             # time data
-            self.model.time = self._rpc_client.data.timestamp.isoformat()
-            self.model.date = self._rpc_client.data.datestamp.isoformat()
+            self.model.time = self._rpc_client.data.timestamp
+            #strftime(self._rpc_client.data.timestamp).isoformat()
+            self.model.date = self._rpc_client.data.datestamp
+            #strftime(self._rpc_client.data.datestamp).isoformat()
         
             # other data
             self.model.temperature = self._rpc_client.data.temperature
@@ -64,7 +67,7 @@ class MainViewController:
     
     def set_auto_pilot_mode(self):
         """ Stops current manual drive and starts navigation unit. """
-        self._rpc_client.set_auto_pilot_mode()
+        self._rpc_client.set_auto_mode()
     
     def halt(self):
         """ Commands the NavigationUnit and Drive Control to Halt! """
@@ -80,6 +83,11 @@ class MainViewController:
     def set_drive(self, throttle_level, angle):
         # throttle
         throttle_act = float(throttle_level)/100.0
+        #
+        # speed limiter!!
+        #
+        #throttle_act *= 0.2
+        
         # adjustment for slider so min +/- .3 so if in .05 to .3 range, jump to .3
         if throttle_act > 0.05 and throttle_act < 0.3:
             throttle_act = 0.3
@@ -89,7 +97,7 @@ class MainViewController:
         # steering
         angle_in_rad = (float(angle)/180.0)*math.pi
         # adjustment for slider in opposite direction - TODO - move to drive controller
-        angle_in_rad = angle_in_rad * -1.0
+        #angle_in_rad = angle_in_rad * -1.0
     
         # call rpc
         self._rpc_client.set_drive(throttle_act, angle_in_rad)
@@ -143,7 +151,7 @@ class MainViewModel:
         self.temperature = 0.0
         
         # other settings
-        self.capture_img_enabled = False
+        self.capture_img_enabled = True
         
         # route data
         self.waypoints = []

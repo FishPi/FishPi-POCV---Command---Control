@@ -29,7 +29,7 @@ class ModeCmd(Command):
 
 class QueryStatus(Command):
     arguments = []
-    response = [('fix', Integer()),
+    response = [('fix', Boolean()),
                 ('lat', Float()),
                 ('lon', Float()),
                 ('gps_heading', Float()),
