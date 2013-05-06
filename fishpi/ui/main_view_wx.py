@@ -281,7 +281,9 @@ class AutoPilotPanel(wx.Panel):
     def halt(self, event):
         # tell controller to halt
         self.speed.SetValue(0.0)
-        self.heading.SetValue(0.0)
+        self.heading.SetValue(0.0)        
+        self.lblThrottle.SetLabel(0.0)
+        self.lblHeading.SetLabel(0.0)
         self.controller.halt()
 
     def zero_speed(self, event):
@@ -363,7 +365,9 @@ class ManualPilotPanel(wx.Panel):
     def halt(self, event):
         # tell controller to halt
         self.throttle.SetValue(0.0)
-        self.steering.SetValue(0.0)
+        self.steering.SetValue(0.0)        
+        self.lblThrottle.SetLabel(0.0)
+        self.lblHeading.SetLabel(0.0)
         self.controller.halt()
 
     def zero_throttle(self, event):
