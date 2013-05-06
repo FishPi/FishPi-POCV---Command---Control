@@ -240,7 +240,7 @@ class AutoPilotPanel(wx.Panel):
 
         self.sizer.Add(wx.StaticLine(self), (1,0), (1,3), wx.EXPAND | wx.ALL, 4)
         
-        self.lblHeading = wx.StaticText(self, label="--")
+        self.lblHeading = wx.TextCtrl(self, value="--", style=wx.TE_READONLY)
         self.sizer.Add(self.lblHeading, (3,0), (1,3), wx.CENTER | wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 2)
 
         self.heading = wx.Slider(self, value=0, minValue=-45, maxValue=45, style=wx.SL_HORIZONTAL)
@@ -251,10 +251,10 @@ class AutoPilotPanel(wx.Panel):
         self.btnCentreRudder.Bind(wx.EVT_BUTTON, self.zero_heading)
         self.sizer.Add(self.btnCentreRudder, (5,0), (1,3), wx.ALIGN_CENTER | wx.ALL, 2)
         
-        self.lblThrottle = wx.StaticText(self, label="--")
+        self.lblThrottle = wx.TextCtrl(self, value="--", style=wx.TE_READONLY)
         self.sizer.Add(self.lblThrottle, (7,0), (3,1), wx.CENTER | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 2)
 
-        self.speed = wx.Slider(self, value=0, minValue=-100, maxValue=100, style=wx.SL_VERTICAL)
+        self.speed = wx.Slider(self, value=0, minValue=100, maxValue=-100, style=wx.SL_VERTICAL)
         self.speed.Bind(wx.EVT_SCROLL, self.on_speed_scroll)
         self.sizer.Add(self.speed, (7, 1), (3,1), wx.EXPAND | wx.ALL, 2)
         
@@ -305,6 +305,8 @@ class AutoPilotPanel(wx.Panel):
     def send_update(self):
         sp = self.speed.GetValue()
         he = self.heading.GetValue()
+        self.lblThrottle.SetValue(str(sp))
+        self.lblHeading.SetValue(str(he))
         self.controller.set_navigation(sp, he)
 
 class ManualPilotPanel(wx.Panel):
@@ -320,7 +322,7 @@ class ManualPilotPanel(wx.Panel):
        
         self.sizer.Add(wx.StaticLine(self), (1,0), (1,3), wx.EXPAND | wx.ALL, 4)
         
-        self.lblHeading = wx.StaticText(self, label="--")
+        self.lblHeading = wx.TextCtrl(self, value="--", style=wx.TE_READONLY)
         self.sizer.Add(self.lblHeading, (3,0), (1,3), wx.CENTER | wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 2)
         
         self.steering = wx.Slider(self, value=0, minValue=-45, maxValue=45, style=wx.SL_HORIZONTAL)
@@ -331,10 +333,10 @@ class ManualPilotPanel(wx.Panel):
         self.btnCentreRudder.Bind(wx.EVT_BUTTON, self.centre_rudder)
         self.sizer.Add(self.btnCentreRudder, (5,0), (1,3), wx.ALIGN_CENTER | wx.ALL, 2)
 
-        self.lblThrottle = wx.StaticText(self, label="--")
+        self.lblThrottle = wx.TextCtrl(self, value="--", style=wx.TE_READONLY)
         self.sizer.Add(self.lblThrottle, (7,0), (3,1), wx.CENTER | wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 2)
         
-        self.throttle = wx.Slider(self, value=0, minValue=-100, maxValue=100, style=wx.SL_VERTICAL)
+        self.throttle = wx.Slider(self, value=0, minValue=100, maxValue=-100, style=wx.SL_VERTICAL)
         self.throttle.Bind(wx.EVT_SCROLL, self.on_throttle_scroll)
         self.sizer.Add(self.throttle, (7, 1), (3,1), wx.EXPAND | wx.ALL, 2)
     
@@ -383,5 +385,7 @@ class ManualPilotPanel(wx.Panel):
     
     def send_update(self):
         th = self.throttle.GetValue()
-        st = self.steering.GetValue()
+        st = self.steering.GetValue()        
+        self.lblThrottle.SetValue(str(th))
+        self.lblHeading.SetValue(str(st))
         self.controller.set_drive(th, st)

@@ -136,21 +136,10 @@ class RPCHost(AMP):
         """ Direct drive. """
         self._heartbeat.pulse()
         # throttle
-        # expected +/- 100
-        throttle_act = float(throttle)/100.0
-        # adjustment for slider so min +/- .3 so if in .05 to .3 range, jump to .3
-        if throttle_act > 0.05 and throttle_act < 0.3:
-            throttle_act = 0.3
-        elif throttle_act < -0.05 and throttle_act > -0.3:
-            throttle_act = -0.3
-        self._kernel.set_throttle(throttle_act)
+        self._kernel.set_throttle(throttle)
         
         # steering
-        angle = steering
-        angle_in_rad = (float(angle)/180.0)*math.pi
-        # adjustment for slider in opposite direction - TODO - move to drive controller
-        angle_in_rad = angle_in_rad * -1.0
-        self._kernel.set_steering(angle_in_rad)
+        self._kernel.set_steering(steering)
         return {'status':True}
 
     @ExitCmd.responder
