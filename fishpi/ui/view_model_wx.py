@@ -146,7 +146,7 @@ class MainViewModel:
         self.temperature = 0.0
         
         # other settings
-        self.capture_img_enabled = False
+        self.capture_img_enabled = True
         
         # route data
         self.waypoints = []

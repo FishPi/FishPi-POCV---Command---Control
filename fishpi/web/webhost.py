@@ -137,7 +137,7 @@ class RPCHost(AMP):
         self._heartbeat.pulse()
         # throttle
         # expected +/- 100
-        throttle_act = float(throttle_level)/100.0
+        throttle_act = float(throttle)/100.0
         # adjustment for slider so min +/- .3 so if in .05 to .3 range, jump to .3
         if throttle_act > 0.05 and throttle_act < 0.3:
             throttle_act = 0.3

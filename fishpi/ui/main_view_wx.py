@@ -38,6 +38,7 @@ class MainWindow(wx.Frame):
         cam_enabled = self.controller.model.capture_img_enabled
         self.camera_frame = CameraPanel(self.panel, server_name, camera_port, cam_enabled)
         self.sizer_view.Add(self.camera_frame, 1, wx.EXPAND)
+        self.camera_update_count = 0
         
         # waypoint frame
         self.waypoint_frame = WayPointPanel(self.panel)
@@ -84,7 +85,12 @@ class MainWindow(wx.Frame):
         self.controller.update()
         # update screens
         self.display_frame.update()
-        self.camera_frame.update()
+        # update camera less frequently
+        if self.camera_update_count > 200:
+            self.camera_frame.update()
+            self.camera_update_count = 0
+        else:
+            self.camera_update_count += 1
 
     @property
     def server(self):
