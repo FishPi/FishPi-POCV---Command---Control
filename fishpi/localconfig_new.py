@@ -32,8 +32,8 @@ class FishPiConfig(object):
     _platform = ""
     _root_dir = os.path.join(os.getenv("HOME"), "fishpi")
 
-	def __init__(self):
-		
+    def __init__(self):
+        
         self.hardware_model = ()    # list of already configured hardware
 
         # default attachments to None
@@ -52,9 +52,9 @@ class FishPiConfig(object):
         return os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources')
 
 
-	def configure_devices(self, debug=False):
-		""" Is called from the outside, does the entire device setup """
-		# only configure devices for Linux
+    def configure_devices(self, debug=False):
+        """ Is called from the outside, does the entire device setup """
+        # only configure devices for Linux
         if not(platform.system() == "Linux"):
             logging.info("CFG:\tNot running on Linux distro. Not configuring i2c or other devices.")
             self.set_dummy_devices()
@@ -97,7 +97,7 @@ class FishPiConfig(object):
 
 
 
-	def setup_dirs(self):
+    def setup_dirs(self):
         """ Create directories """
         if not os.path.exists(self._root_dir):
             os.makedirs(self._root_dir)
@@ -126,8 +126,8 @@ def setup_logging(self):
         #handler.doRollover()
 
 
-	def load_config_file(self, file_name):
-		""" loads a config file and parses the values. """
+    def load_config_file(self, file_name):
+        """ loads a config file and parses the values. """
 
         # loading config file
         parser = ConfigParser.RawConfigParser()
@@ -194,13 +194,13 @@ def setup_logging(self):
 
 
 
-	def _scan_i2c(self, debug=False):
-		""" Internal function to scan an I2C bus for devices (when and where does that work?) """
-		pass
+    def _scan_i2c(self, debug=False):
+        """ Internal function to scan an I2C bus for devices (when and where does that work?) """
+        pass
 
-	def _set_dummy_devices(self):
-		""" Goes through the list of devices and adds a dummy for every missing device """
-		
+    def _set_dummy_devices(self):
+        """ Goes through the list of devices and adds a dummy for every missing device """
+        
         if not self.gps_sensor:
             pass
             # set dummy gps here. gpsfake in combination with gpsd?
