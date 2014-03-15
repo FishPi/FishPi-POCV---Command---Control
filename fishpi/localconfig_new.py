@@ -287,7 +287,8 @@ class VehicleConstants:
 
 
 if __name__ == "__main__":
-    pass
+    config = FishPiConfig()
+    config.configure_interface()
     # create instance, and call for testing.
 
 
