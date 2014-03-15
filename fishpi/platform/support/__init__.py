@@ -1,0 +1,1 @@
+# Init file for BeagleBone support package
