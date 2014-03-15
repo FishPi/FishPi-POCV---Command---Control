@@ -108,7 +108,7 @@ class FishPiConfig(object):
         if not os.path.exists(self.logs_path):
             os.makedirs(self.logs_path)
 
-def setup_logging(self):
+    def setup_logging(self):
         """ Create and configure logging. """
         # TODO setup logging (from config)
         logger = logging.getLogger()
@@ -124,11 +124,9 @@ def setup_logging(self):
         logger.addHandler(handler)
         # can force new file start if needed
         #handler.doRollover()
-
-
+        
     def load_config_file(self, file_name):
         """ loads a config file and parses the values. """
-
         # loading config file
         parser = ConfigParser.RawConfigParser()
         try:
