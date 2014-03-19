@@ -32,6 +32,8 @@ class FishPiKernel:
         # sensors
         self._gps_sensor = config.gps_sensor
         self._compass_sensor = config.compass_sensor
+        self._accelerometer_sensor = config.accelerometer_sensor
+        self._gyro_sensor = config.gyro_sensor
         self._temperature_sensor = config.temperature_sensor
         
         self._vehicle_constants = config.vehicle_constants
@@ -68,6 +70,18 @@ class FishPiKernel:
         except Exception as ex:
             self.data.has_compass = False
             logging.exception("CORE:\tError in update loop (COMPASS) - %s" % ex)
+
+        try:
+            self.read_accelerometer()
+        except Exception as ex:
+            self.data.has_accelerometer = False
+            logging.exception("CORE:\tError in update loop (ACCELEROMETER) - %s" % ex)
+
+        try:
+            self.read_gyro()
+        except Exception as ex:
+            self.data.has_gyro = False
+            logging.exception("CORE:\tError in update loop (GYROSCOPE) - %s" % ex)
 
         try:
             self.read_temperature()
@@ -144,6 +158,12 @@ class FishPiKernel:
             self.data.has_compass = True
         else:
             self.data.has_compass = False
+
+    def read_accelerometer(self):
+        pass
+
+    def read_gyro(self):
+        pass
 
     def read_temperature(self):
         if self._temperature_sensor:
