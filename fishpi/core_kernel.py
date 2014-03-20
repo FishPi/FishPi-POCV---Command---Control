@@ -58,7 +58,7 @@ class FishPiKernel:
         except Exception as ex:
             self.data.has_time = False
             logging.exception("CORE:\tError in update loop (TIME) - %s" % ex)
-                
+
         try:
             self.read_GPS()
         except Exception as ex:
@@ -70,6 +70,12 @@ class FishPiKernel:
         except Exception as ex:
             self.data.has_compass = False
             logging.exception("CORE:\tError in update loop (COMPASS) - %s" % ex)
+
+        try:
+            self.read_magnetometer()
+        except Exception as ex:
+            self.data.has_magnetometer = False
+            logging.exception("CORE:\tError in update loop (MAGNETOMETER) - %s" % ex)
 
         try:
             self.read_accelerometer()
@@ -159,6 +165,9 @@ class FishPiKernel:
         else:
             self.data.has_compass = False
 
+    def read_magnetometer(self):
+        pass
+
     def read_accelerometer(self):
         pass
 
@@ -172,7 +181,7 @@ class FishPiKernel:
             self.data.has_temperature = True
         else:
             self.data.has_temperature = False
-    
+
     # Control Systems
     # temporary direct access to DriveController to test hardware.
 
@@ -181,7 +190,7 @@ class FishPiKernel:
 
     def set_steering(self, angle):
         self._drive_controller.set_steering(angle)
-    
+
     # Control modes (Manual, AutoPilot)
     def set_manual_mode(self):
         """ Stops navigation unit and current auto-pilot drive. """
@@ -192,11 +201,11 @@ class FishPiKernel:
         """ Stops current manual drive and starts navigation unit. """
         self.halt()
         self._navigation_unit.start()
-    
+
     @property
     def auto_mode_enabled(self):
         return self._navigation_unit.auto_mode_enabled
-                
+
     # Route Planning and Navigation
     def set_speed(self, speed):
         """ Commands the NavigationUnit to set and hold a given speed. """

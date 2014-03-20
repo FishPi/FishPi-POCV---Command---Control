@@ -37,6 +37,8 @@ class FishPiConfig(object):
         self.gps_sensor = None
         self.compass_sensor = None
         self.temperature_sensor = None
+        self.magnetometer = None
+        self.accelerometer = None
         self.drive_controller = None
         self.camera_controller = None
 
@@ -304,6 +306,9 @@ class FishPiConfig(object):
     def _set_dummy_devices(self):
         """ Goes through the list of devices and adds a dummy for every
             missing device """
+
+        # We do not set dummy devices for Magnetometer or Accelerometer.
+        # Later this should be handled differently
 
         if not self.gps_sensor:
             pass
