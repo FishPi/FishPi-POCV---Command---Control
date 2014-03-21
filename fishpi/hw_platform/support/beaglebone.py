@@ -9,6 +9,8 @@ import logging
 # This is to satisfy the driver includes. hope they work..
 import Adafruit.I2C.Adafruit_I2C as Adafruit_I2C
 
+import ../hw_config
+
 # TODO: Detect if the path to the capemanager is 8 or 9 and configure the
 #       variable accordingly
 
@@ -18,7 +20,9 @@ class BeagleBoneSupport(object):
         device tree for the used hardware """
 
     def __init__(self):
-        pass
+        # every support code has to set this to notify drivers on
+        # which platform they are working.
+        hw_config.platform = 'BBB'
 
     def configure_interface(self, name):
         """ Export a specific overlay which is identified by name,

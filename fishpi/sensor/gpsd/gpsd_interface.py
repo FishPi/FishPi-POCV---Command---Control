@@ -1,14 +1,16 @@
-# ASPilot GPSD Interface Library
 #
-# This file is part of the ASPilot project
+# FishPi - An autonomous drop in the ocean
 #
 # TODO: -Enable for RaspberryPi as well. BBB-specific stuff from here should
 #        go to the platform library
 
-import Adafruit_BBIO.UART as UART
+# how to make the fishpi directory available everywhere?
+import ../../hw_platform.hw_config
+
 import gps
 import serial
 from subprocess import call
+from time import sleep
 import logging
 
 
@@ -19,13 +21,16 @@ class GPSDError(Exception):
 
 class gpsdInterface():
     # constants and stuff here
-    uart_tty_map = {
+    bbb_uart_tty_map = {
         "UART1": "/dev/ttyO1",
         'UART2': "/dev/ttyO2",
         "UART4": "/dev/ttyO4",
-        "UART5": "/dev/ttyO5"}
+        "UART5": "/dev/ttyO5",
+        "default": "/dev/ttyO4"}
 
-    def __init__(self, uart="UART4", debug=False):
+    rpi_uart_tty_map = {"default": "/dev/ttyAMA0"}
+
+    def __init__(self, uart="default", debug=False):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
         self.debug = debug
@@ -40,22 +45,56 @@ class gpsdInterface():
             return 1
         self.tty = self.uart_tty_map[self.uart]
 
-        UART.setup(uart)
+        if hw_config.platform is None:
+            logging.error("GPSD Interface:\tHardware platform is not " +
+                "specified! Won't set up sensor.")
+            return 1
+
+        # Do setup for BeagleBone Black
+        if hw_config.platform == 'BBB':
+            if not self.setup_bbb():
+                return 1
+        # Do setup for RaspberryPi
+        elif hw_config.platform == 'RPi':
+            self.tty = self.rpi_uart_tty_map[self.uart]
+
+        call(["gpsd", self.tty])
+        self.session = gps.gps(mode=gps.WATCH_ENABLE)
+        logging.info("GPSD Interface:\tInitialization complete.")
+
+    def setup_bbb(self):
+        # Ugly inline import right here! Booya.
+        import Adafruit_BBIO.UART as UART
+
+        self.tty = self.bbb_uart_tty_map[self.uart]
+        num_failed_tries = 0
+        while not self.setup_bbb_uart():
+            if num_failed_tries < 10:
+                logging.error("GPSD Interface:\tCould not connect to " +
+                    "serial interface. Trying again..")
+                num_failed_tries += 1
+            else:
+                logging.error("GPSD Interface:\tFailed to connect to " +
+                    "serial interface. Aborting.")
+                return return False
+        return True
+
+    def setup_bbb_uart(self):
+        # Is this necessary if I don't want to use it myself??
+        UART.setup(self.uart)
         self.ser = serial.Serial(port=self.tty, baudrate=9600)
         self.ser.close()
         self.ser.open()
         if self.ser.isOpen():
-            call(["gpsd", self.tty])
-            self.session = gps.gps(mode=gps.WATCH_ENABLE)
-            logging.info("GPSD Interface:\tInitialization complete.")
+            return True
         else:
-            logging.error("GPSD Interface:\tCould not open serial port.")
-            return 1
+            return False
 
     def tear_down(self):
         self.session.close()
         call(["killall", "gpsd"])
-        self.ser.close()
+        if hw_config.platform == 'BBB':
+            self.ser.close()
         # UART.cleanup(uart)    # not functional right now according to Adafruit
         logging.info("GPSD Interface:\tTear-down complete.")
         return 0
