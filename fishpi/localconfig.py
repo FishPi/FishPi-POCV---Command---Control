@@ -141,8 +141,8 @@ class FishPiConfig(object):
 
         # Load platform support code
         try:
-            self.platform_support = self._load_platform_code(
-                device_conf['Platform'])()
+	    self.platform_support = self._load_platform_code(
+                device_conf['Platform'])
         except ConfigError:
             return
         del device_conf['Platform']  # Don't need this anymore

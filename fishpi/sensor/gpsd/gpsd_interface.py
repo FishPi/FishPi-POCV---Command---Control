@@ -5,7 +5,10 @@
 #        go to the platform library
 
 # how to make the fishpi directory available everywhere?
-import ../../hw_platform.hw_config
+import hw_platform.hw_config as hw_config
+
+if hw_config.platform == 'BBB':
+   import Adafruit_BBIO.UART as UART
 
 import gps
 import serial
@@ -34,16 +37,16 @@ class gpsdInterface():
         if debug:
             logging.basicConfig(level=logging.DEBUG)
         self.debug = debug
-        self.uart = uart        # not really useful right now, might be once the cleanup() method works
-
+        #self.uart = uart        # not really useful right now, might be once the cleanup() method works
+        self.uart = "UART4"
         self.num_sat = 0
 
         # Map UART to ttyO interface
-        if not self.uart in self.uart_tty_map:
+        if not self.uart in self.bbb_uart_tty_map:
             logging.error("GPSD Interface:\tThe serial interface %s " +
                 "is not supported.", uart)
             return 1
-        self.tty = self.uart_tty_map[self.uart]
+        self.tty = self.bbb_uart_tty_map[self.uart]
 
         if hw_config.platform is None:
             logging.error("GPSD Interface:\tHardware platform is not " +
@@ -64,7 +67,7 @@ class gpsdInterface():
 
     def setup_bbb(self):
         # Ugly inline import right here! Booya.
-        import Adafruit_BBIO.UART as UART
+        #import Adafruit_BBIO.UART as UART
 
         self.tty = self.bbb_uart_tty_map[self.uart]
         num_failed_tries = 0
@@ -76,7 +79,7 @@ class gpsdInterface():
             else:
                 logging.error("GPSD Interface:\tFailed to connect to " +
                     "serial interface. Aborting.")
-                return return False
+                return False
         return True
 
     def setup_bbb_uart(self):
