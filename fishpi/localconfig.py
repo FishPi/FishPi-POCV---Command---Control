@@ -36,7 +36,7 @@ class FishPiConfig(object):
         # default attachments to None
         self.gps_sensor = None
         self.compass_sensor = None
-	self.gyro_sensor = None
+        self.gyro_sensor = None
         self.temperature_sensor = None
         self.magnetometer_sensor = None
         self.accelerometer_sensor = None
