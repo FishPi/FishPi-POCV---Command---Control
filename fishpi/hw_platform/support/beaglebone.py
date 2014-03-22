@@ -9,7 +9,7 @@ import logging
 # This is to satisfy the driver includes. hope they work..
 import Adafruit.I2C.Adafruit_I2C as Adafruit_I2C
 
-import ../hw_config
+import hw_platform.hw_config
 
 # TODO: Detect if the path to the capemanager is 8 or 9 and configure the
 #       variable accordingly

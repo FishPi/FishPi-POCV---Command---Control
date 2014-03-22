@@ -36,9 +36,10 @@ class FishPiConfig(object):
         # default attachments to None
         self.gps_sensor = None
         self.compass_sensor = None
+	self.gyro_sensor = None
         self.temperature_sensor = None
-        self.magnetometer = None
-        self.accelerometer = None
+        self.magnetometer_sensor = None
+        self.accelerometer_sensor = None
         self.drive_controller = None
         self.camera_controller = None
 
@@ -271,23 +272,23 @@ class FishPiConfig(object):
                 device_handle = device_class(debug=debug)
 
             if k == 'GPS':
-                self._gps_sensor = device_handle
+                self.gps_sensor = device_handle
                 logging.info("CFG:\tFor GPS loaded driver %s" %
                     device_conf[k]['driver'])
             elif k == 'Magnetometer':
-                self._magnetometer_sensor = device_handle
+                self.magnetometer_sensor = device_handle
                 logging.info("CFG:\tFor magnetometer loaded driver %s" %
                     device_conf[k]['driver'])
             elif k == 'Accelerometer':
-                self._accelerometer_sensor = device_handle
+                self.accelerometer_sensor = device_handle
                 logging.info("CFG:\tFor accelerometer loaded driver %s" %
                     device_conf[k]['driver'])
             elif k == 'Compass':
-                self._compass_sensor = device_handle
+                self.compass_sensor = device_handle
                 logging.info("CFG:\tFor compass loaded driver %s" %
                     device_conf[k]['driver'])
             elif k == 'Gyro':
-                self._gyro_sensor = device_handle
+                self.gyro_sensor = device_handle
                 logging.info("CFG:\tFor gyroscope loaded driver %s" %
                     device_conf[k]['driver'])
             elif k == 'Temperature':
