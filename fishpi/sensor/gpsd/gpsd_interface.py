@@ -8,12 +8,11 @@
 import hw_platform.hw_config as hw_config
 
 if hw_config.platform == 'BBB':
-   import Adafruit_BBIO.UART as UART
+    import Adafruit_BBIO.UART as UART
 
 import gps
 import serial
 from subprocess import call
-from time import sleep
 import logging
 
 
@@ -26,10 +25,9 @@ class gpsdInterface():
     # constants and stuff here
     bbb_uart_tty_map = {
         "UART1": "/dev/ttyO1",
-        'UART2': "/dev/ttyO2",
+        "UART2": "/dev/ttyO2",
         "UART4": "/dev/ttyO4",
-        "UART5": "/dev/ttyO5",
-        "default": "/dev/ttyO4"}
+        "UART5": "/dev/ttyO5"}
 
     rpi_uart_tty_map = {"default": "/dev/ttyAMA0"}
 
@@ -37,16 +35,22 @@ class gpsdInterface():
         if debug:
             logging.basicConfig(level=logging.DEBUG)
         self.debug = debug
-        #self.uart = uart        # not really useful right now, might be once the cleanup() method works
         self.uart = "UART4"
         self.num_sat = 0
 
-        # Map UART to ttyO interface
-        if not self.uart in self.bbb_uart_tty_map:
-            logging.error("GPSD Interface:\tThe serial interface %s " +
-                "is not supported.", uart)
-            return 1
-        self.tty = self.bbb_uart_tty_map[self.uart]
+        # Default answer. Defined here to include num_sat
+        self.default_return = (
+            1,      # fix
+            0.0,    # lat
+            0.0,    # lon
+            0.0,    # heading
+            0.0,    # speed
+            0.0,    # altitude
+            self.num_sat,  # num_sat
+            "",     # timestamp
+            "")     # datestamp
+
+        self.latest_return = self.default_return
 
         if hw_config.platform is None:
             logging.error("GPSD Interface:\tHardware platform is not " +
@@ -55,8 +59,17 @@ class gpsdInterface():
 
         # Do setup for BeagleBone Black
         if hw_config.platform == 'BBB':
+            # This is kind of a dirty fix, something smoother will follow
+            if self.uart == "default":
+                self.uart = "UART4"
+
+            if not self.uart in self.bbb_uart_tty_map:
+                logging.error("GPSD Interface:\tThe serial interface %s " +
+                    "is not supported.", uart)
+                return 1
             if not self.setup_bbb():
                 return 1
+
         # Do setup for RaspberryPi
         elif hw_config.platform == 'RPi':
             self.tty = self.rpi_uart_tty_map[self.uart]
@@ -113,38 +126,32 @@ class gpsdInterface():
         except StopIteration:
             raise GPSDError()
 
-    def read(self):
+    def read_sensor(self):
         """Read the newest data from gpsd and return a formatted version.
             Not active right now."""
         data = self.read_raw_gpsd_data()
 
-        if data['class'] == 'TPV':
-            if data['mode'] == 1:  # really a number, not a string?
-                return (
-                    1,      # fix
-                    0.0,    # lat
-                    0.0,    # lon
-                    0.0,    # heading
-                    0.0,    # speed
-                    0.0,    # altitude
-                    self.num_sat,  # num_sat
-                    "",     # timestamp
-                    "")     # datestamp
+        if data.get('class') == 'TPV':
+            if data.get('mode') == 1:  # really a number, not a string?
+                return self.default_answer
             else:
-                return (
-                    data['mode'],
-                    data['lat'],
-                    data['lon'],
-                    data['track'],
-                    data['speed'],
+                self.latest_return = (
+                    data.get('mode'),
+                    data.get('lat'),
+                    data.get('lon'),
+                    data.get('track'),
+                    data.get('speed'),
                     self.num_sat,
                     data['time'].split('T')[1],
                     data['time'].split('T')[2])
+                return self.latest_return
         elif data['class'] == 'SKY':
             if 'satellites' in data.keys():
                 self.num_sat = len(data['satellites'])
             else:
                 self.num_sat = 0
+        else:
+            return self.latest_answer
 
 
 if __name__ == "__main__":

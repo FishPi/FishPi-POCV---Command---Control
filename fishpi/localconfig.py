@@ -141,7 +141,7 @@ class FishPiConfig(object):
 
         # Load platform support code
         try:
-	    self.platform_support = self._load_platform_code(
+            self.platform_support = self._load_platform_code(
                 device_conf['Platform'])
         except ConfigError:
             return
@@ -263,8 +263,8 @@ class FishPiConfig(object):
             device_class = self._load_class(device_conf[k]['driver'],
                                     device_conf[k]['module'])
             if device_class is None:
-                logging.error("CFG:\tCould not load device driver %s. " +
-                    "Configuring dummy device instead."
+                logging.error(("CFG:\tCould not load device driver %s. " +
+                    "Configuring dummy device instead.")
                     % device_conf[k]['driver'])
                 continue
             else:

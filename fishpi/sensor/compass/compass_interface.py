@@ -25,7 +25,9 @@ class Compass(object):
         # Split and return only compass data
         data = self.device_handler.read()
 
-        (x_a, y_a, z_a, x_m, y_m, z_m, or_) = data
+
+
+        ((x_a, y_a, z_a), (x_m, y_m, z_m, or_)) = data
 
         # Calculate roll and pitch in radians
         pitch_r = atan2(x_a, sqrt(fpow(y_a, 2) + fpow(z_a, 2)))
