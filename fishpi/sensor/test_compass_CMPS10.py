@@ -11,7 +11,7 @@ from compass_CMPS10 import Cmps10_Sensor
 
 if __name__ == "__main__":
     print "Testing compass sensor..."
-    compassSensor = Cmps10_Sensor(i2c_bus=raspberrypi.i2c_bus(), debug=True)
+    compassSensor = Cmps10_Sensor(interface=raspberrypi.i2c_bus(), debug=True)
 
     # heading
     (heading, pitch, roll) = compassSensor.read_sensor()

@@ -81,7 +81,8 @@ class FishPi:
 
     def configure_devices(self):
         """ Configures eg i2c and other attached devices."""
-        self.config.configure_devices(self.debug)
+        # maybe change this back
+        return self.config.configure_devices(self.debug)
 
     def run(self):
         """ Runs selected FishPi mode."""

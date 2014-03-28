@@ -16,13 +16,13 @@ class ConnectionError(Exception):
 
 class Gyroscope(object):
     
-    def __init__(self, busnum=-1, debug=False, rng=L3GD20_range.R250DPS):
+    def __init__(self, interface="", hw_interface="-1", debug=False, rng=L3GD20_range.R250DPS):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
-        self.gyro_handler = L3GD20(busnum=busnum, debug=debug, rng=rng)
+        self.gyro_handler = L3GD20(busnum=int(hw_interface), debug=debug, rng=rng)
     
     def tear_down(self):
-        logging.info("Gyroscope Interface:\tTear-down complete, nothing to be done.")
+        logging.info("GYRO:\tTear-down complete, nothing to be done.")
     
     def read_sensor(self):
         data = self.gyro_handler.read()

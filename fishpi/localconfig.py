@@ -132,6 +132,8 @@ class FishPiConfig(object):
             return
 
         device_conf = self.load_config_file('devices.conf')
+        if device_conf is None:
+            return
 
         if not 'Platform' in device_conf:
             logging.error("CFG:\tSection \"Platform\" not found in " +
@@ -257,19 +259,27 @@ class FishPiConfig(object):
                 self.platform_support.configure_interface(
                     device_conf[k]['interface'])
 
-                # Append interface to list
+                # Append interface name to list
                 self.hardware_model.append(device_conf[k]['interface'])
 
             device_class = self._load_class(device_conf[k]['driver'],
                                     device_conf[k]['module'])
             if device_class is None:
                 logging.error(("CFG:\tCould not load device driver %s. " +
-                    "Configuring dummy device instead.")
+                    "Loading dummy device instead.")
                     % device_conf[k]['driver'])
                 continue
             else:
-                # Get device driver handle
-                device_handle = device_class(debug=debug)
+                # Get device driver handle and pass the params
+                try:
+                    device_handle = device_class(
+                        debug=debug,
+                        **(self._create_device_params(device_conf[k])))
+                except Exception, e:
+                    logging.error(("CGF:\tError while configuring %s: %s. " +
+                        "Loading dummy device instead.")
+                        % (device_conf[k].get('name'), e))
+                    continue
 
             if k == 'GPS':
                 self.gps_sensor = device_handle
@@ -295,10 +305,32 @@ class FishPiConfig(object):
                 self.temperature_sensor = device_handle
                 logging.info("CFG:\tFor temperature sensor loaded driver %s" %
                     device_conf[k]['driver'])
+            elif k == 'Camera':
+                self.camera_controller = device_handle
+                logging.info("CFG:\tFor camera loaded driver %s" %
+                    device_conf[k]['driver'])
             elif k == 'Drive':
                 self.drive_controller = device_handle
                 logging.info("CFG:\tFor drive controller loaded driver %s" %
                     device_conf[k]['driver'])
+
+    def _create_device_params(self, config):
+        """ Creates a subdict from the device config and parses some
+            system values """
+        ret_dict = dict(config)
+        try:
+            ret_dict['hw_interface'] = self.platform_support.lookup_interface(
+                ret_dict['interface'])
+            del (
+                ret_dict['driver'],
+                ret_dict['module'],
+                ret_dict['name'],
+                ret_dict['type'])
+            return ret_dict
+        except KeyError, e:
+            logging.error(("CGF:\tError while configuring %s: %s." +
+                "Configuring dummy device instead.") % (config['name'], e))
+            return None
 
     def _scan_i2c(self, debug=False):
         """ Internal function to scan an I2C bus for devices """

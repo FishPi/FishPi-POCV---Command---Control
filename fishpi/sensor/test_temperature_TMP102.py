@@ -36,7 +36,7 @@ if __name__ == "__main__":
     #test_conversions()
 
     print "Testing temperature sensor..."
-    tmpSensor = TemperatureSensor(debug=True, i2c_bus=raspberrypi.i2c_bus())
+    tmpSensor = TemperatureSensor(debug=True, interface=raspberrypi.i2c_bus())
     value = tmpSensor.read_sensor()
     print "Current temperature: %f" % value
 

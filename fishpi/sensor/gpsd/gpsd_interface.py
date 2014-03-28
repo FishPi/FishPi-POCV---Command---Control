@@ -22,20 +22,13 @@ class GPSDError(Exception):
 
 
 class gpsdInterface():
-    # constants and stuff here
-    bbb_uart_tty_map = {
-        "UART1": "/dev/ttyO1",
-        "UART2": "/dev/ttyO2",
-        "UART4": "/dev/ttyO4",
-        "UART5": "/dev/ttyO5"}
 
-    rpi_uart_tty_map = {"default": "/dev/ttyAMA0"}
-
-    def __init__(self, uart="default", debug=False):
+    def __init__(self, interface="", hw_interface=None, debug=False):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
         self.debug = debug
-        self.uart = "UART4"
+        self.uart = interface
+        self.tty = hw_interface
         self.num_sat = 0
 
         # Default answer. Defined here to include num_sat
@@ -59,38 +52,27 @@ class gpsdInterface():
 
         # Do setup for BeagleBone Black
         if hw_config.platform == 'BBB':
-            # This is kind of a dirty fix, something smoother will follow
-            if self.uart == "default":
-                self.uart = "UART4"
 
-            if not self.uart in self.bbb_uart_tty_map:
-                logging.error("GPSD Interface:\tThe serial interface %s " +
-                    "is not supported.", uart)
-                return 1
             if not self.setup_bbb():
                 return 1
 
         # Do setup for RaspberryPi
         elif hw_config.platform == 'RPi':
-            self.tty = self.rpi_uart_tty_map[self.uart]
+            pass  # nothing to be done here
 
         call(["gpsd", self.tty])
         self.session = gps.gps(mode=gps.WATCH_ENABLE)
-        logging.info("GPSD Interface:\tInitialization complete.")
+        logging.info("GPSD:\tInitialization complete.")
 
     def setup_bbb(self):
-        # Ugly inline import right here! Booya.
-        #import Adafruit_BBIO.UART as UART
-
-        self.tty = self.bbb_uart_tty_map[self.uart]
         num_failed_tries = 0
         while not self.setup_bbb_uart():
             if num_failed_tries < 10:
-                logging.error("GPSD Interface:\tCould not connect to " +
+                logging.error("GPSD:\tCould not connect to " +
                     "serial interface. Trying again..")
                 num_failed_tries += 1
             else:
-                logging.error("GPSD Interface:\tFailed to connect to " +
+                logging.error("GPSD:\tFailed to connect to " +
                     "serial interface. Aborting.")
                 return False
         return True
@@ -112,17 +94,17 @@ class gpsdInterface():
         if hw_config.platform == 'BBB':
             self.ser.close()
         # UART.cleanup(uart)    # not functional right now according to Adafruit
-        logging.info("GPSD Interface:\tTear-down complete.")
+        logging.info("GPSD:\tTear-down complete.")
         return 0
 
     def read_raw_gpsd_data(self):
         """Read the newest data from gpsd and return it"""
         try:
-            #if self.session.waiting():
-            report = self.session.next()
-            return report
-            #else:
-            #   return None
+            if self.session.waiting():
+                report = self.session.next()
+                return report
+            else:
+                return None
         except StopIteration:
             raise GPSDError()
 
@@ -130,8 +112,10 @@ class gpsdInterface():
         """Read the newest data from gpsd and return a formatted version.
             Not active right now."""
         data = self.read_raw_gpsd_data()
+        if data is None:
+            return self.latest_return
 
-        if data.get('class') == 'TPV':
+        if data['class'] == 'TPV':
             if data.get('mode') == 1:  # really a number, not a string?
                 return self.default_answer
             else:
@@ -151,7 +135,7 @@ class gpsdInterface():
             else:
                 self.num_sat = 0
         else:
-            return self.latest_answer
+            return self.latest_return
 
 
 if __name__ == "__main__":

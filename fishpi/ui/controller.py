@@ -38,6 +38,7 @@ def run_main_view_wx(config):
 
     # ip address *much* faster than by device name
     ipaddr = socket.gethostbyname(config.server_name)
+    logging.debug("RPC:\tServer name %s resolved to IP address %s" % (config.server_name, ipaddr))
 
     # create rpc client
     from web.webclient import RPCClient, RPCClientFactory

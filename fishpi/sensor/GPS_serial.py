@@ -50,9 +50,9 @@ class GPS_AdafruitSensor:
     #  how long to wait when we're looking for a response
     MAXWAITSENTENCE = 5
 
-    def __init__(self, serial_bus="/dev/ttyAMA0", baud=9600, debug=False):
+    def __init__(self, interface="", hw_interface="/dev/ttyAMA0", baud=9600, debug=False):
         self.debug = debug
-        self._GPS = serial.Serial(serial_bus, baud)
+        self._GPS = serial.Serial(hw_interface, baud)
         #self._GPS.write(self.PMTK_Q_RELEASE)
         #self._version = self._GPS.readline(20)
         self._GPS.write(self.PMTK_SET_NMEA_UPDATE_1HZ)

@@ -162,6 +162,7 @@ class FishPiKernel:
             self.data.compass_pitch = pitch
             self.data.compass_roll = roll
             self.data.has_compass = True
+            # logging.info("CORE:\tHeading: %f, Pitch: %f, Roll: %f" % (heading, pitch, roll))
         else:
             self.data.has_compass = False
 

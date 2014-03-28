@@ -59,6 +59,14 @@ class MainViewController:
         
             # other data
             self.model.temperature = self._rpc_client.data.temperature
+
+            # some debugging:
+            logging.debug("GPS:\tLat = %s" % str(self.model.GPS_latitude))
+            logging.debug("GPS:\tLon = %s" % str(self.model.GPS_longitude))
+            logging.debug("GPS:\tHead = %s" % str(self.model.GPS_heading))
+            logging.debug("GPS:\tSpeed = %s" % str(self.model.GPS_speed))
+            logging.debug("GPS:\tAlt = %s" % str(self.model.GPS_altitude))
+            logging.debug("Compass:\tHead = %s" % str(self.model.compass_heading))
     
     # Control modes (Manual, AutoPilot)
     def set_manual_mode(self):
