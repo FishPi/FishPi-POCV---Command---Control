@@ -1,15 +1,6 @@
-
-
 #
 # FishPi - An autonomous drop in the ocean
 #
-# A new localconfig with a different approach:
-# Load a config file (or various) with information about sensors and actuators.
-# Drivers are imported dynamically and hardware is set up when needed.
-# If a device can not be loaded (or is not specified) a dummy is used instead.
-# All drivers need a unified interface for this approach. That means that all
-# drivers that are provided by the vendor need a wrapper that creates
-# the interface.
 
 import ConfigParser
 import logging
@@ -17,6 +8,12 @@ import logging.handlers
 import os
 import platform
 import time
+
+from dummy_devices import (
+    DummyCameraController,
+    DummyCompassSensor,
+    DummyDriveController,
+    DummyTemperatureSensor)
 
 
 class ConfigError(Exception):
@@ -348,11 +345,11 @@ class FishPiConfig(object):
             # set dummy gps here. gpsfake in combination with gpsd?
 
         if not self.compass_sensor:
-            pass
+            self.compass_sensor = DummyCompassSensor()
             # set dummy compass here.
 
         if not self.temperature_sensor:
-            pass
+            self.temperature_sensor = DummyTemperatureSensor()
             # set dummy temp sensor here. what is this thing for anyways?
 
         if not self.drive_controller:
@@ -361,52 +358,6 @@ class FishPiConfig(object):
         if not self.camera_controller:
             self.camera_controller = DummyCameraController(
                 self.resources_folder())
-
-
-class DummyCameraController(object):
-    """ 'Dummy' camera controller that just logs. """
-
-    def __init__(self, resources_folder):
-        self.enabled = False
-        from PIL import Image
-        temp_image_path = os.path.join(resources_folder, 'camera.jpg')
-        self._last_img = Image.open(temp_image_path)
-
-    def capture_now(self):
-        if self.enabled:
-            logging.debug("CAM:\tCapture image.")
-        pass
-
-    @property
-    def last_img(self):
-        return self._last_img
-
-
-class DummyDriveController(object):
-    """ 'Dummy' drive controller that just logs. """
-
-    # current state
-    throttle_level = 0.0
-    steering_angle = 0.0
-
-    def __init__(self):
-        pass
-
-    def set_throttle(self, throttle_level):
-        logging.debug("DRIVE:\tThrottle set to: %s" % throttle_level)
-        self.throttle_level = throttle_level
-        pass
-
-    def set_steering(self, angle):
-        logging.debug("DRIVE:\tSteering set to: %s" % angle)
-        self.steering_angle = angle
-        pass
-
-    def halt(self):
-        logging.debug("DRIVE:\tDrive halting.")
-        self.throttle_level = 0.0
-        self.steering_angle = 0.0
-        pass
 
 
 class VehicleConstants:

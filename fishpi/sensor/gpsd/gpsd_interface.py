@@ -11,6 +11,8 @@ if hw_config.platform == 'BBB':
     import Adafruit_BBIO.UART as UART
 
 import gps
+import os
+import psutil
 import serial
 from subprocess import call
 import logging
@@ -23,7 +25,7 @@ class GPSDError(Exception):
 
 class gpsdInterface():
 
-    def __init__(self, interface="", hw_interface=None, debug=False):
+    def __init__(self, interface="", hw_interface="/dev/ttyO4", debug=False):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
         self.debug = debug
@@ -52,7 +54,6 @@ class gpsdInterface():
 
         # Do setup for BeagleBone Black
         if hw_config.platform == 'BBB':
-
             if not self.setup_bbb():
                 return 1
 
@@ -60,9 +61,19 @@ class gpsdInterface():
         elif hw_config.platform == 'RPi':
             pass  # nothing to be done here
 
+        # stop gpsd if it is running
+        self.stop_gpsd()
+
         call(["gpsd", self.tty])
         self.session = gps.gps(mode=gps.WATCH_ENABLE)
         logging.info("GPSD:\tInitialization complete.")
+
+    # This is untested!!
+    def stop_gpsd(self):
+        """ Searches for running instances of gpsd and kill them """
+        for proc in psutil.process_iter():
+            if proc.name == "gpsd":
+                os.kill(proc.pid)
 
     def setup_bbb(self):
         num_failed_tries = 0
