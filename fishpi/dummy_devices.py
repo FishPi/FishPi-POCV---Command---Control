@@ -58,6 +58,8 @@ class DummyCompassSensor(object):
     def __init__(self, interface="", hw_interface="-1", debug=False,
             heading=0.0, pitch=0.0, roll=0.0):
         self.debug = debug
+        if self.debug:
+            logging.basicConfig(level=logging.DEBUG)
         self.heading = heading
         self.pitch = pitch
         self.roll = roll
@@ -71,7 +73,7 @@ class DummyCompassSensor(object):
 class DummyTemperatureSensor(object):
     """ 'Dummy' temperature sensor that outputs a static temperature value. """
 
-    def __init__(self, interface="", hw_interface="-1", debug=False,
+    def __init__(self, interface="", hw_interface="", debug=False,
             temperature=0.0):
         self.debug = debug
         self.temperature = temperature
@@ -80,3 +82,27 @@ class DummyTemperatureSensor(object):
         logging.debug("SENSOR:\tDUMMY_TEMP:\tTemperature: %f",
             self.temperature)
         return self.temperature
+
+
+class DummyGPSSensor(object):
+    """ 'Dummy' GPS sensor that outputs static GPS data. """
+    def __init__(self, interface="", hw_interface="", debug=False,
+            fix=1, lat=0.0, lon=0.0, head=0.0, speed=0.0, alt=0.0,
+            sat=0, time="", date=""):
+        self.gps_data = (
+            fix,      # fix
+            lat,      # lat
+            lon,      # lon
+            head,     # heading
+            speed,    # speed
+            alt,      # altitude
+            sat,      # num_sat
+            time,     # timestamp
+            date)     # datestamp
+
+    def read_sensor(self):
+        logging.debug(("SENSOR:\tDUMMY_GPS:\tFix: %d, Lat: %f, Lon: %f, " +
+            "Heading: %f, Speed: %f, Altitude: %f, Satellites: %d, " +
+            "Time: %s, Date: %s") %
+            self.gps_data)
+        return self.gps_data

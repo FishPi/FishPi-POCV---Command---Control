@@ -65,10 +65,10 @@ class FishPi:
 
         # init rest
         logging.info("FISHPI:\tInitializing FishPi (v{0})...".format(FISH_PI_VERSION))
-	
-	# add current working dir to include path
-	sys.path.append(os.getcwd())
-	
+    
+    # add current working dir to include path
+    sys.path.append(os.getcwd())
+    
     def self_check(self):
         # TODO implement check for .lastState file
         # check contents for run mode and stable exit

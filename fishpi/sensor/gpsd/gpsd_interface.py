@@ -25,7 +25,8 @@ class GPSDError(Exception):
 
 class gpsdInterface():
 
-    def __init__(self, interface="", hw_interface="/dev/ttyO4", debug=False):
+    def __init__(self, interface="UART4", hw_interface="/dev/ttyO4",
+            debug=False):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
         self.debug = debug
@@ -128,7 +129,7 @@ class gpsdInterface():
 
         if data['class'] == 'TPV':
             if data.get('mode') == 1:  # really a number, not a string?
-                return self.default_answer
+                return self.default_return
             else:
                 self.latest_return = (
                     data.get('mode'),
@@ -152,7 +153,7 @@ class gpsdInterface():
 if __name__ == "__main__":
     from time import sleep
     gps_handler = gpsdInterface(debug=True)
-    print 'ASPilot gpsd Interface Example'
+    print 'FishPi gpsd Interface Example'
     while True:
         print gps_handler.read_raw_gpsd_data()
         sleep(1)

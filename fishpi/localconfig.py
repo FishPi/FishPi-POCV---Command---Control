@@ -13,6 +13,7 @@ from dummy_devices import (
     DummyCameraController,
     DummyCompassSensor,
     DummyDriveController,
+    DummyGPSSensor,
     DummyTemperatureSensor)
 
 
@@ -43,7 +44,10 @@ class FishPiConfig(object):
         # load vehicle constants
         self._vehicle_constants = VehicleConstants()
 
+        # setup folders
         self.setup_dirs()
+
+        # setup logging
         self.setup_logging()
 
     @property
@@ -121,6 +125,12 @@ class FishPiConfig(object):
             connected devices are specified. The resources are imported
             dynamically and the device drivers are set up. """
 
+        # # setup folders
+        # self.setup_dirs()
+
+        # # setup logging
+        # self.setup_logging(debug)
+
         # only configure devices for Linux
         if not(platform.system() == "Linux"):
             logging.info("CFG:\tNot running on Linux distro. " +
@@ -168,6 +178,11 @@ class FishPiConfig(object):
         # TODO setup logging (from config)
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
+        # TODO: Check why this is not working correctly!
+        # if debug:
+        #     logger.setLevel(logging.DEBUG)
+        # else:
+        #     logger.setLevel(logging.INFO)
         console = logging.StreamHandler()
         logger.addHandler(console)
 
@@ -341,23 +356,28 @@ class FishPiConfig(object):
         # Later this should be handled differently
 
         if not self.gps_sensor:
-            pass
+            self.gps_sensor = DummyGPSSensor(fix=3, lat=90)
+            logging.info("CFG:\tLoaded dummy GPS driver")
             # set dummy gps here. gpsfake in combination with gpsd?
 
         if not self.compass_sensor:
             self.compass_sensor = DummyCompassSensor()
+            logging.info("CFG:\tLoaded dummy compass driver")
             # set dummy compass here.
 
         if not self.temperature_sensor:
             self.temperature_sensor = DummyTemperatureSensor()
+            logging.info("CFG:\tLoaded dummy temperature driver")
             # set dummy temp sensor here. what is this thing for anyways?
 
         if not self.drive_controller:
             self.drive_controller = DummyDriveController()
+            logging.info("CFG:\tLoaded dummy drive driver")
 
         if not self.camera_controller:
             self.camera_controller = DummyCameraController(
                 self.resources_folder())
+            logging.info("CFG:\tLoaded dummy camera driver")
 
 
 class VehicleConstants:
