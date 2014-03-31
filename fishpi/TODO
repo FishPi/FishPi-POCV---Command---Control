@@ -1,0 +1,5 @@
+TODO:
+
+-modify gpsd_interface
+-modify drive controller to have configure function rather than init that does everything
+-maybe everyone should have configure instead of init?
