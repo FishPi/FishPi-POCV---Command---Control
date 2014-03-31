@@ -21,4 +21,3 @@ error: command 'cc' failed with exit status 1"
 
 While that can't really be a permanent solution, for now this issue can be solved by prepending this to the installation command: "ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future"
 So, installing Fabric with pip would be become "ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future pip install fabric"
-
