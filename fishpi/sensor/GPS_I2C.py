@@ -19,7 +19,8 @@
 import logging
 from datetime import datetime
 
-from Adafruit_I2C import Adafruit_I2C
+# from Adafruit_I2C import Adafruit_I2C
+from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
 
 class GPS_NavigatronSensor:
     """ GPS Navigatron over I2C. """
@@ -53,11 +54,11 @@ class GPS_NavigatronSensor:
     # UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
     I2C_GPS_TIME = 39
 
-    def __init__(self, address=0x20, i2c_bus=None, debug=False):
-        if i2c_bus is None:
+    def __init__(self, address=0x20, interface="", hw_interface="-1", debug=False):
+        if hw_interface is None:
             self.i2c = Adafruit_I2C(address, debug=debug)
         else:
-            self.i2c = Adafruit_I2C(address, bus=i2c_bus, debug=debug)
+            self.i2c = Adafruit_I2C(address, busnum=int(hw_interface), debug=debug)
         self.address = address
         self.debug = debug
         if self.debug:

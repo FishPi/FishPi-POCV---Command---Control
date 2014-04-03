@@ -8,16 +8,17 @@
 #
 # Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
 
-from Adafruit_I2C import Adafruit_I2C
+# from Adafruit_I2C import Adafruit_I2C
+from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
 
 class TemperatureSensor:
     """ Temperature Sensor using Tmp102 TI chip over I2C """
 
-    def __init__(self, address=0x48, i2c_bus=None, debug=False):
-        if i2c_bus is None:
+    def __init__(self, address=0x48, interface="", hw_interface="-1", debug=False):
+        if hw_interface is None:
             self.i2c = Adafruit_I2C(address, debug=debug)
         else:
-            self.i2c = Adafruit_I2C(address, bus=i2c_bus, debug=debug)
+            self.i2c = Adafruit_I2C(address, busnum=int(hw_interface), debug=debug)
         self.address = address
         self.debug = debug
 

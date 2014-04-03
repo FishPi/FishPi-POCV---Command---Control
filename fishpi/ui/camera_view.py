@@ -18,7 +18,8 @@ class CameraPanel(wx.Panel):
     
     def __init__(self, parent, server, port, enabled=True):
         wx.Panel.__init__(self, parent, size=(320,240), style=wx.SUNKEN_BORDER)
-        self.enabled = enabled
+        # self.enabled = enabled
+        self.enabled = False  # debug. Remove this!!!
         if self.enabled:
             ipaddr = socket.gethostbyname(server)
             self._conn = httplib.HTTPConnection(ipaddr, port)

@@ -1,0 +1,23 @@
+How to install Fabric:
+
+The new deploy system uses Fabric for its deploys. In order to use it, you need to install Fabric on your development machine. 
+If you have pip or easy_install, that is pretty straightforward.
+If you don't install one of those two tool (preferably pip, as it is newer) first. 
+Visit http://www.pip-installer.org/en/latest/installing.html for finding out how to install pip. 
+If you want to install easy_install, check this page out: https://pypi.python.org/pypi/setuptools#installing-and-using-setuptools
+
+Ok, now that you have either pip or easy_install, installing Fabric is easy:
+Just open a terminal and type "pip install fabric" or "easy_install fabric".
+Depending on your operating system and your user privileges you might have to add a "sudo" in front of the command. 
+
+Note:
+"pip install fabric" failed on my system, because pip couldn't find Fabric's dependency Paramiko. However, running "pip install paramiko" before installing Fabric worked fine.
+
+Note for OSX Mavericks:
+Starting with Xcode 5.1 unknown compiler flags are treated as errors. This might cause the install to fail with an error message like:
+"clang: error: unknown argument: '-mno-fused-madd' [-Wunused-command-line-argument-hard-error-in-future]
+clang: note: this will be a hard error (cannot be downgraded to a warning) in the future
+error: command 'cc' failed with exit status 1"
+
+While that can't really be a permanent solution, for now this issue can be solved by prepending this to the installation command: "ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future"
+So, installing Fabric with pip would be become "ARCHFLAGS=-Wno-error=unused-command-line-argument-hard-error-in-future pip install fabric"

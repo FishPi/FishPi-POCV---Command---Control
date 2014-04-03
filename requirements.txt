@@ -1,0 +1,6 @@
+PIL
+psutil
+twisted
+wx
+Adafruit_Libraries
+smbus

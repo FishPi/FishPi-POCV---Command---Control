@@ -19,7 +19,7 @@ def board_ver():
         results[k.strip()] = v.strip()
     return results['Revision']
 
-def i2c_bus():
+def i2c_bus(bus=""):
     ver = board_ver()
     if int(ver) > 4:
         return smbus.SMBus(1)
@@ -33,7 +33,7 @@ def i2c_bus_num():
     else:
         return '0'
 
-def serial_bus():
+def serial_bus(bus=""):
     return "/dev/ttyUSB0"
     #return "/dev/ttyAMA0"
 

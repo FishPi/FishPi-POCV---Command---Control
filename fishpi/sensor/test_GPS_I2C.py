@@ -30,7 +30,7 @@ if __name__ == "__main__":
     print "Testing GPS sensor (running 5x with 5s pause)..."
 
     print "Initialising..."
-    gps_sensor = GPS_NavigatronSensor(i2c_bus=raspberrypi.i2c_bus(), debug=True)
+    gps_sensor = GPS_NavigatronSensor(interface=raspberrypi.i2c_bus(), debug=True)
 
     # test raw conversion logic
     #test_buffer_conversion(gps_sensor)
