@@ -33,7 +33,7 @@ Clone this repository to your local machine.
 - Install Fabric on your local machine (see the "How to install Fabric" file).
 - Make sure you have a network connection to the embedded device and the device has internet access.
 - Open a terminal session on your local machine, navigate to the FishPi directory and run "fab full_install".
-- When prompted for a host, specify the remote device like this: "username@host_address", you will then asked for the user password.
+- When prompted for a host, specify the remote device like this: "username@host_address", you will then be asked for the user password.
 - Wait and let Fabric do its magic. :-) Done!
 
 
