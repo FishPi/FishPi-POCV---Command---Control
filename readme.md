@@ -25,16 +25,16 @@ The FishPi software is being developed in Python (2.7) inline with the education
 
 Clone this repository to your local machine.
 
-To install FishPi on your local machine:
--Make sure you have pip installed.
--Open a terminal, navigate to your FishPi directory and run "pip install -r requirements.txt".
+#### To install FishPi on your local machine:
+- Make sure you have pip installed.
+- Open a terminal, navigate to your FishPi directory and run "pip install -r requirements.txt".
 
-To install FishPi on the embedded device (RaspberryPi or BeagleBone Black):
--Install Fabric on your local machine (see the "How to install Fabric" file).
--Make sure you have a network connection to the embedded device and the device has internet access.
--Open a terminal session on your local machine, navigate to the FishPi directory and run "fab full_install".
--When prompted for a host, specify the remote device like this: "username@host_address", you will then asked for the user password.
--Wait and let Fabric do its magic. :-) Done!
+#### To install FishPi on the embedded device (RaspberryPi or BeagleBone Black):
+- Install Fabric on your local machine (see the "How to install Fabric" file).
+- Make sure you have a network connection to the embedded device and the device has internet access.
+- Open a terminal session on your local machine, navigate to the FishPi directory and run "fab full_install".
+- When prompted for a host, specify the remote device like this: "username@host_address", you will then asked for the user password.
+- Wait and let Fabric do its magic. :-) Done!
 
 
 ### Usage ###
