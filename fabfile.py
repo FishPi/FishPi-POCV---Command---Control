@@ -7,7 +7,10 @@ from __future__ import with_statement
 from fabric.api import cd, local, run, sudo, settings
 from fabric.utils import puts
 
-code_dir = '/usr/local/src/fishpi/'
+import sys
+
+
+embedded_code_dir = '/usr/local/src/fishpi/'
 
 
 def package_installed(pkg_name):
@@ -33,7 +36,7 @@ def push():
 
 ### High level functions ###
 
-def install_requirements():
+def install_requirements(code_dir):
     # check if pip is installed
     if not package_installed('python-pip'):
         install('python-pip')
@@ -42,15 +45,15 @@ def install_requirements():
         sudo("pip install -r requirements.txt")
 
 
-def deploy():
+def deploy_embedded():
     if not package_installed('git'):
         install('git')
 
     with settings(warn_only=True):
-        if run("test -d %s" % code_dir).failed:
+        if run("test -d %s" % embedded_code_dir).failed:
             puts("Cloning FishPi repository...")
-            sudo("git clone https://github.com/SvenChmie/FishPi-POCV---Command---Control.git %s" % code_dir)
-    with cd(code_dir):
+            sudo("git clone https://github.com/SvenChmie/FishPi-POCV---Command---Control.git %s" % embedded_code_dir)
+    with cd(embedded_code_dir):
         puts("Pulling newest changes from FishPi repository...")
         sudo("git pull")
 
@@ -60,6 +63,19 @@ def prepare_deploy():
     push()
 
 
-def full_install():
-    deploy()
-    install_requirements()
+def install_embedded():
+    """ Install FishPi on the embedded remote device """
+    deploy_embedded()
+    install_requirements(embedded_code_dir)
+
+
+def install_desktop():
+    """ Install FishPi on the developer machine """
+    install_requirements('')
+    # Install PIL in case it failed with pip (which it sometimes does)
+    # and Imaging-TK on Linux.
+    if sys.platform.startswith('linux'):
+        if not package_installed('python-imaging'):
+            install('python-imaging')
+        if not package_installed('Python-Imaging-Tk'):
+            install('Python-Imaging-Tk')
