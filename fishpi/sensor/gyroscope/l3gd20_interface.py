@@ -10,24 +10,25 @@ from L3GD20 import L3GD20
 from L3GD20 import L3GD20_range
 import logging
 
+
 class ConnectionError(Exception):
     '''Exception class indicating that an occured while connection to the remote device'''
     pass
 
+
 class Gyroscope(object):
-    
+
     def __init__(self, interface="", hw_interface="-1", debug=False, rng=L3GD20_range.R250DPS):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
         self.gyro_handler = L3GD20(busnum=int(hw_interface), debug=debug, rng=rng)
-    
+
     def tear_down(self):
         logging.info("GYRO:\tTear-down complete, nothing to be done.")
-    
+
     def read_sensor(self):
         data = self.gyro_handler.read()
         return data
-    
 
 
 if __name__ == "__main__":

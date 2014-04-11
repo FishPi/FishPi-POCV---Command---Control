@@ -9,6 +9,7 @@
 # if this does not work, the 9 after the bone_capemgr. might be an 8 or
 # some other digit.
 
+# THIS IS NOT USED RIGHT NOW. SEE compass_interface.py
 
 from Adafruit_LSM303 import Adafruit_LSM303
 import logging
@@ -19,7 +20,7 @@ class LSM303(object):
         self._setup_complete = False
         self.device_handler = None
 
-    def setup(self, interface=-1, debug=False, hires=False):
+    def setup(self, interface="-1", debug=False, hires=False):
         if self._setup_complete:
             return
         self.device_handler = Adafruit_LSM303(debug=debug)
@@ -34,10 +35,10 @@ sensor = LSM303()
 
 class Magnetometer(object):
 
-    def __init__(self, interface=-1, debug=False, hires=False):
+    def __init__(self, interface="-1", debug=False, hires=False):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
-        sensor.setup(busnum=interface, debug=debug, hires=hires)
+        sensor.setup(busnum=int(interface), debug=debug, hires=hires)
 
     def tear_down(self):
         logging.info("Magnetometer Interface:\tTear-down complete, " +
@@ -50,10 +51,10 @@ class Magnetometer(object):
 
 class Accelerometer(object):
 
-    def __init__(self, interface=-1, debug=False, hires=False):
+    def __init__(self, interface="-1", debug=False, hires=False):
         if debug:
             logging.basicConfig(level=logging.DEBUG)
-        sensor.setup(busnum=interface, debug=debug, hires=hires)
+        sensor.setup(busnum=int(interface), debug=debug, hires=hires)
 
     def tear_down(self):
         logging.info("Accelerometer Interface:\tTear-down complete, " +

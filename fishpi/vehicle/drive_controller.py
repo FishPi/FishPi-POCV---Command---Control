@@ -17,7 +17,7 @@
 # Standard meduim model servo for steering
 #
 
-import time
+# import time
 import logging
 
 # from Adafruit_I2C import Adafruit_I2C
@@ -25,15 +25,15 @@ from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
 
 class DriveController:
     """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
-        
+
     # initially setting to full left / right (of servo) to +/- Pi/2
     FULL_LEFT_SERVO = -1.570796
     FULL_RIGHT_SERVO = 1.570796
-        
+
     # initially setting to full left / right (of allowed movement) to +/- Pi/4
     FULL_LEFT_ALLOWED = -0.785398
     FULL_RIGHT_ALLOWED = 0.785398
-    
+
     # current state
     throttle_level = 0.0
     steering_angle = 0.0
@@ -90,19 +90,19 @@ class DriveController:
 class PyJuiceDriveController(DriveController):
     """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
 
-    def __init__(self, i2c_addr=0x32, i2c_bus=None, prop_channel=2, servo_channel=1, debug=False):
+    def __init__(self, i2c_addr=0x32, interface="", hw_interface="-1", prop_channel=2, servo_channel=1, debug=False):
         self.debug = debug
         self.prop_channel = prop_channel
         self.servo_channel = servo_channel
         # Initialise the PWM device
-        if i2c_bus is None:
+        if hw_interface == "-1":
             self.i2c_bus = Adafruit_I2C(i2c_addr, debug=debug)
-    	else:
-            self.i2c_bus = Adafruit_I2C(i2c_addr, bus=i2c_bus, debug=debug)
+        else:
+            self.i2c_bus = Adafruit_I2C(i2c_addr, bus=int(hw_interface), debug=debug)
         # Set initial positions to centre
         self.set_servo_pulse(self.prop_channel, 1.5)
         self.set_servo_pulse(self.servo_channel, 1.5)
-    
+
     def set_servo_pulse(self, channel, pulse):
         """ 1000 is ~1ms pulse so standard servo would be in range 1000 <- 1500 -> 2000 """
         actual_pulse_value = int(pulse * 1000)
@@ -114,17 +114,17 @@ class AdafruitDriveController(DriveController):
     # TODO might need tuning or configuring
     #servoMin = 150  # Min pulse length out of 4096
     #servoMax = 600  # Max pulse length out of 4096
-    
+
     # 'standard' analog servo freq
     ic_pwm_freq = 60
 
-    def __init__(self, i2c_addr=0x40, i2c_bus=None, prop_channel=0, servo_channel=1, debug=False):
+    def __init__(self, i2c_addr=0x40, interface="", hw_interface="-1", prop_channel=0, servo_channel=1, debug=False):
         self.debug = debug
         self.prop_channel = prop_channel
         self.servo_channel = servo_channel
         # Initialise the PWM device
         from Adafruit.PWM_Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
-        # self._pwm = PWM(i2c_addr, i2c_bus=i2c_bus, debug=debug)
+        # self._pwm = PWM(i2c_addr, i2c_bus=int(hw_interface), debug=debug)
         self._pwm = PWM(i2c_addr, debug=debug)
         self._pwm.setPWMFreq(self.ic_pwm_freq)
         # Set initial positions to centre

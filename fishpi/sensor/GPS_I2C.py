@@ -55,7 +55,7 @@ class GPS_NavigatronSensor:
     I2C_GPS_TIME = 39
 
     def __init__(self, address=0x20, interface="", hw_interface="-1", debug=False):
-        if hw_interface is None:
+        if hw_interface == "-1":
             self.i2c = Adafruit_I2C(address, debug=debug)
         else:
             self.i2c = Adafruit_I2C(address, busnum=int(hw_interface), debug=debug)
