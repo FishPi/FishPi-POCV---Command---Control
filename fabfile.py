@@ -18,7 +18,7 @@ embedded_code_dir = '/usr/local/src/fishpi/'
 def determine_system_info():
     env.os = platform.system()
     if env.os == 'Linux':
-        env.os_distname, env.os_version, encv.os_id = platform.linux_distribution()
+        env.os_distname, env.os_version, env.os_id = platform.linux_distribution()
 
 
 def install_embedded():
@@ -29,6 +29,16 @@ def install_embedded():
         install('python-pip')
 
     install_requirements(embedded_code_dir)
+
+# This i unused to far
+def install_pip():
+    """ Install pip using the Python script from their website """
+    wget("https://raw.github.com/pypa/pip/master/contrib/get-pip.py")
+    run("python get-pip.py")
+
+
+def wget(url):
+    run("wget --progress=dot:mega -c %s" % url)
 
 
 def deploy_embedded():
@@ -75,7 +85,7 @@ def install_desktop():
         return False
 
     if not package_installed_local('python-pip'):
-        install_local('python-pip')
+        install_local('python-pip')   # This has a problem. pip for ubuntu precise is terribly old
 
     # Let's install wx
     install_wx_local()
@@ -85,22 +95,26 @@ def install_desktop():
     # Ok, let's see if the installation of PIL succeeded. If not, install it via apt-get
     if not package_installed_local('python-imaging'):
         install_local('python-imaging')
-    if not package_installed_local('Python-Imaging-Tk'):
-        install_local('Python-Imaging-Tk')
+    # This doesn't work. There is no package Python-Imaging-Tk for ubuntu precise
+    #if not package_installed_local('Python-Imaging-Tk'):
+    #    install_local('Python-Imaging-Tk')
 
 
+# better download and build from source?
 def install_wx_local():
     determine_system_info()
-    if env.os != 'Linux' or env.os_distname != ('debian' or 'ubuntu'):
-        puts("This does not seem to be a debian-like Linux. Sorry, the Python wx installer does not work on this platform.")
+    print env.os.lower(), env.os_distname.lower()
+    if env.os.lower() != 'linux' or (env.os_distname.lower() != ('debian' and 'ubuntu')):  # make this case-insensitive!!
+        puts("This does not seem to be a Debian-based Linux. Sorry, the Python wx installer does not work on this platform.")
         return
     if env.os_id == '':
         env.os_id = 'squeeze'  # This is a dirty fix. Would this work under Ubuntu?
 
     local("curl http://apt.wxwidgets.org/key.asc | sudo apt-key add -")
+    # This does not work. WX Repos are old as stone..
     local("""echo "# wxWidgets/wxPython repository at apt.wxwidgets.org
         deb http://apt.wxwidgets.org/ %s-wx main
-        deb-src http://apt.wxwidgets.org/ %s-wx main" >> /etc/apt/sources.list""" % (env.os_id, env.os_id))
+        deb-src http://apt.wxwidgets.org/ %s-wx main" | sudo tee -a /etc/apt/sources.list""" % (env.os_id, env.os_id))
     local("sudo apt-get update")
     local("sudo apt-get install python-wxgtk2.8 python-wxtools wx2.8-i18n")
 
@@ -121,9 +135,9 @@ def install_local(pkg_name):
 def install_local_requirements():
     # get dir of fabfile
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    with cd(current_dir):
+    with cd(current_dir), settings(warn_only=True):
         puts("Installing required Python libraries...")
-        sudo("pip install -r requirements.txt")
+        local("sudo pip install -r requirements.txt")
 
 
 #########################
