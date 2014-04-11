@@ -1,4 +1,6 @@
-PIL
+# add versions here!!
+
+--allow-external PIL --allow-unverified PIL PIL
 psutil
 twisted
 wx
