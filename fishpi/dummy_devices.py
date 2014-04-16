@@ -18,7 +18,6 @@ class DummyCameraController(object):
     def capture_now(self):
         if self.enabled:
             logging.debug("CAM:\tCapture image.")
-        pass
 
     @property
     def last_img(self):
@@ -38,18 +37,15 @@ class DummyDriveController(object):
     def set_throttle(self, throttle_level):
         logging.debug("DRIVE:\tThrottle set to: %s" % throttle_level)
         self.throttle_level = throttle_level
-        pass
 
     def set_steering(self, angle):
         logging.debug("DRIVE:\tSteering set to: %s" % angle)
         self.steering_angle = angle
-        pass
 
     def halt(self):
         logging.debug("DRIVE:\tDrive halting.")
         self.throttle_level = 0.0
         self.steering_angle = 0.0
-        pass
 
 
 class DummyCompassSensor(object):

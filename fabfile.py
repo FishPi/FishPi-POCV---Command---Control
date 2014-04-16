@@ -49,7 +49,7 @@ def deploy():
     with settings(warn_only=True):
         if run("test -d %s" % code_dir).failed:
             puts("Cloning FishPi repository...")
-            sudo("git clone https://github.com/SvenChmie/FishPi-POCV---Command---Control.git %s" % code_dir)
+            sudo("git clone https://github.com/FishPi/FishPi-POCV---Command---Control.git %s" % code_dir)
     with cd(code_dir):
         puts("Pulling newest changes from FishPi repository...")
         sudo("git pull")

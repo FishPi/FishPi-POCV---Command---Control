@@ -246,7 +246,6 @@ class FishPiConfig(object):
             return None
         return ret_class
 
-    # let's not use that yet!
     def _load_platform_code(self, platform_conf):
         """ Interpret the platform configuration and import
             the needed libraries """
@@ -342,7 +341,7 @@ class FishPiConfig(object):
         except KeyError, e:
             logging.error(("CGF:\tError while configuring %s: %s." +
                 "Configuring dummy device instead.") % (config['name'], e))
-            return None
+            return {}     # This should not return None, driver loading crashes if it does!
 
     def _scan_i2c(self, debug=False):
         """ Internal function to scan an I2C bus for devices """
@@ -372,7 +371,7 @@ class FishPiConfig(object):
 
         if not self.drive_controller:
             self.drive_controller = DummyDriveController()
-            logging.info("CFG:\tLoaded dummy drive driver")
+            logging.info("CFG:\tLoaded dummy drive controller")
 
         if not self.camera_controller:
             self.camera_controller = DummyCameraController(

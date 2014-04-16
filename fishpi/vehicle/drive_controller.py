@@ -23,7 +23,7 @@ import logging
 # from Adafruit_I2C import Adafruit_I2C
 from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
 
-class DriveController:
+class DriveController(object):
     """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
 
     # initially setting to full left / right (of servo) to +/- Pi/2
@@ -87,6 +87,7 @@ class DriveController:
         """ Standard servo would be in range 1ms <- 1.5ms -> 2.0ms """
         pass
 
+
 class PyJuiceDriveController(DriveController):
     """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
 
@@ -95,21 +96,26 @@ class PyJuiceDriveController(DriveController):
         self.prop_channel = prop_channel
         self.servo_channel = servo_channel
         # Initialise the PWM device
+        # if hw_interface is None:
+        #     hw_interface = "-1"     # need better solution here!!
         if hw_interface == "-1":
             self.i2c_bus = Adafruit_I2C(i2c_addr, debug=debug)
         else:
-            self.i2c_bus = Adafruit_I2C(i2c_addr, bus=int(hw_interface), debug=debug)
+            self.i2c_bus = Adafruit_I2C(i2c_addr, busnum=int(hw_interface), debug=debug)
         # Set initial positions to centre
         self.set_servo_pulse(self.prop_channel, 1.5)
         self.set_servo_pulse(self.servo_channel, 1.5)
 
     def set_servo_pulse(self, channel, pulse):
-        """ 1000 is ~1ms pulse so standard servo would be in range 1000 <- 1500 -> 2000 """
+        """ 1000 is ~1ms pulse so standard servo would be in
+            range 1000 <- 1500 -> 2000 """
         actual_pulse_value = int(pulse * 1000)
-        self.i2c_bus.writeWord(channel, actual_pulse_value)
+        self.i2c_bus.write16(channel, actual_pulse_value)
+
 
 class AdafruitDriveController(DriveController):
-    """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
+    """ Provides drive and steering control abstraction from eg PWM servo or
+        ESC devices. """
 
     # TODO might need tuning or configuring
     #servoMin = 150  # Min pulse length out of 4096
