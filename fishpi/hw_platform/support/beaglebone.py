@@ -8,7 +8,7 @@ import logging
 import smbus
 
 # This is to satisfy the driver includes. hope they work..
-import Adafruit.I2C.Adafruit_I2C as Adafruit_I2C
+# import Adafruit.I2C.Adafruit_I2C as Adafruit_I2C
 
 import hw_platform.hw_config as hw_config
 

@@ -7,6 +7,7 @@ import logging
 import logging.handlers
 import os
 import platform
+import sys
 import time
 
 from dummy_devices import (
@@ -43,6 +44,9 @@ class FishPiConfig(object):
 
         # load vehicle constants
         self._vehicle_constants = VehicleConstants()
+
+        # set import paths
+        self.setup_import_paths()
 
         # setup folders
         self.setup_dirs()
@@ -125,12 +129,6 @@ class FishPiConfig(object):
             connected devices are specified. The resources are imported
             dynamically and the device drivers are set up. """
 
-        # # setup folders
-        # self.setup_dirs()
-
-        # # setup logging
-        # self.setup_logging(debug)
-
         # only configure devices for Linux
         if not(platform.system() == "Linux"):
             logging.info("CFG:\tNot running on Linux distro. " +
@@ -161,6 +159,14 @@ class FishPiConfig(object):
 
         # Add dummies for devices that are still missing.
         self._set_dummy_devices()
+
+    def setup_import_paths(self):
+        """ Set import paths for external import """
+        # general path for all drivers (problematic because many modules in
+        # the Adafruit don't have __init__.py files)
+        sys.path.append('../external/adafruit/')
+        sys.path.append('../external/adafruit/Adafruit_I2C')
+        sys.path.append('../external/adafruit/Adafruit_PWM_Servo_Driver')
 
     def setup_dirs(self):
         """ Create directories """

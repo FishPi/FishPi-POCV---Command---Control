@@ -20,7 +20,7 @@ import logging
 from datetime import datetime
 
 # from Adafruit_I2C import Adafruit_I2C
-from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
+from Adafruit_I2C import Adafruit_I2C
 
 class GPS_NavigatronSensor:
     """ GPS Navigatron over I2C. """

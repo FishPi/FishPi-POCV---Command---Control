@@ -9,7 +9,7 @@
 # Adafruit i2c library (and others) at https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
 
 # from Adafruit_I2C import Adafruit_I2C
-from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
+from Adafruit_I2C import Adafruit_I2C
 
 class TemperatureSensor:
     """ Temperature Sensor using Tmp102 TI chip over I2C """

@@ -22,7 +22,7 @@
 
 import logging
 # from Adafruit_I2C import Adafruit_I2C
-from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
+from Adafruit_I2C import Adafruit_I2C
 
 class Cmps10_Sensor:
     """ Tilt adjusted Compass sensor CMP10 over I2C. """

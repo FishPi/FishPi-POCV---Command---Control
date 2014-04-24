@@ -21,7 +21,7 @@
 import logging
 
 # from Adafruit_I2C import Adafruit_I2C
-from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
+from Adafruit_I2C import Adafruit_I2C
 
 class DriveController(object):
     """ Provides drive and steering control abstraction from eg PWM servo or ESC devices. """
@@ -129,7 +129,7 @@ class AdafruitDriveController(DriveController):
         self.prop_channel = prop_channel
         self.servo_channel = servo_channel
         # Initialise the PWM device
-        from Adafruit.PWM_Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
+        from Adafruit_PWM_Servo_Driver import PWM
         # self._pwm = PWM(i2c_addr, i2c_bus=int(hw_interface), debug=debug)
         self._pwm = PWM(i2c_addr, debug=debug)
         self._pwm.setPWMFreq(self.ic_pwm_freq)

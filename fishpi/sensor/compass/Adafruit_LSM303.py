@@ -26,8 +26,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-# from Adafruit_I2C import Adafruit_I2C
-from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
+from Adafruit_I2C import Adafruit_I2C
 
 
 class Adafruit_LSM303(Adafruit_I2C):

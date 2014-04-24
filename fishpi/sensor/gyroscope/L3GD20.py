@@ -10,7 +10,7 @@
 # Copyright for the Adafruit libraries used here and the original L3GD20 library 
 # for Arduino by Adafruit Industries.
 
-from Adafruit.I2C.Adafruit_I2C import Adafruit_I2C
+from Adafruit_I2C import Adafruit_I2C
 import logging
 
 
