@@ -120,17 +120,18 @@ class FishPiKernel:
     
     def capture_img(self):
         self._camera_controller.capture_now()
-    
-    def get_capture_img_enabled(self):
-        return self._camera_controller.enabled
-    
-    def set_capture_img_enabled(self, capture_img_enabled):
-        self._camera_controller.enabled = capture_img_enabled
-    
-    @property
-    def last_img(self):
-        return self._camera_controller.last_img
-        
+
+    # DEACTIVATED FOR NOW UNTIL NEW LIB IS USABLE
+    # def get_capture_img_enabled(self):
+    #     return self._camera_controller.enabled
+
+    # def set_capture_img_enabled(self, capture_img_enabled):
+    #     self._camera_controller.enabled = capture_img_enabled
+
+    # @property
+    # def last_img(self):
+    #     return self._camera_controller.last_img
+
     # Sensors
     
     def read_time(self):
