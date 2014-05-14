@@ -134,24 +134,24 @@ class FishPiConfig(object):
             logging.info("CFG:\tNot running on Linux distro. " +
                 "Not configuring i2c or other devices.")
             self._set_dummy_devices()
-            return
+            return False
 
         device_conf = self.load_config_file('devices.conf')
         if device_conf is None:
-            return
+            return False
 
         if not 'Platform' in device_conf:
             logging.error("CFG:\tSection \"Platform\" not found in " +
                 "config file. Only adding dummy devices.")
             self._set_dummy_devices()
-            return
+            return False
 
         # Load platform support code
         try:
             self.platform_support = self._load_platform_code(
                 device_conf['Platform'])
         except ConfigError:
-            return
+            return False
         del device_conf['Platform']  # Don't need this anymore
 
         # Load device drivers and configure hardware
@@ -159,6 +159,8 @@ class FishPiConfig(object):
 
         # Add dummies for devices that are still missing.
         self._set_dummy_devices()
+
+        return True
 
     def setup_import_paths(self):
         """ Set import paths for external import """

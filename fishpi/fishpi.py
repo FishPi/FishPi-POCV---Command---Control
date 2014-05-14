@@ -126,7 +126,8 @@ class FishPi:
     def run_headless(self):
         """ Runs in headless (manual) mode. """
         # configure
-        self.configure_devices()
+        if self.configure_devices() is False:
+            return 1    # if config failed, exit..
 
         # create controller
         kernel = FishPiKernel(self.config, debug=self.debug)

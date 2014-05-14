@@ -58,7 +58,7 @@ def deploy_fishpi():
 
 def deploy_adafruit_libs():
     with settings(warn_only=True):
-        if run("test -d %s" % code_dir).failed:
+        if run("test -d %s" % adafruit_dir).failed:
             puts("Cloning FishPi's Adafruit libraries repository...")
             sudo("git clone https://github.com/FishPi/FishPi-POCV---Command---Control.git %s" % adafruit_dir)
     with cd(adafruit_dir):
