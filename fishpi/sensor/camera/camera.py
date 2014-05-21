@@ -105,7 +105,7 @@ class CameraThread(threading.Thread):
 
     def run(self):
         server_socket = socket.socket()
-        server_socket.bind((self.server_address, self.server_port))
+        server_socket.bind((self.ip, self.port))
         server_socket.listen(0)
         # Accept a single connection and make a file-like object out of it
         connection = server_socket.accept()[0].makefile('rb')
