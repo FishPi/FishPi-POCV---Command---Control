@@ -18,9 +18,10 @@ from commands import *
 # callback interval in seconds
 callback_interval = 1
 
+
 class RPCClient(AMP):
     """ Client Protocol for rpc connection. """
-    
+
     def __init__(self):
         logging.debug("RPC:\tCreating Protocol...")
         self.factory = None
@@ -28,10 +29,10 @@ class RPCClient(AMP):
 
     def connectionMade(self):
         logging.debug("RPC:\tConnection made.")
-    
+
     def connectionLost(self, reason):
         logging.debug("RPC:\tConnection lost.")
-    
+
     def close_connection(self):
         logging.debug("RPC:\tClosing RPC connection.")
         # tell protocol factory not to attempt reconnects
@@ -44,7 +45,7 @@ class RPCClient(AMP):
         reactor.stop()
 
     # RPC Commands
-    
+
     def update(self):
         """ RPC call to get status update. """
         self.callRemote(QueryStatus).addCallback(self.status_update)
@@ -54,25 +55,25 @@ class RPCClient(AMP):
         logging.debug("RPC:\tResponse - %s" % result)
         self.data.lat = result['lat']
         self.data.lon = result['lon']
-    
+
         self.data.gps_heading = result['gps_heading']
         self.data.gps_speed = result['gps_speed']
         self.data.altitude = result['altitude']
-    
+
         self.data.fix = result['fix']
         self.data.num_sat = result['num_sat']
-    
+
         self.data.compass_heading = result['compass_heading']
-    
+
         self.data.datestamp = result['datestamp']
         self.data.timestamp = result['timestamp']
-    
+
         self.data.temperature = result['temperature']
 
     def cmd_callback(self):
         """ General callback. """
         logging.debug("RPC:\Command executed.")
-    
+
     def halt(self):
         """ RPC call to get call HaltCmd. """
         self.callRemote(HaltCmd)
@@ -80,7 +81,7 @@ class RPCClient(AMP):
     def set_manual_mode(self):
         """ RPC call to get call ModeCmd. """
         self.callRemote(ModeCmd, mode="manual")
-    
+
     def set_auto_mode(self):
         """ RPC call to get call ModeCmd. """
         self.callRemote(ModeCmd, mode="auto")
@@ -93,13 +94,18 @@ class RPCClient(AMP):
         """ RPC call to get call ManualDriveCmd (for manual drive). """
         self.callRemote(ManualDriveCmd, throttle=throttle, steering=steering)
 
+    def set_camera_mode(self, camera_cmd):
+        """ RPC call to change the camera recording mode """
+        self.callRemote(CameraCmd, camera_cmd=camera_cmd)
+
     def pulse_heartbeat(self):
         """ RPC call to get call HeartbeatCmd. """
         self.callRemote(HeartbeatCmd).addCallback(self.cmd_callback)
-    
+
     def exit(self):
         """ RPC call to get call ExitCmd. """
         self.callRemote(ExitCmd).addCallback(self.cmd_callback)
+
 
 class StatusData:
     """ Data from the rpc client calls. """
@@ -118,9 +124,11 @@ class StatusData:
         self.datestamp = dt.date()
         self.temperature = None
 
+
 class RPCClientFactory(ReconnectingClientFactory):
-    """ Factory for rpc client connection. Manages UI reference to active protocol. """
-    
+    """ Factory for rpc client connection.
+        Manages UI reference to active protocol. """
+
     def __init__(self, gui):
         self.gui = gui
         self.protocol = RPCClient
@@ -136,7 +144,7 @@ class RPCClientFactory(ReconnectingClientFactory):
         rpc_protocol.factory = self
         self.gui.set_rpc_client(rpc_protocol)
         return rpc_protocol
-    
+
     def clientConnectionLost(self, transport, reason):
         logging.debug("RPC:\tConnection lost - %s" % reason)
         self.gui.lost_rpc_client()

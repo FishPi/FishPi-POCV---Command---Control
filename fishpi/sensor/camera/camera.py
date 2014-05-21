@@ -6,53 +6,69 @@
 # PiCameraController - Provides access to the
 # RaspberryPi cam via the PiCamera lib.
 #
-# Features:
+# Current State:
+# - Can continously take pictures and send them over a network
+#
+# Future Features:
 # - Is configured like any other sensor
 # - Can take pictures on demand (capture())
 # - Can take continously take pictures (with adjustable interval)
 # - Can capture video and stream it via MJPEG (with adjustable quality)
 # - Both images and video can be send somewhere and/or saved to memory
 
+
 from __future__ import with_statement
 import io
 import logging
 import picamera
+import socket
+import struct
 import time
 import threading
 
 
+class CameraConfigError(Exception):
+    pass
+
+
 class CameraController(object):
     _cam_thread = None
-    _stream = None
 
-    def __init__(self, interface="", hw_interface=None, debug=False, **kwargs):
-        self.configure(**kwargs)
-        pass  # configuration?? what is that?
 
-    @property
-    def stream(self):
-        return self._stream
+    def __init__(self, interface="", hw_interface=None, debug=False, server='0.0.0.0', port='8000'):
+        self.server = server
+        self.port = port
+        self.debug = debug
+        self.configure()
 
-    def configure(self, **kwargs):
+    def set_mode(self, camera_cmd):
+        """ External command interface. More commands to be added later """
+        logging.info("CAM:\tReceived command %s" % camera_cmd)
+        if camera_cmd == "start_image_capture":
+            self.start_image_capture()
+        elif camera_cmd == "stop_image_capture":
+            self.stop_image_capture()
+
+    def configure(self):
         logging.info("CAM:\tConfiguring PiCamera")
-        self._stream = io.BytesIO()
-        self.lock = threading.Lock()
-        self._cam_thread = CameraThread(self.lock, self._stream)
-        # later thread's config could be called here with kwargs
+
+        # self.lock = threading.Lock()
+        self._cam_thread = CameraThread(self.server, self.port)
         self._cam_thread.start()
+        if self.debug:
+            self.start_image_capture()  # in debug always record
 
     def clean_up(self):
         logging.info("CAM:\tCleaning up")
+        if self._cam_thread is None:
+            logging.error("CAM:\tNot configured correctly")
+            return
+        self._cam_thread.stop = True
         self._cam_thread.join()
 
     def capture_now(self):
         """ Captures a picture with the current configuration
             and sends it out """
-        if self._cam_thread is None:
-            logging.error("CAM:\tNot configured correctly")
-            return
-        self.lock.aquire()
-        self._cam_thread.take_single_image = True
 
     def start_video_capture(self):
         """ Starts the video capture with the current configuration """
@@ -64,40 +80,62 @@ class CameraController(object):
 
     def start_image_capture(self):
         """ Starts continous image capture with the current configuration """
-        pass
+        if self._cam_thread is None:
+            logging.error("CAM:\tNot configured correctly")
+            return
+        if not self._cam_thread.is_alive():
+            self._cam_thread.start()
+        self._cam_thread.stop = False
 
     def stop_image_capture(self):
         """ Stops a running continous image captureing """
-        pass
+        if self._cam_thread is None:
+            logging.error("CAM:\tNot configured correctly")
+            return
+        self._cam_thread.stop = True
 
 
 class CameraThread(threading.Thread):
-    take_single_image = False
-    start_cont_image_capture = False
-    stop_cont_image_capture = False
-    start_video_capture = False
-    stop_video_capture = False
-    heating_up = False
 
-    def __init__(self, lock, stream):
+    def __init__(self, server_address, server_port):
         threading.Thread.__init__(self)
-        self.lock = lock
-        self.stream = stream
-        self.configure()
+        self.ip = server_address
+        self.port = server_port
+        self.stop = True
 
     def run(self):
-        """ Check the state variables and take the appropriate actions """
-        if self.stream is None:
-            self.configure()
-        self.lock.aquire()
-        if self.take_single_image:
-            with picamera.PiCamera() as camera:
-                camera.start_preview()
-                camera.capture(self.stream, 'jpeg')
-            self.take_single_image = False
-        self.lock.release()
-        time.sleep(0.5)
+        server_socket = socket.socket()
+        server_socket.bind((self.server_address, self.server_port))
+        server_socket.listen(0)
+        # Accept a single connection and make a file-like object out of it
+        connection = server_socket.accept()[0].makefile('rb')
 
-    def configure(self, **kwargs):
-        with picamera.PiCamera() as camera:
-            camera.resolution = (640, 480)
+        while self.stop:
+            time.sleep(1)
+
+        try:
+            with picamera.PiCamera() as camera:
+                camera.resolution = (640, 480)
+                # Start a preview and let the camera warm up for 2 seconds
+                camera.start_preview()
+                time.sleep(2)
+                stream = io.BytesIO()
+                for foo in camera.capture_continuous(stream, 'jpeg'):
+                    # Write the length of the capture to the stream and flush to
+                    # ensure it actually gets sent
+                    connection.write(struct.pack('<L', stream.tell()))
+                    connection.flush()
+                    # Rewind the stream and send the image data over the wire
+                    stream.seek(0)
+                    connection.write(stream.read())
+                    # When stop is set, get out.
+                    if self.stop:
+                        break
+                    # Reset the stream for the next capture
+                    stream.seek(0)
+                    stream.truncate()
+            # Write a length of zero to the stream to signal we're done
+            connection.write(struct.pack('<L', 0))
+        finally:
+            connection.close()
+            server_socket.close()

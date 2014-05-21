@@ -20,27 +20,28 @@ from model_data import POCVModelData
 from control.navigation import NavigationUnit
 from perception.world import PerceptionUnit
 
+
 class FishPiKernel:
     """ Coordinator between different layers. """
-    
+
     def __init__(self, config, debug=False):
         self.config = config
         self.debug = debug
-        
+
         # pull over all hw devices (or proxies) from config
-        
+
         # sensors
         self._gps_sensor = config.gps_sensor
         self._compass_sensor = config.compass_sensor
         self._accelerometer_sensor = config.accelerometer_sensor
         self._gyro_sensor = config.gyro_sensor
         self._temperature_sensor = config.temperature_sensor
-        
+
         self._vehicle_constants = config.vehicle_constants
-        
+
         # vehicle
         self._drive_controller = config.drive_controller
-        
+
         # camera
         self._camera_controller = config.camera_controller
 
@@ -50,7 +51,7 @@ class FishPiKernel:
         # supporting classes
         self._perception_unit = PerceptionUnit(self._vehicle_constants, self.data)
         self._navigation_unit = NavigationUnit(self._perception_unit, self._drive_controller, self._vehicle_constants)
-        
+
     def update(self):
         """ Update loop for sensors->perception->control(->vehicle). """
         try:
@@ -94,7 +95,7 @@ class FishPiKernel:
         except Exception as ex:
             self.data.has_temperature = False
             logging.exception("CORE:\tError in update loop (TEMPERATURE) - %s" % ex)
-        
+
         try:
             self.capture_img()
         except Exception as ex:
@@ -104,42 +105,50 @@ class FishPiKernel:
             self._perception_unit.update(self.data)
         except Exception as ex:
             logging.exception("CORE:\tError in update loop (PERCEPTION) - %s" % ex)
-        
+
         try:
             self._navigation_unit.update()
         except Exception as ex:
             logging.exception("CORE:\tError in update loop (NAVIGATION) - %s" % ex)
-        
-            
+
     # Devices
-    
+
     def list_devices(self):
         logging.info("CORE:\tListing devices...")
         for device in self.config.devices:
             logging.info(device)
-    
-    def capture_img(self):
-        self._camera_controller.capture_now()
 
-    # DEACTIVATED FOR NOW UNTIL NEW LIB IS USABLE
-    # def get_capture_img_enabled(self):
-    #     return self._camera_controller.enabled
+    def get_capture_img_enabled(self):
+        return self._camera_controller.enabled
 
-    # def set_capture_img_enabled(self, capture_img_enabled):
-    #     self._camera_controller.enabled = capture_img_enabled
+    def set_camera_mode(self, camera_cmd):
+        if not isinstance(camera_cmd, basestring):
+            logging.error("CORE:\tCamera command needs to be string")
+            return
+        self._camera_controller.set_mode(camera_cmd)
+
+    # Can later be shortcut methods for the above one
+    # def capture_img(self):
+    #     self._camera_controller.capture_now()
+
+    # def start_capture_img(self):
+    #     self._camera_controller.start_image_capture()
+
+    # def stop_capture_img(self):
+    #     self._camera_controller.stop_image_capture()
 
     # @property
     # def last_img(self):
     #     return self._camera_controller.last_img
 
     # Sensors
-    
+
     def read_time(self):
         dt = datetime.today()
         self.data.timestamp = dt.time()
         self.data.datestamp = dt.date()
         self.data.has_time = True
-    
+
     def read_GPS(self):
         if self._gps_sensor:
             (fix, lat, lon, heading, speed, altitude, num_sat, timestamp, datestamp) = self._gps_sensor.read_sensor()
@@ -212,16 +221,16 @@ class FishPiKernel:
     def set_speed(self, speed):
         """ Commands the NavigationUnit to set and hold a given speed. """
         self._navigation_unit.set_speed(speed)
-    
+
     def set_heading(self, heading):
         """ Commands the NavigationUnit to set and hold a given heading. """
         self._navigation_unit.set_heading(heading)
-    
+
     def navigate_to(self):
         """ Commands the NavigationUnit to commence navigation of a route. """
         #self.navigation_unit.NavigateTo(route)
         pass
-    
+
     def halt(self):
         """ Commands the NavigationUnit and Drive Control to Halt! """
         self._navigation_unit.stop()

@@ -109,17 +109,17 @@ class RPCHost(AMP):
         if ts:
             ts = ts.isoformat()
 
-        status = { 'fix' : self._kernel.data.fix,
-            'lat' : self._kernel.data.lat,
-            'lon' : self._kernel.data.lon,
-            'gps_heading' : self._kernel.data.gps_heading,
-            'gps_speed' : self._kernel.data.speed,
-            'altitude' : self._kernel.data.altitude,
-            'num_sat' : self._kernel.data.num_sat,
-            'timestamp' : ts,
-            'datestamp' : dt,
-            'compass_heading' : self._kernel.data.compass_heading,
-            'temperature' : self._kernel.data.temperature}
+        status = {'fix': self._kernel.data.fix,
+            'lat': self._kernel.data.lat,
+            'lon': self._kernel.data.lon,
+            'gps_heading': self._kernel.data.gps_heading,
+            'gps_speed': self._kernel.data.speed,
+            'altitude': self._kernel.data.altitude,
+            'num_sat': self._kernel.data.num_sat,
+            'timestamp': ts,
+            'datestamp': dt,
+            'compass_heading': self._kernel.data.compass_heading,
+            'temperature': self._kernel.data.temperature}
         #print status
         return status
 
@@ -129,18 +129,25 @@ class RPCHost(AMP):
         self._heartbeat.pulse()
         self._kernel.set_speed(speed)
         self._kernel.set_heading(heading)
-        return {'status':True}
-        
+        return {'status': True}
+
     @ManualDriveCmd.responder
     def set_drive(self, throttle, steering):
         """ Direct drive. """
         self._heartbeat.pulse()
         # throttle
         self._kernel.set_throttle(throttle)
-        
+
         # steering
         self._kernel.set_steering(steering)
-        return {'status':True}
+        return {'status': True}
+
+    @CameraCmd.responder
+    def set_camera_mode(self, camera_cmd):
+        """ Set the camera recording mode """
+        self._heartbeat.pulse()  # why this?
+        self._kernel.set_camera_mode(camera_cmd)
+        return {'status': True}  # maybe this should at some point become a real command status
 
     @ExitCmd.responder
     def exit_cmd(self):
