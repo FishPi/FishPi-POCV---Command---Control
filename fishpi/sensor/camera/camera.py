@@ -55,7 +55,7 @@ class CameraController(object):
         # self.lock = threading.Lock()
         self._cam_thread = CameraThread(self.server, self.port)
         self._cam_thread.daemon = True
-        self._cam_thread.start()
+        # self._cam_thread.start()
         if initial_mode is not None:
             self.set_mode(initial_mode)
 
@@ -86,8 +86,8 @@ class CameraController(object):
             logging.error("CAM:\tNot configured correctly")
             return
         if not self._cam_thread.is_alive():
+            self._cam_thread.stop = False
             self._cam_thread.start()
-        self._cam_thread.stop = False
 
     def stop_image_capture(self):
         """ Stops a running continous image captureing """

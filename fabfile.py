@@ -43,7 +43,7 @@ def install_requirements():
         sudo("pip install -r requirements.txt")
 
 
-def deploy_fishpi():
+def deploy_fishpi(system=""):
     if not package_installed('git'):
         install('git')
 
@@ -54,6 +54,12 @@ def deploy_fishpi():
     with cd(code_dir):
         puts("Pulling newest changes from FishPi repository...")
         sudo("git pull")
+
+        # now let's create the right devices.conf for the system
+        if system.lower == "rpi" or system.lower == "raspberry" or system.lower == "raspberrypi":
+            sudo("cp --remove-destination device_rpi.conf device.conf")
+        elif system.lower == "bbb" or system.lower == "beaglebone" or system.lower == "beagleboneblack":
+            sudo("cp --remove-destination device_bbb.conf device.conf")
 
 
 def deploy_adafruit_libs():
@@ -70,7 +76,7 @@ def prepare_deploy():
     push()
 
 
-def full_install():
-    deploy_fishpi()
+def full_install(system=""):
+    deploy_fishpi(system)
     deploy_adafruit_libs()
     install_requirements()
