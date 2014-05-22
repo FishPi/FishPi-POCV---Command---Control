@@ -56,10 +56,13 @@ def deploy_fishpi(system=""):
         sudo("git pull")
 
         # now let's create the right devices.conf for the system
-        if system.lower == "rpi" or system.lower == "raspberry" or system.lower == "raspberrypi":
-            sudo("cp --remove-destination device_rpi.conf device.conf")
-        elif system.lower == "bbb" or system.lower == "beaglebone" or system.lower == "beagleboneblack":
-            sudo("cp --remove-destination device_bbb.conf device.conf")
+        system = system.lower()
+        if system == "rpi" or system == "raspberry" or system == "raspberrypi":
+            puts("Creating devices.conf for RaspberryPi...")
+            sudo("cp --remove-destination fishpi/devices_rpi.conf fishpi/devices.conf")
+        elif system == "bbb" or system == "beaglebone" or system == "beagleboneblack":
+            puts("Creating devices.conf for BeagleBone Black...")
+            sudo("cp --remove-destination fishpi/devices_bbb.conf fishpi/devices.conf")
 
 
 def deploy_adafruit_libs():
