@@ -96,10 +96,10 @@ class FishPiKernel:
             self.data.has_temperature = False
             logging.exception("CORE:\tError in update loop (TEMPERATURE) - %s" % ex)
 
-        try:
-            self.capture_img()
-        except Exception as ex:
-            logging.exception("CORE:\tError in update loop (CAMERA) - %s" % ex)
+        # try:
+        #     self.capture_img()
+        # except Exception as ex:
+        #     logging.exception("CORE:\tError in update loop (CAMERA) - %s" % ex)
 
         try:
             self._perception_unit.update(self.data)

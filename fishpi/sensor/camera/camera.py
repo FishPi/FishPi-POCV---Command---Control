@@ -35,11 +35,11 @@ class CameraController(object):
     _cam_thread = None
 
 
-    def __init__(self, interface="", hw_interface=None, debug=False, server='0.0.0.0', port='8000'):
+    def __init__(self, interface="", hw_interface=None, debug=False, server='0.0.0.0', port='8000', initial_mode=None):
         self.server = server
-        self.port = port
+        self.port = int(port)
         self.debug = debug
-        self.configure()
+        self.configure(initial_mode)
 
     def set_mode(self, camera_cmd):
         """ External command interface. More commands to be added later """
@@ -49,14 +49,15 @@ class CameraController(object):
         elif camera_cmd == "stop_image_capture":
             self.stop_image_capture()
 
-    def configure(self):
+    def configure(self, initial_mode):
         logging.info("CAM:\tConfiguring PiCamera")
 
         # self.lock = threading.Lock()
         self._cam_thread = CameraThread(self.server, self.port)
+        self._cam_thread.daemon = True
         self._cam_thread.start()
-        if self.debug:
-            self.start_image_capture()  # in debug always record
+        if initial_mode is not None:
+            self.set_mode(initial_mode)
 
     def clean_up(self):
         logging.info("CAM:\tCleaning up")
@@ -80,6 +81,7 @@ class CameraController(object):
 
     def start_image_capture(self):
         """ Starts continous image capture with the current configuration """
+        logging.info("CAM:\tStarting image capture")
         if self._cam_thread is None:
             logging.error("CAM:\tNot configured correctly")
             return
@@ -89,6 +91,7 @@ class CameraController(object):
 
     def stop_image_capture(self):
         """ Stops a running continous image captureing """
+        logging.info("CAM:\tStopping image capture")
         if self._cam_thread is None:
             logging.error("CAM:\tNot configured correctly")
             return
@@ -104,6 +107,7 @@ class CameraThread(threading.Thread):
         self.stop = True
 
     def run(self):
+        logging.info("CAM:\tCamera thread running")
         server_socket = socket.socket()
         server_socket.bind((self.ip, self.port))
         server_socket.listen(0)
