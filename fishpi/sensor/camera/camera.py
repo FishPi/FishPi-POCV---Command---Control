@@ -20,6 +20,7 @@
 from __future__ import with_statement
 import io
 import logging
+import os
 import socket
 import struct
 import time
@@ -34,7 +35,7 @@ class CameraController(object):
         self.server = server
         self.port = int(port)
         self.debug = debug
-        self.configure(initial_mode)
+        self.set_up(initial_mode)
         self.enabled = True  # what's this for? The Kernel wants it, but why?
 
     def set_up(self, initial_mode):
@@ -112,10 +113,14 @@ class CameraThread(threading.Thread):
 
         try:
             while not self.stop:
+                # Make sure mode if 'demo' if lock is set
+                if self.demo_lock is True:
+                    self.mode = 'demo'
+
                 if self.mode == 'stop':
                     time.sleep(1)
-                elif self.demo_lock:
-                    self.mode = 'demo'
+                elif self.mode == 'demo':
+                    logging.debug("CAM:\tRunning demo mode...")
                     self._demo_mode(connection)
                 elif self.mode == 'continous':
                     self._capture_continuous(connection)
@@ -168,7 +173,9 @@ class CameraThread(threading.Thread):
 
     def _demo_mode(self, connection):
         """ Continuously broadcast a demo image """
-        stream = io.open('test.bmp', 'rb')
+        os.abspath(__name__)
+        stream = io.open(os.path.dirname(os.path.abspath(__file__)) +
+            'test.bmp', 'rb')
         stream.seek(0, 2)
 
         while self.mode == 'demo':

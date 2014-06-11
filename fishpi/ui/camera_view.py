@@ -17,7 +17,7 @@ import wx
 
 class CameraPanel(wx.Panel):
 
-    def __init__(self, parent, server, port=8000, enabled=True):
+    def __init__(self, parent, server, port=8001, enabled=True):
         wx.Panel.__init__(self, parent,
             size=(320, 240), style=wx.SUNKEN_BORDER)
         self.enabled = enabled

@@ -29,6 +29,7 @@ from localconfig import FishPiConfig
 
 FISH_PI_VERSION = 0.2
 
+
 class FishPiRunMode:
     Inactive = 'inactive'
     Local = 'local'
@@ -36,6 +37,7 @@ class FishPiRunMode:
     Remote = 'remote'
     Auto = 'auto'
     Modes = [Inactive, Local, Manual, Remote, Auto]
+
 
 class FishPi:
     """ Entrypoint and setup class. """
@@ -50,11 +52,11 @@ class FishPi:
         parser.add_argument("--version", action='version', version='%(prog)s {0}'.format(FISH_PI_VERSION))
         parser.add_argument("-s", "--server", help="server for remote device", default="raspberrypi.local", type=str, action='store')
         parser.add_argument("-dp", "--devport", help="port for device rpc", default=2040, type=int, action='store')
-        parser.add_argument("-cp", "--camport", help="port for camera stream", default=8080, type=int, action='store')
-        
+        parser.add_argument("-cp", "--camport", help="port for camera stream", default=8001, type=int, action='store')
+
         # TODO - add further arguments here
-        #parser.add_argument(...)        
-        
+        #parser.add_argument(...)
+
         # and parse
         selected_args = parser.parse_args()
         self.selected_mode = selected_args.mode
@@ -65,19 +67,18 @@ class FishPi:
 
         # init rest
         logging.info("FISHPI:\tInitializing FishPi (v{0})...".format(FISH_PI_VERSION))
-    
+
     # add current working dir to include path
     sys.path.append(os.getcwd())
-    
+
     def self_check(self):
         # TODO implement check for .lastState file
         # check contents for run mode and stable exit
         logging.info("FISHPI:\tChecking last running state...")
-        
+
         # TODO check for sufficient power for normal operation
         # otherwise implement eg emergency beacon mode
         logging.info("FISHPI:\tChecking sufficient power...")
-
 
     def configure_devices(self):
         """ Configures eg i2c and other attached devices."""
@@ -107,10 +108,10 @@ class FishPi:
         if self.selected_mode == FishPiRunMode.Local:
             # configure
             self.configure_devices()
-        
+
             # create controller
             kernel = FishPiKernel(self.config, debug=self.debug)
-        
+
             # run ui loop
             logging.info("FISHPI:\tLaunching UI...")
             ui.controller.run_main_view_tk(kernel)
@@ -142,17 +143,17 @@ class FishPi:
         import web.webhost
         web.webhost.run_main_host(kernel, self.config.rpc_port)
         logging.info("FISHPI:\tProgram complete - exiting.")
-        
+
         # done
         return 0
 
     def run_auto(self):
         """ Runs in full auto mode. """
         self.configure_devices()
-        
+
         # create controller
         kernel = FishPiKernel(self.config, debug=self.debug)
-        
+
         # testing
         kernel.list_devices()
 
@@ -162,6 +163,7 @@ class FishPi:
         logging.info("FISHPI:\tNo autonomous scripts implemented - exiting.")
         # done
         return 0
+
 
 def main():
     fishPi = FishPi()
