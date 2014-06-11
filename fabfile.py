@@ -74,12 +74,19 @@ def deploy_adafruit_libs():
         puts("Pulling newest changes from FishPi's Adafruit libraries repository...")
         sudo("git pull")
 
+
+def clean_fishpi():
+    puts("Cleaning code directory...")
+    sudo("rm -r /usr/local/src/fishpi/")
+
+
 def prepare_deploy():
     commit()
     push()
 
 
 def full_install(system=""):
+    clean_fishpi()
     deploy_fishpi(system)
     deploy_adafruit_libs()
     install_requirements()
