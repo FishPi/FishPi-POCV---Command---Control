@@ -77,7 +77,8 @@ def deploy_adafruit_libs():
 
 def clean_fishpi():
     puts("Cleaning code directory...")
-    sudo("rm -r /usr/local/src/fishpi/")
+    with settings(warn_only=True):
+        sudo("rm -r /usr/local/src/fishpi/")
 
 
 def prepare_deploy():
