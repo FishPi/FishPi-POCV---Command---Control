@@ -87,7 +87,11 @@ def prepare_deploy():
 
 
 def full_install(system=""):
-    clean_fishpi()
     deploy_fishpi(system)
     deploy_adafruit_libs()
     install_requirements()
+
+
+def full_install_clean(system=""):
+    clean_fishpi()
+    full_install(system)

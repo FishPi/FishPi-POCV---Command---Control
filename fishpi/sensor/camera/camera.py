@@ -31,7 +31,7 @@ class CameraController(object):
     _cam_thread = None
     modes = ['stop', 'single', 'continuous', 'video', 'demo']
 
-    def __init__(self, interface="", hw_interface=None, debug=False, server='0.0.0.0', port='8000', initial_mode=None):
+    def __init__(self, interface="", hw_interface=None, debug=False, server='0.0.0.0', port='8001', initial_mode=None):
         self.server = server
         self.port = int(port)
         self.debug = debug
