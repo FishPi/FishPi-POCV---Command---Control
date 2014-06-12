@@ -1,1 +1,0 @@
-../../external/adafruit/Adafruit_I2C.py
